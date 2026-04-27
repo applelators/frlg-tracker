@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+const { useState, useEffect, useCallback, useMemo } = React;
 
 // ─── KANTO DEX (151) ─────────────────────────────────────────────────────────
 const DEX = [
@@ -371,7 +371,7 @@ function pct(a, b) { return b ? Math.round((a / b) * 100) : 0; }
 function groupByPart(arr) { return arr.reduce((a, x) => { (a[x.part] = a[x.part]||[]).push(x); return a; }, {}); }
 
 // ─── ROOT COMPONENT ───────────────────────────────────────────────────────────
-export default function FireRedTracker() {
+function FireRedTracker() {
   const [tab, setTab]           = useState("dex");
   const [caught, setCaught]     = useState({});  // {pokémonName: true} — GLOBAL
   const [items, setItems]       = useState({});  // {areaId|itemName: true} — area-specific
@@ -383,8 +383,8 @@ export default function FireRedTracker() {
 
   useEffect(() => {
     (async () => {
-      try { const r = await window.storage.get("fr-caught5"); if (r) setCaught(JSON.parse(r.value)); } catch {}
-      try { const r = await window.storage.get("fr-items5");  if (r) setItems(JSON.parse(r.value));  } catch {}
+      try { const r = localStorage.getItem("fr-caught5"); if (r) setCaught(JSON.parse(r)); } catch {}
+      try { const r = localStorage.getItem("fr-items5");  if (r) setItems(JSON.parse(r));  } catch {}
       setBooted(true);
     })();
   }, []);
@@ -393,7 +393,7 @@ export default function FireRedTracker() {
     setCaught(prev => {
       const next = { ...prev };
       if (next[name]) delete next[name]; else next[name] = true;
-      window.storage.set("fr-caught5", JSON.stringify(next)).catch(()=>{});
+      try { localStorage.setItem("fr-caught5", JSON.stringify(next)); } catch {}
       return next;
     });
   }, []);
@@ -402,7 +402,7 @@ export default function FireRedTracker() {
     setItems(prev => {
       const next = { ...prev };
       if (next[key]) delete next[key]; else next[key] = true;
-      window.storage.set("fr-items5", JSON.stringify(next)).catch(()=>{});
+      try { localStorage.setItem("fr-items5", JSON.stringify(next)); } catch {}
       return next;
     });
   }, []);
