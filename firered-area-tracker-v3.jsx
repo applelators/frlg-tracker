@@ -2347,9 +2347,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                             <Section title="Wild Pokémon" count={`${pokDone}/${(floor.pokemon||[]).length}`} color={C.green}
                               allDone={pokDone===(floor.pokemon||[]).length && (floor.pokemon||[]).length>0}
                               onMarkAll={() => pokDone===(floor.pokemon||[]).length ? clearAllPokemon(floor.pokemon||[]) : markAllPokemon(floor.pokemon||[])}>
-                              {!hasPoks ? <Empty text="No wild Pokémon here" /> : floor.pokemon.map((p,i) => (
-                                <PokemonEntry key={i} p={p} caught={caught} toggleCaught={toggleCaught} version={version} />
-                              ))}
+                              {!hasPoks ? <Empty text="No wild Pokémon here" /> : renderPokemonList(floor.pokemon, caught, toggleCaught, version)}
                             </Section>
                             <Section title="Items" count={`${itmDone}/${(floor.items||[]).length}`} color={C.gold}
                               allDone={itmDone===(floor.items||[]).length && (floor.items||[]).length>0}
@@ -2382,7 +2380,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                       allDone={pokeDone===areaPokemon.length && areaPokemon.length>0}
                       onMarkAll={() => pokeDone===areaPokemon.length ? clearAllPokemon(areaPokemon) : markAllPokemon(areaPokemon)}>
                       {areaPokemon.length === 0 ? <Empty text="No wild Pokémon here" /> :
-                        areaPokemon.map((p,i) => <PokemonEntry key={i} p={p} caught={caught} toggleCaught={toggleCaught} version={version} />)
+                        renderPokemonList(areaPokemon, caught, toggleCaught, version)
                       }
                     </Section>
                     <Section title="Items" count={`${itemDone}/${areaItems.length}`} color={C.gold}
@@ -2450,6 +2448,39 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers }) {
 }
 
 
+
+const METHOD_GROUP = m => {
+  if (m === "Surf") return "Surf";
+  if (m === "Old Rod" || m === "Good Rod" || m === "Super Rod") return "Fishing";
+  return null;
+};
+
+function MethodDivider({ label }) {
+  const color = label === "Surf" ? "#4a8fc4" : "#4a9fa0";
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:7, margin:"6px 0 2px" }}>
+      <div style={{ flex:1, height:1, background:C.border }} />
+      <span style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.1em", textTransform:"uppercase", color }}>{label}</span>
+      <div style={{ flex:1, height:1, background:C.border }} />
+    </div>
+  );
+}
+
+function renderPokemonList(pokemon, caught, toggleCaught, version) {
+  const items = [];
+  let lastGroup = null;
+  pokemon.forEach((p, i) => {
+    const group = METHOD_GROUP(p.method);
+    if (group && group !== lastGroup) items.push({ type:"divider", label:group, key:`div-${i}` });
+    lastGroup = group;
+    items.push({ type:"pokemon", p, key:i });
+  });
+  return items.map(item =>
+    item.type === "divider"
+      ? <MethodDivider key={item.key} label={item.label} />
+      : <PokemonEntry key={item.key} p={item.p} caught={caught} toggleCaught={toggleCaught} version={version} />
+  );
+}
 
 function PokemonEntry({ p, caught, toggleCaught, version }) {
   const isCaught = !!caught[p.name];
