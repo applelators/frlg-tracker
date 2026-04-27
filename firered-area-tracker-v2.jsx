@@ -407,7 +407,7 @@ const AREAS = [
         team:[{name:"Pidgeotto",level:19},{name:"Raticate",level:16},{name:"Kadabra",level:18}]},
     ] },
 
-  { part:"Part 6", id:"digletts-cave", name:"Diglett's Cave",
+  { part:"Part 7", id:"digletts-cave", name:"Diglett's Cave",
     note:"Simple cave between Route 2 and Route 11. Two Pokémon only.",
     pokemon:[{name:"Diglett",method:"Cave",levels:"15–22",rate:"95%"},{name:"Dugtrio",method:"Cave",levels:"29–31",rate:"5%"}],
     items:[] },
