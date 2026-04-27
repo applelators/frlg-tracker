@@ -310,9 +310,25 @@ const AREAS = [
     items:[] },
 
   { part:"Part 6", id:"route6", name:"Route 6",
-    note:"Same encounters as Route 5.",
-    pokemon:[{name:"Pidgey",method:"Grass",levels:"13–17",rate:"30%"},{name:"Mankey",method:"Grass",levels:"13–17",rate:"25%",frOnly:true},{name:"Meowth",method:"Grass",levels:"13–17",rate:"25%",lgOnly:true},{name:"Oddish",method:"Grass",levels:"13–17",rate:"20%",frOnly:true},{name:"Bellsprout",method:"Grass",levels:"13–17",rate:"20%",lgOnly:true},{name:"Jigglypuff",method:"Grass",levels:"13–17",rate:"5%"},{name:"Abra",method:"Grass",levels:"11–15",rate:"5%"}],
-    items:[{name:"Super Repel",hidden:false,note:"South portion of route"}] },
+    note:"Same Pokémon pool as Route 5. Meowth appears in both versions at 35%.",
+    pokemon:[
+      {name:"Pidgey",    method:"Grass",levels:"13–16",rate:"40%"},
+      {name:"Meowth",    method:"Grass",levels:"10–16",rate:"35%"},
+      {name:"Oddish",    method:"Grass",levels:"13–16",rate:"25%",frOnly:true},
+      {name:"Bellsprout",method:"Grass",levels:"13–16",rate:"25%",lgOnly:true},
+    ],
+    items:[
+      {name:"Rare Candy",  hidden:true,note:"Northeast hill, two steps north of gap between ledges (★ Itemfinder)"},
+      {name:"Sitrus Berry",hidden:true,note:"Northwest hill (★ Itemfinder)"},
+    ],
+    trainers:[
+      {class:"Bug Catcher",name:"Keigo",   team:[{name:"Weedle",    level:16},{name:"Caterpie",level:16},{name:"Weedle",level:16}]},
+      {class:"Camper",     name:"Ricky",   team:[{name:"Squirtle",  level:20}]},
+      {class:"Picnicker",  name:"Nancy",   team:[{name:"Rattata",   level:16},{name:"Pikachu", level:16}]},
+      {class:"Bug Catcher",name:"Elijah",  team:[{name:"Butterfree",level:20}]},
+      {class:"Picnicker",  name:"Isabelle",team:[{name:"Pidgey",    level:16},{name:"Pidgey",  level:16},{name:"Pidgey",level:16}]},
+      {class:"Camper",     name:"Jeff",    team:[{name:"Spearow",   level:16},{name:"Raticate",level:16}]},
+    ] },
 
   { part:"Part 5", id:"underground-5-6", name:"Underground Path (5↔6)",
     note:"No wild encounters. A woman gives you a nicknamed Nidoran (Ms. Nido in FR, Mr. Nido in LG) — it holds a Tiny Mushroom. A trade NPC lets you swap for the opposite gender. Both methods are version-exclusive.",
@@ -333,14 +349,63 @@ const AREAS = [
     trainers:[] },
 
   { part:"Part 6", id:"vermilion-city", name:"Vermilion City",
-    note:"Get the Old Rod here. Fan Club President gives the Bike Voucher for free — very important!",
-    pokemon:[{name:"Tentacool",method:"Surf",levels:"5–40",rate:"90%"},{name:"Tentacruel",method:"Surf",levels:"5–40",rate:"10%"},{name:"Magikarp",method:"Old Rod",levels:"5",rate:"100%"},{name:"Tentacool",method:"Good Rod",levels:"10–30"},{name:"Tentacool",method:"Super Rod",levels:"15–40"},{name:"Tentacruel",method:"Super Rod",levels:"15–40"}],
-    items:[{name:"Old Rod",hidden:false,note:"Fisherman in east house"},{name:"Bike Voucher",hidden:false,note:"Pokémon Fan Club President — exchange at Cerulean Bike Shop"}] },
+    note:"Get the Bike Voucher from the Fan Club Chairman — exchange it at Cerulean's Bike Shop. Farfetch'd trade: give a Spearow to receive Ch'Ding, which holds a Stick.",
+    pokemon:[
+      {name:"Farfetch'd",method:"Trade",  levels:"any",note:"Trade Spearow to the man near the Pokémon Center; Ch'Ding holds a Stick"},
+      {name:"Magikarp",  method:"Old Rod",levels:"5",  rate:"100%"},
+    ],
+    items:[
+      {name:"Max Ether",      hidden:true, note:"Four steps south, one step west of Pokémon Center entrance (★ Itemfinder)"},
+      {name:"Vs. Seeker",     hidden:false,note:"Pokémon Center — from the female Ace Trainer at the counter"},
+      {name:"Old Rod",        hidden:false,note:"Northwest house, from the Fishing Guru"},
+      {name:"Bike Voucher",   hidden:false,note:"Pokémon Fan Club Chairman — exchange at Cerulean City Bike Shop for the Bicycle"},
+      {name:"TM34 Shock Wave",hidden:false,note:"From Lt. Surge after defeating him"},
+    ],
+    trainers:[
+      {class:"Sailor",    name:"Dwayne",   team:[{name:"Pikachu",  level:21},{name:"Pikachu",  level:21}]},
+      {class:"Engineer",  name:"Baily",    team:[{name:"Voltorb",  level:21},{name:"Magnemite",level:21}]},
+      {class:"Gentleman", name:"Tucker",   team:[{name:"Pikachu",  level:23}]},
+      {class:"Gym Leader",name:"Lt. Surge",team:[{name:"Voltorb",  level:21},{name:"Pikachu",  level:18},{name:"Raichu",level:24}]},
+    ] },
 
   { part:"Part 6", id:"ss-anne", name:"S.S. Anne",
-    note:"⚠ ONE-TIME EVENT — ship leaves after you get HM01 Cut. Sweep all three floors before speaking to the Captain!",
+    note:"⚠ ONE-TIME EVENT — ship leaves permanently after receiving HM01 Cut. Defeat Blue on 2F and sweep all cabins before talking to the Captain! A hidden Lava Cookie in the harbour requires Surf — missable if you skip it.",
     pokemon:[],
-    items:[{name:"HM01 Cut",hidden:false,note:"From the Captain after curing his seasickness"},{name:"Potion",hidden:false,note:"Trash can, 1F east corridor"},{name:"Potion",hidden:false,note:"Trash can, 1F west corridor"},{name:"Great Ball",hidden:false,note:"Trash can, 1F"},{name:"Burn Heal",hidden:false,note:"1F cabin"},{name:"Great Ball",hidden:false,note:"Trash can, 2F"},{name:"Super Repel",hidden:false,note:"2F cabin"},{name:"Ice Heal",hidden:false,note:"2F cabin"},{name:"TM44 Rest",hidden:false,note:"Trash can, 2F"},{name:"Fresh Water",hidden:false,note:"2F"},{name:"Rare Candy",hidden:false,note:"Captain's cabin"},{name:"Ether",hidden:false,note:"B1F trash can"},{name:"Antidote",hidden:false,note:"B1F"},{name:"Full Restore",hidden:true,note:"Itemfinder, Captain's room"}] },
+    items:[
+      {name:"TM31 Brick Break",hidden:false,note:"1F, second cabin from left"},
+      {name:"Great Ball",      hidden:false,note:"1F, kitchen"},
+      {name:"Pecha Berry",     hidden:true, note:"1F, kitchen — nearest trash can to doorway (★ Itemfinder)"},
+      {name:"Cheri Berry",     hidden:true, note:"1F, kitchen — middle trash can (★ Itemfinder)"},
+      {name:"Chesto Berry",    hidden:true, note:"1F, kitchen — farthest trash can from doorway (★ Itemfinder)"},
+      {name:"Hyper Potion",    hidden:true, note:"B1F, hallway trash can near stairs to 1F (★ Itemfinder)"},
+      {name:"Super Potion",    hidden:false,note:"B1F, rightmost cabin"},
+      {name:"Ether",           hidden:false,note:"B1F, middle cabin"},
+      {name:"TM44 Rest",       hidden:false,note:"B1F, second cabin from left"},
+      {name:"Stardust",        hidden:false,note:"2F, second cabin from left"},
+      {name:"X Attack",        hidden:false,note:"2F, fourth cabin from left"},
+      {name:"HM01 Cut",        hidden:false,note:"2F, Captain's quarters — from the Captain after helping him"},
+      {name:"Lava Cookie",     hidden:true, note:"⚠ Harbour SE corner near the truck — requires Surf, only while ship is moored (★ Itemfinder)"},
+    ],
+    trainers:[
+      {class:"Gentleman",name:"Thomas", team:[{name:"Growlithe",level:18},{name:"Growlithe",level:18}]},
+      {class:"Gentleman",name:"Arthur", team:[{name:"Nidoran♂", level:19},{name:"Nidoran♀", level:19}]},
+      {class:"Lass",     name:"Ann",    team:[{name:"Pidgey",   level:18},{name:"Nidoran♀", level:18}]},
+      {class:"Youngster",name:"Tyler",  team:[{name:"Nidoran♂", level:21}]},
+      {class:"Fisherman",name:"Barny",  team:[{name:"Tentacool",level:17},{name:"Staryu",   level:17},{name:"Shellder",level:17}]},
+      {class:"Sailor",   name:"Phillip",team:[{name:"Machop",   level:20}]},
+      {class:"Sailor",   name:"Huey",   team:[{name:"Tentacool",level:18},{name:"Staryu",   level:18}]},
+      {class:"Sailor",   name:"Dylan",  team:[{name:"Horsea",   level:17},{name:"Horsea",   level:17},{name:"Horsea",  level:17}]},
+      {class:"Sailor",   name:"Duncan", team:[{name:"Horsea",   level:17},{name:"Shellder",  level:17},{name:"Tentacool",level:17}]},
+      {class:"Sailor",   name:"Leonard",team:[{name:"Shellder", level:21}]},
+      {class:"Sailor",   name:"Trevor", team:[{name:"Machop",   level:17},{name:"Tentacool",level:17}]},
+      {class:"Sailor",   name:"Edmond", team:[{name:"Machop",   level:18},{name:"Shellder",  level:18}]},
+      {class:"Fisherman",name:"Dale",   team:[{name:"Goldeen",  level:17},{name:"Goldeen",   level:17},{name:"Tentacool",level:17}]},
+      {class:"Gentleman",name:"Brooks", team:[{name:"Pikachu",  level:23}]},
+      {class:"Lass",     name:"Dawn",   team:[{name:"Rattata",  level:18},{name:"Pikachu",   level:18}]},
+      {class:"Gentleman",name:"Lamar",  team:[{name:"Growlithe",level:17},{name:"Ponyta",    level:17}]},
+      {class:"Rival",    name:"Blue",   note:"4th Pokémon is the starter strong against yours.",
+        team:[{name:"Pidgeotto",level:19},{name:"Raticate",level:16},{name:"Kadabra",level:18}]},
+    ] },
 
   { part:"Part 6", id:"digletts-cave", name:"Diglett's Cave",
     note:"Simple cave between Route 2 and Route 11. Two Pokémon only.",
@@ -546,7 +611,7 @@ const C = {
 };
 
 // Parts that have been fully audited against the Bulbapedia walkthrough — extend as each part is verified.
-const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5"]);
+const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6"]);
 
 // ─── SPRITES ─────────────────────────────────────────────────────────────────
 const DEX_ID = Object.fromEntries(DEX.map(p => [p.name, p.id]));
@@ -569,6 +634,11 @@ const ITEM_SPRITE = {
   "Bicycle":"bicycle","Nugget":"nugget",
   "Dome Fossil":"dome-fossil","Helix Fossil":"helix-fossil",
   "Powder Jar":"powder-jar","Fame Checker":"fame-checker","S.S. Ticket":"ss-ticket",
+  "Sitrus Berry":"sitrus-berry","Cheri Berry":"cheri-berry","Chesto Berry":"chesto-berry",
+  "Max Ether":"max-ether","Vs. Seeker":"vs-seeker","Old Rod":"old-rod",
+  "Bike Voucher":"bike-voucher","TM34 Shock Wave":"tm-electric","TM31 Brick Break":"tm-fighting",
+  "TM44 Rest":"tm-normal","Hyper Potion":"hyper-potion","Super Potion":"super-potion",
+  "X Attack":"x-attack","HM01 Cut":"hm01","Lava Cookie":"lava-cookie","Stardust":"stardust",
 };
 const itemSpriteUrl = name => { const s = ITEM_SPRITE[name]; return s ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${s}.png` : null; };
 
@@ -576,8 +646,9 @@ const TRAINER_CLASS_SPRITE = {
   "Bug Catcher":"bugcatcher","Camper":"camper","Lass":"lass","Youngster":"youngster",
   "Hiker":"hiker","Super Nerd":"supernerd","Team Rocket Grunt":"teamrocket",
   "Picnicker":"picnicker","Swimmer":"swimmer",
+  "Gentleman":"gentleman","Fisherman":"fisherman","Sailor":"sailor","Engineer":"engineer",
 };
-const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Blue":"blue"};
+const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Lt. Surge":"lt-surge","Blue":"blue"};
 const trainerSpriteUrl = (cls, name) => { const s = TRAINER_NAME_SPRITE[name] || TRAINER_CLASS_SPRITE[cls]; return s ? `https://play.pokemonshowdown.com/sprites/trainers/${s}.png` : null; };
 
 function pct(a, b) { return b ? Math.round((a / b) * 100) : 0; }
