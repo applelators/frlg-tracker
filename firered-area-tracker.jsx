@@ -87,17 +87,17 @@ const AREAS = [
 
   { part:"Part 2", id:"viridian-city", name:"Viridian City",
     note:"Deliver Oak's Parcel to unlock the old man's Pokémon-catching tutorial on Route 2.",
-    pokemon:[{name:"Farfetch'd",method:"Trade",levels:"any",note:"Trade your Spearow to the man in the north house"}],
-    items:[{name:"Oak's Parcel",hidden:false,note:"From the Poké Mart shopkeeper — deliver to Professor Oak in Pallet Town"},{name:"Potion",hidden:false,note:"Near the city's north exit, west of the small tree"},{name:"Teachy TV",hidden:false,note:"From the old man after delivering Oak's Parcel"}] },
+    pokemon:[],
+    items:[{name:"Oak's Parcel",hidden:false,note:"From the Poké Mart shopkeeper — deliver to Professor Oak in Pallet Town"},{name:"Potion",hidden:false,note:"Near the city's north exit, west of the small tree"},{name:"Teachy TV",hidden:false,note:"From the old man after delivering Oak's Parcel"},{name:"TM26 Earthquake",hidden:false,note:"From the Viridian Gym Leader after defeating them — not accessible until post-game"}] },
 
   { part:"Part 2", id:"route22", name:"Route 22",
-    note:"Worth visiting early — Mankey is useful against Brock. Spearow can be traded for Farfetch'd in Viridian City.",
+    note:"Worth visiting early — Mankey is useful against Brock.",
     pokemon:[{name:"Rattata",method:"Grass",levels:"2–5",rate:"45%"},{name:"Mankey",method:"Grass",levels:"2–5",rate:"45%"},{name:"Spearow",method:"Grass",levels:"3–5",rate:"10%"}],
     items:[],
     trainers:[{class:"Rival",name:"Blue",note:"Pidgey + whichever starter counters yours, both Lv.9.",team:[{name:"Pidgey",level:9}]}] },
 
-  { part:"Part 3", id:"route2-south", name:"Route 2 (South)",
-    note:"Pass-through only on first visit. Return with Cut + Boulder Badge to reach the north section and its items.",
+  { part:"Part 2", id:"route2-west", name:"Route 2 (West)",
+    note:"Pass-through on the way to Viridian Forest. Wild Pokémon are available on first visit.",
     pokemon:[{name:"Pidgey",method:"Grass",levels:"2–5",rate:"45%"},{name:"Rattata",method:"Grass",levels:"2–5",rate:"45%"},{name:"Caterpie",method:"Grass",levels:"4–5",rate:"5%"},{name:"Weedle",method:"Grass",levels:"4–5",rate:"5%"}],
     items:[] },
 
