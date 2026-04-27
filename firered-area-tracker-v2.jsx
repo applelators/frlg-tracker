@@ -243,8 +243,8 @@ const AREAS = [
       {name:"Weedle",    method:"Grass",levels:"7",    rate:"20%"},
       {name:"Pidgey",    method:"Grass",levels:"11–13",rate:"15%"},
       {name:"Abra",      method:"Grass",levels:"8–12", rate:"15%"},
-      {name:"Metapod",   method:"Grass",levels:"8",    rate:"4% FR / 1% LG"},
-      {name:"Kakuna",    method:"Grass",levels:"8",    rate:"1% FR / 4% LG"},
+      {name:"Metapod",   method:"Grass",levels:"8",    rate:"1% FR / 4% LG"},
+      {name:"Kakuna",    method:"Grass",levels:"8",    rate:"4% FR / 1% LG"},
     ],
     items:[
       {name:"Nugget",       hidden:false,note:"From the Team Rocket Grunt at the north end of Nugget Bridge"},
@@ -270,8 +270,8 @@ const AREAS = [
       {name:"Weedle",    method:"Grass",levels:"7",    rate:"20%"},
       {name:"Pidgey",    method:"Grass",levels:"11–13",rate:"15%"},
       {name:"Abra",      method:"Grass",levels:"8–12", rate:"15%"},
-      {name:"Metapod",   method:"Grass",levels:"8",    rate:"4% FR / 1% LG"},
-      {name:"Kakuna",    method:"Grass",levels:"8",    rate:"1% FR / 4% LG"},
+      {name:"Metapod",   method:"Grass",levels:"8",    rate:"1% FR / 4% LG"},
+      {name:"Kakuna",    method:"Grass",levels:"8",    rate:"4% FR / 1% LG"},
     ],
     items:[
       {name:"Elixir",          hidden:true, note:"Northwest maze near Hiker Franklin (★ Itemfinder)"},
@@ -300,13 +300,12 @@ const AREAS = [
     trainers:[{class:"Team Rocket Grunt",name:"Grunt",team:[{name:"Machop",level:17},{name:"Drowzee",level:17}]}] },
 
   { part:"Part 5", id:"route5", name:"Route 5",
-    note:"Meowth appears in both versions at 35%. Oddish is FR-only; Bellsprout is LG-only. The south gatehouse to Saffron City has a trade NPC offering Mr. Mime for Abra.",
+    note:"Meowth appears in both versions at 35%. Oddish is FR-only; Bellsprout is LG-only.",
     pokemon:[
       {name:"Pidgey",    method:"Grass",levels:"13–16",rate:"40%"},
       {name:"Meowth",    method:"Grass",levels:"10–16",rate:"35%"},
       {name:"Oddish",    method:"Grass",levels:"13–16",rate:"25%",frOnly:true},
       {name:"Bellsprout",method:"Grass",levels:"13–16",rate:"25%",lgOnly:true},
-      {name:"Mr. Mime",  method:"Trade",levels:"any",note:"Trade Abra to the man in the south gatehouse to Saffron City"},
     ],
     items:[] },
 
@@ -318,10 +317,8 @@ const AREAS = [
   { part:"Part 5", id:"underground-5-6", name:"Underground Path (5↔6)",
     note:"No wild encounters. A woman gives you a nicknamed Nidoran (Ms. Nido in FR, Mr. Nido in LG) — it holds a Tiny Mushroom. A trade NPC lets you swap for the opposite gender. Both methods are version-exclusive.",
     pokemon:[
-      {name:"Nidoran♀",method:"Gift",  levels:"any",frOnly:true,note:"Ms. Nido (FR) — from the woman in the tunnel; holds Tiny Mushroom"},
-      {name:"Nidoran♂",method:"Trade", levels:"any",frOnly:true,note:"Trade Nidoran♀ (Ms. Nido) with the trade NPC in the tunnel"},
-      {name:"Nidoran♂",method:"Gift",  levels:"any",lgOnly:true,note:"Mr. Nido (LG) — from the woman in the tunnel; holds Tiny Mushroom"},
-      {name:"Nidoran♀",method:"Trade", levels:"any",lgOnly:true,note:"Trade Nidoran♂ (Mr. Nido) with the trade NPC in the tunnel (LG)"},
+      {name:"Nidoran♀",method:"Gift",levels:"any",frOnly:true,note:"Ms. Nido (FR) — from the woman in the tunnel; holds Tiny Mushroom"},
+      {name:"Nidoran♂",method:"Gift",levels:"any",lgOnly:true,note:"Mr. Nido (LG) — from the woman in the tunnel; holds Tiny Mushroom"},
     ],
     items:[
       {name:"Tiny Mushroom",hidden:false,note:"Held by the gift Nidoran (Ms. Nido / Mr. Nido)"},
