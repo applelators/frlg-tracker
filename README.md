@@ -8,10 +8,11 @@ An interactive tracker built to support a **100% completion + Living Dex** run o
 
 | File | Description |
 |---|---|
-| `firered-area-tracker-v2.jsx` | Main tracker (web) — visually redesigned version rendered by `index.html` |
-| `firered-area-tracker.jsx` | Main tracker (Claude.ai) — original version kept as a React artifact fallback |
+| `firered-area-tracker-v3.jsx` | Main tracker (web) — v3 visual redesign rendered by `index.html` |
+| `firered-area-tracker-v2.jsx` | Previous version — kept as reference/fallback |
+| `firered-area-tracker.jsx` | Original version — kept as a React artifact fallback for Claude.ai |
 | `firered-walkthrough-tracker.jsx` | Simpler walkthrough milestone checklist + 151-Pokémon Living Dex grid |
-| `index.html` | Web entry point — loads DM Sans from Google Fonts and renders v2 |
+| `index.html` | Web entry point — loads DM Sans from Google Fonts and renders v3 |
 
 ---
 
@@ -37,13 +38,20 @@ Connect the GitHub repo to Cloudflare Pages with no build command and no output 
 
 ## Features
 
-- **Pokédex tab** — full 151-Pokémon grid with sprites; click any Pokémon to see a larger sprite, its caught status, and every area it appears in with encounter method, level range, and rate
-- **Areas tab** — audited areas covering Pallet Town through Pewter City, each with:
-  - All wild Pokémon encounters with sprites, encounter rates, and FireRed / LeafGreen differences noted
+- **FR / LG version toggle** — declare your version in the header; accent color switches between FireRed orange and LeafGreen green, and the other version's exclusive encounters dim automatically
+- **Gym badge strip** — eight clickable badge icons in the header; earned badges glow and persist across sessions
+- **Areas tab** — audited areas covering Pallet Town through Fuchsia City (Parts 1–10), each with:
+  - All wild Pokémon encounters with sprites, encounter rates, and FR / LG differences noted
   - All obtainable items with sprites — both visible and hidden (★ = requires Itemfinder)
   - All trainers with trainer class sprites and full Pokémon teams (species, sprite, and level), checkable as defeated
   - FireRed-exclusive and LeafGreen-exclusive tags on relevant encounters
   - Warnings on one-time-only encounters (Snorlax ×2, legendaries, etc.)
+  - Multi-floor areas (Mt. Moon, Rock Tunnel, S.S. Anne, Safari Zone, etc.) organised floor-by-floor with collapsible sections
+  - Mark-all / clear buttons on each section header
+  - Area-type color coding in the sidebar (route / cave / water / safari / special / city)
+  - ← → navigation arrows in the area detail header for sequential stepping
+- **Pokédex tab** — full 151-Pokémon grid with sprites; uncaught Pokémon shown as black silhouettes; click any Pokémon to see its caught status and every area it appears in
+- **Living Dex panel** — collapsible panel listing trade evolutions, fossil choices, Fighting Dojo, version exclusives, and event Pokémon with their caught state
 - **Shared Pokémon state** — catching a Pokémon in any area marks it caught everywhere, including the Pokédex tab
 - **Progress saved automatically** between sessions via browser localStorage
 
@@ -84,17 +92,19 @@ Key things to plan around:
 
 ---
 
-## Design (v2)
+## Design (v3)
 
-The web version (`firered-area-tracker-v2.jsx`) uses a fully redesigned visual system:
+The web version (`firered-area-tracker-v3.jsx`) introduces a dual-version identity system and several visual improvements:
 
-- **Palette** — deep warm near-black backgrounds (`#110d08`) with a FireRed orange accent (`#d4621a`), amber for items, sage green for caught state, and soft violet for event Pokémon
+- **Palette** — deep warm near-black backgrounds (`#110d08`) with a dynamic accent: FireRed orange `#d4621a` or LeafGreen green `#3fa84a`, switching via a header toggle and applied via CSS custom property `--frlg-accent`
 - **Typography** — [DM Sans](https://fonts.google.com/specimen/DM+Sans) (400/600/700) for all UI text; Courier New kept only for Pokédex numbers
+- **Silhouettes** — uncaught Pokémon sprites render as full black silhouettes (`brightness(0)`) at reduced opacity, faithful to the in-game Pokédex
 - **Encounter rate tiers** — sky blue ≥ 30%, golden yellow ≥ 10%, soft violet < 10%; split FR/LG rates rendered as stacked color-coded pill badges
-- **Checkboxes** — explicit 14×14px checkbox on every row; done rows dim to 40% opacity with strikethrough
-- **Sprites** — uncaught Pokémon sprites are desaturated and dimmed; caught sprites render at full opacity
+- **Area-type sidebar colors** — routes (green), caves/forests/towers (tan), water/ships (blue), Safari Zone (bright green), special areas (violet), cities (gold)
+- **Collapsible floor sections** — multi-floor areas show a collapse toggle on each floor divider with done/total count
+- **Mark-all buttons** — each section header (Wild Pokémon / Items / Trainers) includes a one-click mark-all / clear button
 
-The v1 file (`firered-area-tracker.jsx`) retains the original styling for Claude.ai artifact use. localStorage keys are identical between versions — save data is fully compatible.
+The v2 file (`firered-area-tracker-v2.jsx`) is kept as a reference. localStorage keys are compatible between versions — save data carries over.
 
 ---
 
