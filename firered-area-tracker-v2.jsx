@@ -385,43 +385,68 @@ const AREAS = [
     ] },
 
   { part:"Part 6", id:"ss-anne", name:"S.S. Anne",
-    note:"⚠ ONE-TIME EVENT — ship leaves permanently after receiving HM01 Cut. Defeat Blue on 2F and sweep all cabins before talking to the Captain! A hidden Lava Cookie in the harbour requires Surf — missable if you skip it.",
-    pokemon:[],
-    items:[
-      {name:"TM31 Brick Break",hidden:false,note:"1F, second cabin from left"},
-      {name:"Great Ball",      hidden:false,note:"1F, kitchen"},
-      {name:"Pecha Berry",     hidden:true, note:"1F, kitchen — nearest trash can to doorway (★ Itemfinder)"},
-      {name:"Cheri Berry",     hidden:true, note:"1F, kitchen — middle trash can (★ Itemfinder)"},
-      {name:"Chesto Berry",    hidden:true, note:"1F, kitchen — farthest trash can from doorway (★ Itemfinder)"},
-      {name:"Hyper Potion",    hidden:true, note:"B1F, hallway trash can near stairs to 1F (★ Itemfinder)"},
-      {name:"Super Potion",    hidden:false,note:"B1F, rightmost cabin"},
-      {name:"Ether",           hidden:false,note:"B1F, middle cabin"},
-      {name:"TM44 Rest",       hidden:false,note:"B1F, second cabin from left"},
-      {name:"Stardust",        hidden:false,note:"2F, second cabin from left"},
-      {name:"X Attack",        hidden:false,note:"2F, fourth cabin from left"},
-      {name:"HM01 Cut",        hidden:false,note:"2F, Captain's quarters — from the Captain after helping him"},
-      {name:"Lava Cookie",     hidden:true, note:"⚠ Harbour SE corner near the truck — requires Surf, only while ship is moored (★ Itemfinder)"},
-    ],
-    trainers:[
-      {class:"Gentleman",name:"Thomas", team:[{name:"Growlithe",level:18},{name:"Growlithe",level:18}]},
-      {class:"Gentleman",name:"Arthur", team:[{name:"Nidoran♂", level:19},{name:"Nidoran♀", level:19}]},
-      {class:"Lass",     name:"Ann",    team:[{name:"Pidgey",   level:18},{name:"Nidoran♀", level:18}]},
-      {class:"Youngster",name:"Tyler",  team:[{name:"Nidoran♂", level:21}]},
-      {class:"Fisherman",name:"Barny",  team:[{name:"Tentacool",level:17},{name:"Staryu",   level:17},{name:"Shellder",level:17}]},
-      {class:"Sailor",   name:"Phillip",team:[{name:"Machop",   level:20}]},
-      {class:"Sailor",   name:"Huey",   team:[{name:"Tentacool",level:18},{name:"Staryu",   level:18}]},
-      {class:"Sailor",   name:"Dylan",  team:[{name:"Horsea",   level:17},{name:"Horsea",   level:17},{name:"Horsea",  level:17}]},
-      {class:"Sailor",   name:"Duncan", team:[{name:"Horsea",   level:17},{name:"Shellder",  level:17},{name:"Tentacool",level:17}]},
-      {class:"Sailor",   name:"Leonard",team:[{name:"Shellder", level:21}]},
-      {class:"Sailor",   name:"Trevor", team:[{name:"Machop",   level:17},{name:"Tentacool",level:17}]},
-      {class:"Sailor",   name:"Edmond", team:[{name:"Machop",   level:18},{name:"Shellder",  level:18}]},
-      {class:"Fisherman",name:"Dale",   team:[{name:"Goldeen",  level:17},{name:"Goldeen",   level:17},{name:"Tentacool",level:17}]},
-      {class:"Gentleman",name:"Brooks", team:[{name:"Pikachu",  level:23}]},
-      {class:"Lass",     name:"Dawn",   team:[{name:"Rattata",  level:18},{name:"Pikachu",   level:18}]},
-      {class:"Gentleman",name:"Lamar",  team:[{name:"Growlithe",level:17},{name:"Ponyta",    level:17}]},
-      {class:"Rival",    name:"Blue",   note:"4th Pokémon is the starter strong against yours.",
-        team:[{name:"Pidgeotto",level:19},{name:"Raticate",level:16},{name:"Kadabra",level:18}]},
-    ] },
+    note:"⚠ ONE-TIME EVENT — ship leaves permanently after receiving HM01 Cut. Sweep all cabins and defeat Blue on 2F before talking to the Captain! A hidden Lava Cookie in the harbour requires Surf — missable if you skip it.",
+    floors:[
+      { label:"Deck",
+        pokemon:[],
+        items:[],
+        trainers:[
+          {class:"Sailor",name:"Trevor",team:[{name:"Machop",level:17},{name:"Tentacool",level:17}]},
+          {class:"Sailor",name:"Edmond",team:[{name:"Machop",level:18},{name:"Shellder", level:18}]},
+        ]},
+      { label:"1F",
+        pokemon:[],
+        items:[
+          {name:"TM31 Brick Break",hidden:false,note:"Second cabin from left"},
+          {name:"Great Ball",      hidden:false,note:"Kitchen"},
+          {name:"Pecha Berry",     hidden:true, note:"Kitchen — nearest trash can to doorway (★ Itemfinder)"},
+          {name:"Cheri Berry",     hidden:true, note:"Kitchen — middle trash can (★ Itemfinder)"},
+          {name:"Chesto Berry",    hidden:true, note:"Kitchen — farthest trash can from doorway (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Gentleman",name:"Thomas",team:[{name:"Growlithe",level:18},{name:"Growlithe",level:18}]},
+          {class:"Gentleman",name:"Arthur",team:[{name:"Nidoran♂", level:19},{name:"Nidoran♀", level:19}]},
+          {class:"Lass",     name:"Ann",   team:[{name:"Pidgey",   level:18},{name:"Nidoran♀", level:18}]},
+          {class:"Youngster",name:"Tyler", team:[{name:"Nidoran♂", level:21}]},
+        ]},
+      { label:"B1F",
+        pokemon:[],
+        items:[
+          {name:"Hyper Potion",hidden:true, note:"Hallway trash can near stairs to 1F (★ Itemfinder)"},
+          {name:"Super Potion",hidden:false,note:"Rightmost cabin"},
+          {name:"Ether",       hidden:false,note:"Middle cabin"},
+          {name:"TM44 Rest",   hidden:false,note:"Second cabin from left"},
+        ],
+        trainers:[
+          {class:"Fisherman",name:"Barny",  team:[{name:"Tentacool",level:17},{name:"Staryu",  level:17},{name:"Shellder",  level:17}]},
+          {class:"Sailor",   name:"Phillip",team:[{name:"Machop",   level:20}]},
+          {class:"Sailor",   name:"Huey",   team:[{name:"Tentacool",level:18},{name:"Staryu",  level:18}]},
+          {class:"Sailor",   name:"Dylan",  team:[{name:"Horsea",   level:17},{name:"Horsea",  level:17},{name:"Horsea",   level:17}]},
+          {class:"Sailor",   name:"Duncan", team:[{name:"Horsea",   level:17},{name:"Shellder",level:17},{name:"Tentacool",level:17}]},
+          {class:"Sailor",   name:"Leonard",team:[{name:"Shellder", level:21}]},
+        ]},
+      { label:"2F",
+        pokemon:[],
+        items:[
+          {name:"Stardust", hidden:false,note:"Second cabin from left"},
+          {name:"X Attack", hidden:false,note:"Fourth cabin from left"},
+          {name:"HM01 Cut", hidden:false,note:"Captain's quarters — from the Captain after helping him"},
+        ],
+        trainers:[
+          {class:"Fisherman",name:"Dale",  team:[{name:"Goldeen",  level:17},{name:"Goldeen",level:17},{name:"Tentacool",level:17}]},
+          {class:"Gentleman",name:"Brooks",team:[{name:"Pikachu",  level:23}]},
+          {class:"Gentleman",name:"Lamar", team:[{name:"Growlithe",level:17},{name:"Ponyta",  level:17}]},
+          {class:"Lass",     name:"Dawn",  team:[{name:"Rattata",  level:18},{name:"Pikachu", level:18}]},
+          {class:"Rival",    name:"Blue",  note:"4th Pokémon is the starter strong against yours.",
+            team:[{name:"Pidgeotto",level:19},{name:"Raticate",level:16},{name:"Kadabra",level:18}]},
+        ]},
+      { label:"Harbour",
+        pokemon:[],
+        items:[
+          {name:"Lava Cookie",hidden:true,note:"⚠ SE corner near the truck — requires Surf, only while ship is moored (★ Itemfinder)"},
+        ],
+        trainers:[]},
+    ]},
 
   { part:"Part 7", id:"route11", name:"Route 11",
     note:"Ekans is FR-only at 40%; Sandshrew fills the same slot in LeafGreen. Get the Itemfinder from Oak's aide in the east gate (30 Pokémon). Trade NPC in the gate: Nidorino→Nidorina (FR) or Nidorina→Nidorino (LG).",
@@ -1642,39 +1667,40 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                 return (
                   <div key={floor.label}>
                     <FloorDivider label={floor.label} />
-                    {(hasPoks || hasItms) && (
-                      <div style={{ display:"grid", gridTemplateColumns:(hasPoks&&hasItms)?"1fr 1fr":"1fr", gap:12, marginBottom:12 }}>
-                        {hasPoks && (
-                          <Section title="Wild Pokémon" count={`${pokDone}/${floor.pokemon.length}`} color={C.green}>
-                            {floor.pokemon.map((p,i) => <PokemonEntry key={i} p={p} caught={caught} toggleCaught={toggleCaught} />)}
-                          </Section>
-                        )}
-                        {hasItms && (
-                          <Section title="Items" count={`${itmDone}/${floor.items.length}`} color={C.gold}>
-                            {floor.items.map((it,i) => {
-                              const key = floorItemKey(areaId, floor.label, i);
-                              return <ItemEntry key={i} it={it} itemKey={key} done={!!items[key]} toggleItem={toggleItem} />;
-                            })}
-                          </Section>
-                        )}
-                      </div>
-                    )}
-                    {hasTrns && (
-                      <div style={{ marginBottom:12 }}>
-                        <Section title="Trainers" count={`${trnDone}/${floor.trainers.length}`} color="#a87acc">
-                          {floor.trainers.map((t,i) => (
-                            <TrainerEntry key={i} t={t} areaId={areaId} done={!!trainers[`${areaId}|${t.class}|${t.name}`]} toggleTrainer={toggleTrainer} />
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+                      <Section title="Trainers" count={`${trnDone}/${floor.trainers.length}`} color="#a87acc">
+                        {!hasTrns ? <Empty text="No trainers here" /> : floor.trainers.map((t,i) => (
+                          <TrainerEntry key={i} t={t} areaId={areaId} done={!!trainers[`${areaId}|${t.class}|${t.name}`]} toggleTrainer={toggleTrainer} />
+                        ))}
+                      </Section>
+                      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                        <Section title="Wild Pokémon" count={`${pokDone}/${floor.pokemon.length}`} color={C.green}>
+                          {!hasPoks ? <Empty text="No wild Pokémon here" /> : floor.pokemon.map((p,i) => (
+                            <PokemonEntry key={i} p={p} caught={caught} toggleCaught={toggleCaught} />
                           ))}
                         </Section>
+                        <Section title="Items" count={`${itmDone}/${floor.items.length}`} color={C.gold}>
+                          {!hasItms ? <Empty text="No items here" /> : floor.items.map((it,i) => {
+                            const key = floorItemKey(areaId, floor.label, i);
+                            return <ItemEntry key={i} it={it} itemKey={key} done={!!items[key]} toggleItem={toggleItem} />;
+                          })}
+                        </Section>
                       </div>
-                    )}
+                    </div>
                   </div>
                 );
               })
             ) : (
               // ── Flat layout (single-level areas) ───────────────────────────
-              <>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                <Section title="Trainers" count={`${trainerDone}/${areaTrainers.length}`} color="#a87acc">
+                  {areaTrainers.length === 0 ? <Empty text="No trainers here" /> :
+                    areaTrainers.map((t,i) => (
+                      <TrainerEntry key={i} t={t} areaId={areaId} done={!!trainers[`${areaId}|${t.class}|${t.name}`]} toggleTrainer={toggleTrainer} />
+                    ))
+                  }
+                </Section>
+                <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                   <Section title="Wild Pokémon" count={`${pokeDone}/${areaPokemon.length}`} color={C.green}>
                     {areaPokemon.length === 0 ? <Empty text="No wild Pokémon here" /> :
                       areaPokemon.map((p,i) => <PokemonEntry key={i} p={p} caught={caught} toggleCaught={toggleCaught} />)
@@ -1689,16 +1715,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                     }
                   </Section>
                 </div>
-                {areaTrainers.length > 0 && (
-                  <div style={{ marginTop:12 }}>
-                    <Section title="Trainers" count={`${trainerDone}/${areaTrainers.length}`} color="#a87acc">
-                      {areaTrainers.map((t,i) => (
-                        <TrainerEntry key={i} t={t} areaId={areaId} done={!!trainers[`${areaId}|${t.class}|${t.name}`]} toggleTrainer={toggleTrainer} />
-                      ))}
-                    </Section>
-                  </div>
-                )}
-              </>
+              </div>
             )}
           </>
         )}
