@@ -1727,7 +1727,7 @@ const ITEM_SPRITE = {
 };
 const itemSpriteUrl = name => { const s = ITEM_SPRITE[name]; return s ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${s}.png` : null; };
 const METHOD_SPRITE_URL = {
-  "Surf":      "https://play.pokemonshowdown.com/sprites/trainers/swimmer.png",
+  "Surf":      pokeSpriteUrl(131),
   "Old Rod":   itemSpriteUrl("Old Rod"),
   "Good Rod":  itemSpriteUrl("Good Rod"),
   "Super Rod": itemSpriteUrl("Super Rod"),
