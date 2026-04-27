@@ -1,5 +1,15 @@
 const { useState, useEffect, useCallback, useMemo } = React;
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const h = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+  return mobile;
+}
+
 // ─── KANTO DEX (151) ─────────────────────────────────────────────────────────
 const DEX = [
   {id:1,  name:"Bulbasaur"},   {id:2,  name:"Ivysaur"},      {id:3,  name:"Venusaur"},
@@ -1930,6 +1940,7 @@ function LDexSection({ title, color, items, note }) {
 
 // ─── ROOT COMPONENT ───────────────────────────────────────────────────────────
 function FireRedTracker() {
+  const isMobile = useIsMobile();
   const [tab, setTab]           = useState("areas");
   const [caught, setCaught]     = useState({});
   const [items, setItems]       = useState({});
@@ -2064,16 +2075,16 @@ function FireRedTracker() {
       </div>
 
       {/* ── Tab: Pokédex ── */}
-      {tab === "dex" && <DexTab caught={caught} toggleCaught={toggleCaught} dexFilter={dexFilter} setDexFilter={setDexFilter} dexSelected={dexSelected} setDexSelected={setDexSelected} version={version} />}
+      {tab === "dex" && <DexTab caught={caught} toggleCaught={toggleCaught} dexFilter={dexFilter} setDexFilter={setDexFilter} dexSelected={dexSelected} setDexSelected={setDexSelected} version={version} isMobile={isMobile} />}
 
       {/* ── Tab: Areas ── */}
-      {tab === "areas" && <AreasTab caught={caught} toggleCaught={toggleCaught} items={items} toggleItem={toggleItem} trainers={trainers} toggleTrainer={toggleTrainer} areaId={areaId} setAreaId={setAreaId} area={area} search={search} setSearch={setSearch} version={version} />}
+      {tab === "areas" && <AreasTab caught={caught} toggleCaught={toggleCaught} items={items} toggleItem={toggleItem} trainers={trainers} toggleTrainer={toggleTrainer} areaId={areaId} setAreaId={setAreaId} area={area} search={search} setSearch={setSearch} version={version} isMobile={isMobile} />}
     </div>
   );
 }
 
 // ─── POKÉDEX TAB ──────────────────────────────────────────────────────────────
-function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, setDexSelected, version }) {
+function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, setDexSelected, version, isMobile }) {
   const caughtCount = Object.keys(caught).length;
   const filters = [["all","All 151"],["caught","Caught"],["missing","Missing"],["fr","FR Only"],["lg","LG Only"],["event","Event"]];
 
@@ -2118,7 +2129,7 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
 
       <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
         {/* Grid */}
-        <div style={{ flex:1, overflowY:"auto", padding:"12px 16px" }}>
+        <div style={{ flex:1, overflowY:"auto", padding:"12px 16px", paddingBottom: isMobile && selected ? 220 : 12 }}>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(86px,1fr))", gap:6 }}>
             {filtered.map(p => {
               const isCaught = !!caught[p.name];
@@ -2150,48 +2161,81 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
           <LivingDexPanel caught={caught} />
         </div>
 
-        {/* Detail panel */}
-        <div style={{ width:220, flexShrink:0, borderLeft:`1px solid ${C.border}`, background:C.card, overflowY:"auto", padding:16 }}>
-          {!selected ? (
-            <div style={{ color:C.muted, fontSize:12, textAlign:"center", marginTop:48, lineHeight:1.9, padding:"0 12px" }}>
-              Click any Pokémon to toggle caught and see where to find it.
-            </div>
-          ) : (
-            <>
-              <div style={{ marginBottom:14 }}>
-                <img src={pokeSpriteUrl(selected.id)} alt={selected.name} style={{ width:80, height:80, imageRendering:"pixelated", display:"block", margin:"0 auto 8px" }} />
-                <div style={{ fontSize:10, color:C.muted, marginBottom:2, fontFamily:"'Courier New',monospace" }}>#{String(selected.id).padStart(3,"0")}</div>
-                <div style={{ fontSize:17, fontWeight:"700", color: caught[selected.name] ? C.green : C.text }}>{selected.name}</div>
-                <div style={{ fontSize:11, color: caught[selected.name] ? C.green : C.muted, marginTop:3 }}>
-                  {caught[selected.name] ? "✓ Caught" : "Not yet caught"}
-                </div>
-                {selected.frOnly && <div style={{ fontSize:10, color:"#c85252", marginTop:4, fontWeight:"500" }}>FireRed exclusive</div>}
-                {selected.lgOnly && <div style={{ fontSize:10, color:C.lgGreen, marginTop:4, fontWeight:"500" }}>LeafGreen exclusive</div>}
-                {selected.event  && <div style={{ fontSize:10, color:"#a87acc", marginTop:4, fontWeight:"500" }}>Event — not in-game obtainable</div>}
+        {/* Detail panel — desktop only */}
+        {!isMobile && (
+          <div style={{ width:220, flexShrink:0, borderLeft:`1px solid ${C.border}`, background:C.card, overflowY:"auto", padding:16 }}>
+            {!selected ? (
+              <div style={{ color:C.muted, fontSize:12, textAlign:"center", marginTop:48, lineHeight:1.9, padding:"0 12px" }}>
+                Click any Pokémon to toggle caught and see where to find it.
               </div>
-
-              <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:8, textTransform:"uppercase" }}>Where to find</div>
-              {locs.length === 0 ? (
-                <div style={{ fontSize:11, color:C.muted, lineHeight:1.8 }}>
-                  Not found as a wild encounter or gift in any tracked area.<br/>
-                  Obtain via <span style={{ color:C.text, fontWeight:"500" }}>evolution, trading, or breeding</span>.
-                </div>
-              ) : (
-                locs.map((l, i) => (
-                  <div key={i} style={{ marginBottom:8, padding:"8px 10px", background:"rgba(0,0,0,0.2)", borderRadius:6, borderLeft:`3px solid ${C.border}` }}>
-                    <div style={{ fontSize:11, color:C.text, fontWeight:"600", marginBottom:1 }}>{l.areaName}</div>
-                    <div style={{ fontSize:10, color:C.muted }}>{l.part}</div>
-                    <div style={{ fontSize:10, color:C.muted, marginTop:2 }}>
-                      {l.method} · Lv.{l.levels}{l.rate ? ` · ${l.rate}` : ""}
-                    </div>
-                  </div>
-                ))
-              )}
-            </>
-          )}
-        </div>
+            ) : (
+              <DexDetail selected={selected} caught={caught} locs={locs} />
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Bottom sheet — mobile only */}
+      {isMobile && selected && (
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:200, background:C.card, borderTop:`2px solid var(--frlg-accent)`, boxShadow:"0 -6px 24px rgba(0,0,0,0.6)", maxHeight:"52vh", overflowY:"auto" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 16px 6px", borderBottom:`1px solid ${C.border}`, position:"sticky", top:0, background:C.card }}>
+            <span style={{ fontSize:12, fontWeight:"700", color:C.text }}>{selected.name}</span>
+            <button onClick={() => setDexSelected(null)} style={{ background:"transparent", border:`1px solid ${C.border}`, color:C.muted, borderRadius:6, cursor:"pointer", padding:"2px 10px", fontSize:13 }}>✕</button>
+          </div>
+          <div style={{ padding:"12px 16px 20px" }}>
+            <DexDetail selected={selected} caught={caught} locs={locs} compact />
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function DexDetail({ selected, caught, locs, compact }) {
+  return (
+    <>
+      {!compact && (
+        <div style={{ marginBottom:14 }}>
+          <img src={pokeSpriteUrl(selected.id)} alt={selected.name} style={{ width:80, height:80, imageRendering:"pixelated", display:"block", margin:"0 auto 8px" }} />
+          <div style={{ fontSize:10, color:C.muted, marginBottom:2, fontFamily:"'Courier New',monospace" }}>#{String(selected.id).padStart(3,"0")}</div>
+          <div style={{ fontSize:17, fontWeight:"700", color: caught[selected.name] ? C.green : C.text }}>{selected.name}</div>
+          <div style={{ fontSize:11, color: caught[selected.name] ? C.green : C.muted, marginTop:3 }}>
+            {caught[selected.name] ? "✓ Caught" : "Not yet caught"}
+          </div>
+          {selected.frOnly && <div style={{ fontSize:10, color:"#c85252", marginTop:4, fontWeight:"500" }}>FireRed exclusive</div>}
+          {selected.lgOnly && <div style={{ fontSize:10, color:C.lgGreen, marginTop:4, fontWeight:"500" }}>LeafGreen exclusive</div>}
+          {selected.event  && <div style={{ fontSize:10, color:"#a87acc", marginTop:4, fontWeight:"500" }}>Event — not in-game obtainable</div>}
+        </div>
+      )}
+      {compact && (
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
+          <img src={pokeSpriteUrl(selected.id)} alt={selected.name} style={{ width:48, height:48, imageRendering:"pixelated" }} />
+          <div>
+            <div style={{ fontSize:10, color:C.muted, fontFamily:"'Courier New',monospace" }}>#{String(selected.id).padStart(3,"0")}</div>
+            <div style={{ fontSize:13, fontWeight:"700", color: caught[selected.name] ? C.green : C.text }}>{caught[selected.name] ? "✓ Caught" : "Not caught"}</div>
+            {selected.frOnly && <div style={{ fontSize:10, color:"#c85252", fontWeight:"500" }}>FireRed exclusive</div>}
+            {selected.lgOnly && <div style={{ fontSize:10, color:C.lgGreen, fontWeight:"500" }}>LeafGreen exclusive</div>}
+          </div>
+        </div>
+      )}
+      <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:8, textTransform:"uppercase" }}>Where to find</div>
+      {locs.length === 0 ? (
+        <div style={{ fontSize:11, color:C.muted, lineHeight:1.8 }}>
+          Not found as a wild encounter or gift in any tracked area.<br/>
+          Obtain via <span style={{ color:C.text, fontWeight:"500" }}>evolution, trading, or breeding</span>.
+        </div>
+      ) : (
+        locs.map((l, i) => (
+          <div key={i} style={{ marginBottom:8, padding:"8px 10px", background:"rgba(0,0,0,0.2)", borderRadius:6, borderLeft:`3px solid ${C.border}` }}>
+            <div style={{ fontSize:11, color:C.text, fontWeight:"600", marginBottom:1 }}>{l.areaName}</div>
+            <div style={{ fontSize:10, color:C.muted }}>{l.part}</div>
+            <div style={{ fontSize:10, color:C.muted, marginTop:2 }}>
+              {l.method} · Lv.{l.levels}{l.rate ? ` · ${l.rate}` : ""}
+            </div>
+          </div>
+        ))
+      )}
+    </>
   );
 }
 
@@ -2211,7 +2255,7 @@ function countItemsDone(area, areaId, itemsState) {
 }
 
 // ─── AREAS TAB ────────────────────────────────────────────────────────────────
-function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTrainer, areaId, setAreaId, area, search, setSearch, version }) {
+function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTrainer, areaId, setAreaId, area, search, setSearch, version, isMobile }) {
   const visibleAreas = useMemo(() => AREAS.filter(a => AUDITED_PARTS.has(a.part)), []);
   const groups = useMemo(() => groupByPart(visibleAreas), [visibleAreas]);
   const filtered = useMemo(() => search.trim() ? visibleAreas.filter(a => a.name.toLowerCase().includes(search.toLowerCase())) : null, [search, visibleAreas]);
@@ -2238,13 +2282,18 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const markAllTrainers = (trns) => trns.forEach(t => { const k = `${areaId}|${t.class}|${t.name}`; if (!trainers[k]) toggleTrainer(k); });
   const clearAllTrainers = (trns) => trns.forEach(t => { const k = `${areaId}|${t.class}|${t.name}`; if (trainers[k]) toggleTrainer(k); });
 
+  // On mobile: show sidebar when no area selected, detail when area selected
+  const showSidebar = !isMobile || !areaId;
+  const showMain    = !isMobile || !!areaId;
+
   return (
-    <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
+    <div style={{ display:"flex", flex:1, overflow:"hidden", flexDirection: isMobile ? "column" : "row" }}>
       {/* Sidebar */}
-      <div style={{ width:210, flexShrink:0, borderRight:`1px solid ${C.border}`, background:C.card, display:"flex", flexDirection:"column", overflowY:"auto" }}>
+      {showSidebar && (
+      <div style={{ width: isMobile ? "100%" : 210, flexShrink:0, borderRight: isMobile ? "none" : `1px solid ${C.border}`, borderBottom: isMobile ? `1px solid ${C.border}` : "none", background:C.card, display:"flex", flexDirection:"column", overflowY:"auto", flex: isMobile ? "1" : "unset" }}>
         <div style={{ padding:"10px 12px", borderBottom:`1px solid ${C.border}`, position:"sticky", top:0, background:C.card, zIndex:1 }}>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search areas…"
-            style={{ width:"100%", background:"rgba(0,0,0,0.25)", border:`1px solid ${C.border}`, color:C.text, padding:"6px 10px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:12, borderRadius:6, boxSizing:"border-box", outline:"none" }} />
+            style={{ width:"100%", background:"rgba(0,0,0,0.25)", border:`1px solid ${C.border}`, color:C.text, padding:"8px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:14, borderRadius:6, boxSizing:"border-box", outline:"none" }} />
         </div>
         {filtered
           ? filtered.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} />)
@@ -2257,8 +2306,10 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
         }
         {filtered?.length === 0 && <div style={{ padding:20, fontSize:12, color:C.muted, textAlign:"center" }}>No matches</div>}
       </div>
+      )}
 
       {/* Main */}
+      {showMain && (
       <div style={{ flex:1, overflowY:"auto", padding:0 }} id="area-main-scroll">
         {!area ? (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", color:C.muted, textAlign:"center", gap:12 }}>
@@ -2279,6 +2330,12 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                 pokeDone === areaPokemon.length && itemDone === areaItems.length && trainerDone === areaTrainers.length;
               return (
                 <div style={{ position:"sticky", top:0, zIndex:10, background:C.bg, borderBottom:`1px solid ${C.border}`, padding:"12px 20px 10px", boxShadow:"0 2px 8px rgba(0,0,0,0.3)" }}>
+                  {/* Mobile back button */}
+                  {isMobile && (
+                    <button onClick={() => setAreaId(null)} style={{ background:"transparent", border:"none", color:C.muted, fontSize:13, cursor:"pointer", padding:"0 0 8px", display:"flex", alignItems:"center", gap:5, fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+                      <span style={{ fontSize:16 }}>←</span> All Areas
+                    </button>
+                  )}
                   {/* Nav + title row */}
                   <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:8 }}>
                     <div style={{ flex:1 }}>
@@ -2347,7 +2404,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                         <span style={{ fontSize:11, color:C.muted, flexShrink:0 }}>{isCollapsed ? "▶" : "▼"}</span>
                       </div>
                       {!isCollapsed && (
-                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+                        <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:12, marginBottom:12 }}>
                           {/* Wild Pokémon left */}
                           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             <Section title="Wild Pokémon" count={`${pokDone}/${(floor.pokemon||[]).length}`} color={C.green}
@@ -2379,7 +2436,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                 })
               ) : (
                 // ── Flat layout (single-level areas) ─────────────────────
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:12 }}>
                   {/* Wild Pokémon + Items left */}
                   <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                     <Section title="Wild Pokémon" count={`${pokeDone}/${areaPokemon.length}`} color={C.green}
@@ -2416,6 +2473,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
           </>
         )}
       </div>
+      )}
     </div>
   );
 }
@@ -2584,11 +2642,11 @@ function Section({ title, count, color, children, onMarkAll, allDone }) {
 
 function Row({ done, onClick, children }) {
   return (
-    <div onClick={onClick} style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"8px 14px", cursor:"pointer", borderBottom:`1px solid ${C.border}20`, background: done?"rgba(74,175,116,0.05)":"transparent", transition:"background 0.1s" }}
+    <div onClick={onClick} style={{ display:"flex", alignItems:"flex-start", gap:10, padding:"10px 14px", minHeight:44, cursor:"pointer", borderBottom:`1px solid ${C.border}20`, background: done?"rgba(74,175,116,0.05)":"transparent", transition:"background 0.1s" }}
       onMouseEnter={e => e.currentTarget.style.background = done?"rgba(74,175,116,0.09)":"rgba(255,255,255,0.025)"}
       onMouseLeave={e => e.currentTarget.style.background = done?"rgba(74,175,116,0.05)":"transparent"}>
-      <div style={{ width:14, height:14, border:`2px solid ${done ? C.green : C.border}`, background:done?C.green:"transparent", borderRadius:4, flexShrink:0, marginTop:2, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.12s" }}>
-        {done && <span style={{ color:"#000", fontSize:8, fontWeight:"700", lineHeight:1 }}>✓</span>}
+      <div style={{ width:18, height:18, border:`2px solid ${done ? C.green : C.border}`, background:done?C.green:"transparent", borderRadius:4, flexShrink:0, marginTop:1, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.12s" }}>
+        {done && <span style={{ color:"#000", fontSize:10, fontWeight:"700", lineHeight:1 }}>✓</span>}
       </div>
       <div style={{ display:"flex", justifyContent:"space-between", flex:1, opacity:done?0.4:1, textDecoration:done?"line-through":"none" }}>{children}</div>
     </div>
