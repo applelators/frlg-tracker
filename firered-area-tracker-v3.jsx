@@ -1170,20 +1170,177 @@ const AREAS = [
       {class:"Bird Keeper",name:"Ramiro",team:[{name:"Dodrio", level:34}]},
     ] },
 
-  { part:"Part 12", id:"saffron-city", name:"Saffron City",
-    note:"Tea from Celadon Mansion required for gate guards. TM29 Psychic is a free gift — grab it immediately!",
+  { part:"Part 11", id:"saffron-city", name:"Saffron City",
+    note:"Tea from Celadon Mansion required for gate guards. TM29 Psychic is a free gift from Mr. Psychic in the SE house.",
     pokemon:[],
-    items:[{name:"TM29 Psychic",hidden:false,note:"From Mr. Psychic in the SE house"},{name:"Lure Ball ×5",hidden:false,note:"From Silph Co. receptionist after clearing the building"}] },
+    items:[
+      {name:"Nugget",      hidden:true, note:"Copycat's house (NW) — on the desk in her room (★ Itemfinder)"},
+      {name:"TM29 Psychic",hidden:false,note:"From Mr. Psychic in the SE house"},
+    ],
+    trainers:[] },
 
-  { part:"Part 12", id:"silph-co", name:"Silph Co. (1F–11F)",
-    note:"Find Card Key on 5F to open all card-locked doors. Lapras gift on 7F — don't leave that floor without it! Master Ball from Giovanni on 11F.",
-    pokemon:[{name:"Lapras",method:"Gift",levels:"25",note:"⚠ 7F — employee gives it to you; do NOT skip this floor!"}],
-    items:[{name:"Rare Candy",hidden:false,note:"1F"},{name:"TM36 Sludge Bomb",hidden:false,note:"2F"},{name:"HP Up",hidden:false,note:"2F"},{name:"TM49 Snatch",hidden:false,note:"3F"},{name:"Elixir",hidden:false,note:"3F"},{name:"X Accuracy",hidden:false,note:"4F"},{name:"Card Key",hidden:false,note:"5F — unlocks ALL card-locked doors"},{name:"Carbos",hidden:false,note:"5F"},{name:"Max Revive",hidden:false,note:"7F"},{name:"Protein",hidden:false,note:"7F"},{name:"Iron",hidden:false,note:"9F"},{name:"Max Elixir",hidden:false,note:"9F"},{name:"Master Ball",hidden:false,note:"⚠ 11F, from Giovanni — only ONE in the game!"},{name:"Full Restore",hidden:true,note:"Itemfinder, 7F"},{name:"Nugget",hidden:true,note:"Itemfinder, 10F"}] },
+  { part:"Part 11", id:"silph-co", name:"Silph Co.",
+    note:"⚠ Find Card Key on 5F to open all locked doors. Lapras gift on 7F — do not skip it! Master Ball from the president after defeating Giovanni on 11F.",
+    floors:[
+      { label:"2F",
+        pokemon:[],
+        items:[
+          {name:"Ultra Ball",hidden:true,note:"SW room, southern potted plant (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 1", team:[{name:"Golbat",level:25},{name:"Zubat",level:25},{name:"Zubat",level:25},{name:"Raticate",level:25},{name:"Zubat",level:25}]},
+          {class:"Scientist",        name:"Jerry",   team:[{name:"Magnemite",level:28},{name:"Voltorb",level:28},{name:"Magneton",level:28}]},
+          {class:"Team Rocket Grunt",name:"Grunt 2", team:[{name:"Cubone",level:29},{name:"Zubat",level:29}]},
+          {class:"Scientist",        name:"Connor",  team:[{name:"Grimer",level:26},{name:"Weezing",level:26},{name:"Koffing",level:26},{name:"Weezing",level:26}]},
+        ]},
+      { label:"3F",
+        pokemon:[],
+        items:[
+          {name:"Hyper Potion",hidden:false,note:"NE of the Scientist"},
+          {name:"Protein",     hidden:true, note:"SE corner, middle of three potted plants (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 3",team:[{name:"Raticate",level:28},{name:"Hypno",level:28},{name:"Raticate",level:28}]},
+          {class:"Scientist",        name:"Jose",   team:[{name:"Electrode",level:29},{name:"Weezing",level:29}]},
+        ]},
+      { label:"4F",
+        pokemon:[],
+        items:[
+          {name:"Full Heal",    hidden:false,note:"NW room"},
+          {name:"Max Revive",   hidden:false,note:"NW room"},
+          {name:"Escape Rope",  hidden:false,note:"NW room"},
+          {name:"TM41 Torment", hidden:false,note:"SE room"},
+          {name:"Iron",         hidden:true, note:"SE room, southern of three potted plants (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 4", team:[{name:"Ekans",level:28},{name:"Zubat",level:28},{name:"Cubone",level:28}]},
+          {class:"Team Rocket Grunt",name:"Grunt 5", team:[{name:"Machop",level:29},{name:"Drowzee",level:29}]},
+          {class:"Scientist",        name:"Rodney",  team:[{name:"Electrode",level:33}]},
+        ]},
+      { label:"5F",
+        pokemon:[],
+        items:[
+          {name:"Card Key",         hidden:false,note:"South hallway — unlocks all card-locked doors"},
+          {name:"Protein",          hidden:false,note:"NW room (requires Card Key)"},
+          {name:"TM01 Focus Punch", hidden:false,note:"SW room"},
+          {name:"PP Up",            hidden:true, note:"Larger central room, potted plant (★ Itemfinder)"},
+          {name:"Elixir",           hidden:true, note:"Smaller central room, potted plant (★ Itemfinder, requires Card Key)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 6", team:[{name:"Hypno",level:33}]},
+          {class:"Juggler",          name:"Dalton",  team:[{name:"Kadabra",level:29},{name:"Mr. Mime",level:29}]},
+          {class:"Scientist",        name:"Beau",    team:[{name:"Magneton",level:26},{name:"Magnemite",level:26},{name:"Koffing",level:26},{name:"Weezing",level:26}]},
+          {class:"Team Rocket Grunt",name:"Grunt 7", team:[{name:"Arbok",level:33}]},
+        ]},
+      { label:"6F",
+        pokemon:[],
+        items:[
+          {name:"HP Up",     hidden:false,note:"SW room (requires Card Key)"},
+          {name:"X Sp. Atk", hidden:false,note:"SW room (requires Card Key)"},
+          {name:"Carbos",    hidden:true, note:"NW room, western potted plant (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 8",  team:[{name:"Machop",level:29},{name:"Machoke",level:29}]},
+          {class:"Team Rocket Grunt",name:"Grunt 9",  team:[{name:"Zubat",level:28},{name:"Zubat",level:28},{name:"Golbat",level:28}]},
+          {class:"Scientist",        name:"Taylor",   team:[{name:"Voltorb",level:25},{name:"Koffing",level:25},{name:"Magneton",level:25},{name:"Magnemite",level:25},{name:"Koffing",level:25}]},
+        ]},
+      { label:"7F",
+        pokemon:[
+          {name:"Lapras",method:"Gift",levels:"25",note:"⚠ From an employee in the NW area — do not skip this floor!",warn:true},
+        ],
+        items:[
+          {name:"TM08 Bulk Up",hidden:false,note:"East-central room (requires Card Key)"},
+          {name:"Calcium",     hidden:false,note:"SW room"},
+          {name:"Zinc",        hidden:true, note:"East-central room, southern potted plant (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 10", team:[{name:"Cubone",level:29},{name:"Cubone",level:29}]},
+          {class:"Team Rocket Grunt",name:"Grunt 11", team:[{name:"Raticate",level:26},{name:"Zubat",level:26},{name:"Golbat",level:26},{name:"Rattata",level:26}]},
+          {class:"Scientist",        name:"Joshua",   team:[{name:"Electrode",level:29},{name:"Muk",level:29}]},
+          {class:"Team Rocket Grunt",name:"Grunt 12", team:[{name:"Sandshrew",level:29},{name:"Sandslash",level:29}]},
+          {class:"Rival",            name:"Blue",     note:"NW room. Team varies by starter — shown here for Bulbasaur start.",
+            team:[{name:"Pidgeot",level:37},{name:"Exeggcute",level:38},{name:"Gyarados",level:35},{name:"Alakazam",level:35}]},
+        ]},
+      { label:"8F",
+        pokemon:[],
+        items:[
+          {name:"Iron",   hidden:false,note:"East-central room, east of the two beds"},
+          {name:"Nugget", hidden:true, note:"East-central room, northern potted plant (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 13", team:[{name:"Raticate",level:26},{name:"Golbat",level:26},{name:"Arbok",level:26},{name:"Koffing",level:26}]},
+          {class:"Team Rocket Grunt",name:"Grunt 14", team:[{name:"Weezing",level:28},{name:"Golbat",level:28},{name:"Koffing",level:28}]},
+          {class:"Scientist",        name:"Parker",   team:[{name:"Grimer",level:29},{name:"Electrode",level:29}]},
+        ]},
+      { label:"9F",
+        pokemon:[],
+        items:[
+          {name:"Max Potion",hidden:true,note:"S-SW room, corner near the boxes (★ Itemfinder)"},
+          {name:"Calcium",   hidden:true,note:"Western room, eastern potted plant (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 15", team:[{name:"Golbat",level:28},{name:"Drowzee",level:28},{name:"Hypno",level:28}]},
+          {class:"Team Rocket Grunt",name:"Grunt 16", team:[{name:"Drowzee",level:28},{name:"Grimer",level:28},{name:"Machop",level:28}]},
+          {class:"Scientist",        name:"Ed",       team:[{name:"Voltorb",level:28},{name:"Magneton",level:28},{name:"Koffing",level:28}]},
+        ]},
+      { label:"10F",
+        pokemon:[],
+        items:[
+          {name:"Carbos",    hidden:false,note:"SW room"},
+          {name:"Rare Candy",hidden:false,note:"SW room"},
+          {name:"Ultra Ball",hidden:false,note:"SW room"},
+          {name:"HP Up",     hidden:true, note:"NE room, potted plant (★ Itemfinder)"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 17", team:[{name:"Machoke",level:33}]},
+          {class:"Scientist",        name:"Travis",   team:[{name:"Magnemite",level:29},{name:"Koffing",level:29}]},
+        ]},
+      { label:"11F",
+        pokemon:[],
+        items:[
+          {name:"Zinc",       hidden:false,note:"East side, SE corner"},
+          {name:"Revive",     hidden:true, note:"West side, middle of three potted plants outside president's office (★ Itemfinder)"},
+          {name:"Master Ball",hidden:false,note:"⚠ From the president after defeating Giovanni — only ONE in the game!"},
+        ],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 18", team:[{name:"Rattata",level:25},{name:"Zubat",level:25},{name:"Ekans",level:25},{name:"Rattata",level:25},{name:"Rattata",level:25}]},
+          {class:"Team Rocket Grunt",name:"Grunt 19", team:[{name:"Cubone",level:32},{name:"Drowzee",level:32},{name:"Marowak",level:32}]},
+          {class:"Giovanni",         name:"Giovanni", team:[{name:"Nidorino",level:37},{name:"Rhyhorn",level:37},{name:"Kangaskhan",level:35},{name:"Nidoqueen",level:41}]},
+        ]},
+    ]},
 
-  { part:"Part 12", id:"fighting-dojo", name:"Fighting Dojo",
-    note:"Defeat all trainers. Dojo Master awards EITHER Hitmonlee or Hitmonchan — you must choose one. Trade for the other!",
-    pokemon:[{name:"Hitmonlee",method:"Gift",levels:"25",note:"⚠ One-time choice — pick Hitmonlee OR Hitmonchan"},{name:"Hitmonchan",method:"Gift",levels:"25",note:"⚠ One-time choice — pick Hitmonlee OR Hitmonchan"}],
-    items:[] },
+  { part:"Part 11", id:"fighting-dojo", name:"Fighting Dojo",
+    note:"Defeat all Black Belts, then the Karate Master. Choose EITHER Hitmonlee OR Hitmonchan as your reward — trade for the other!",
+    pokemon:[
+      {name:"Hitmonlee", method:"Gift",levels:"25",note:"⚠ One-time choice — pick Hitmonlee OR Hitmonchan",warn:true},
+      {name:"Hitmonchan",method:"Gift",levels:"25",note:"⚠ One-time choice — pick Hitmonlee OR Hitmonchan",warn:true},
+    ],
+    items:[],
+    trainers:[
+      {class:"Black Belt",name:"Hideki",team:[{name:"Machop",level:32},{name:"Machoke",level:32}]},
+      {class:"Black Belt",name:"Hitoshi",team:[{name:"Machop",level:31},{name:"Mankey",level:31},{name:"Primeape",level:31}]},
+      {class:"Black Belt",name:"Mike",   team:[{name:"Mankey",level:31},{name:"Mankey",level:31},{name:"Primeape",level:31}]},
+      {class:"Black Belt",name:"Aaron",  team:[{name:"Primeape",level:36}]},
+      {class:"Black Belt",name:"Koichi", note:"Karate Master — defeat him to earn your choice of Hitmonlee or Hitmonchan.",
+        team:[{name:"Hitmonlee",level:37},{name:"Hitmonchan",level:37}]},
+    ]},
+
+  { part:"Part 11", id:"saffron-gym", name:"Saffron Gym",
+    note:"Psychic-type gym. Warp puzzle: SE → NW → SW → SW leads to Sabrina. Defeat her for the Marsh Badge (obedience up to Lv. 70) and TM04 Calm Mind.",
+    pokemon:[],
+    items:[
+      {name:"TM04 Calm Mind",hidden:false,note:"From Sabrina after defeating her"},
+    ],
+    trainers:[
+      {class:"Psychic",  name:"Cameron",team:[{name:"Slowpoke",level:33},{name:"Slowpoke",level:33},{name:"Slowbro",level:33}]},
+      {class:"Psychic",  name:"Tyron",  team:[{name:"Mr. Mime",level:34},{name:"Kadabra",level:34}]},
+      {class:"Channeler",name:"Stacy",  team:[{name:"Haunter",level:38}]},
+      {class:"Psychic",  name:"Preston",team:[{name:"Slowbro",level:38}]},
+      {class:"Channeler",name:"Amanda", team:[{name:"Gastly",level:34},{name:"Haunter",level:34}]},
+      {class:"Channeler",name:"Tasha",  team:[{name:"Gastly",level:33},{name:"Gastly",level:33},{name:"Haunter",level:33}]},
+      {class:"Psychic",  name:"Johan",  team:[{name:"Kadabra",level:31},{name:"Mr. Mime",level:31},{name:"Slowpoke",level:31},{name:"Kadabra",level:31}]},
+      {class:"Gym Leader",name:"Sabrina",team:[{name:"Kadabra",level:38},{name:"Mr. Mime",level:37},{name:"Venomoth",level:38},{name:"Alakazam",level:43}]},
+    ]},
 
   { part:"Part 13", id:"route19", name:"Route 19",
     note:"Surf south from Fuchsia Beach. Horsea is FireRed-only via fishing — key Living Dex catch.",
@@ -1386,7 +1543,7 @@ const MAP_CONNECTIONS = [
 ];
 
 // Parts that have been fully audited against the Bulbapedia walkthrough — extend as each part is verified.
-const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10"]);
+const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11"]);
 
 // ─── SPRITES ─────────────────────────────────────────────────────────────────
 const DEX_ID = Object.fromEntries(DEX.map(p => [p.name, p.id]));
@@ -1424,7 +1581,9 @@ const ITEM_SPRITE = {
   "TM12 Taunt":"tm-dark","TM49 Snatch":"tm-dark","TM21 Frustration":"tm-normal",
   "Black Glasses":"black-glasses","Net Ball":"net-ball","Nest Ball":"nest-ball",
   "Calcium":"calcium","Protein":"protein","Lift Key":"lift-key",
-  "X Speed":"x-speed","TM24 Thunderbolt":"tm-electric","TM35 Flamethrower":"tm-fire",
+  "X Speed":"x-speed","X Sp. Atk":"x-sp-atk","TM24 Thunderbolt":"tm-electric","TM35 Flamethrower":"tm-fire",
+  "TM01 Focus Punch":"tm-fighting","TM04 Calm Mind":"tm-psychic","TM08 Bulk Up":"tm-fighting",
+  "TM29 Psychic":"tm-psychic","TM41 Torment":"tm-dark","Card Key":"card-key",
   "TM27 Return":"tm-normal","TM48 Skill Swap":"tm-psychic",
   "TM06 Toxic":"tm-poison","TM32 Double Team":"tm-normal",
   "Good Rod":"good-rod","Super Rod":"super-rod",
@@ -1453,8 +1612,9 @@ const TRAINER_CLASS_SPRITE = {
   "Beauty":"beauty","Cooltrainer":"beauty","Bird Keeper":"birdkeeper",
   "Young Couple":"youngcouple","Rocker":"rocker-gen3",
   "Crush Kin":"crushkin-gen3","Juggler":"juggler","Tamer":"tamer-gen3",
+  "Scientist":"scientist","Black Belt":"blackbelt-gen3","Psychic":"psychic-gen3",
 };
-const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Lt. Surge":"lt-surge","Blue":"blue","Giovanni":"giovanni","Erika":"erika","Koga":"koga"};
+const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Lt. Surge":"lt-surge","Blue":"blue","Giovanni":"giovanni","Erika":"erika","Koga":"koga","Sabrina":"sabrina"};
 const trainerSpriteUrl = (cls, name) => { const s = TRAINER_NAME_SPRITE[name] || TRAINER_CLASS_SPRITE[cls]; return s ? `https://play.pokemonshowdown.com/sprites/trainers/${s}.png` : null; };
 
 function pct(a, b) { return b ? Math.round((a / b) * 100) : 0; }

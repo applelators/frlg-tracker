@@ -73,7 +73,8 @@ Area data is being audited part by part against the [Bulbapedia FireRed & LeafGr
 | Part 8 | Rock Tunnel · Route 10 (South) · Route 8 · Route 7 · Lavender Town | Audited |
 | Part 9 | Celadon City · Rocket Hideout · Pokémon Tower | Audited |
 | Part 10 | Route 12 · Route 13 · Route 14 · Route 15 · Fuchsia City · Safari Zone · Route 16 · Route 17 · Route 18 | Audited |
-| Part 11–21 | Saffron City through Sevii Islands | Pending audit |
+| Part 11 | Saffron City · Silph Co. · Fighting Dojo · Saffron Gym | Audited |
+| Part 12–21 | Cinnabar Island through Sevii Islands | Pending audit |
 
 ---
 
