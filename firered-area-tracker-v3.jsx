@@ -1727,7 +1727,7 @@ const ITEM_SPRITE = {
 };
 const itemSpriteUrl = name => { const s = ITEM_SPRITE[name]; return s ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${s}.png` : null; };
 const METHOD_SPRITE_URL = {
-  "Surf":      itemSpriteUrl("HM03 Surf"),
+  "Surf":      "https://play.pokemonshowdown.com/sprites/trainers/swimmer.png",
   "Old Rod":   itemSpriteUrl("Old Rod"),
   "Good Rod":  itemSpriteUrl("Good Rod"),
   "Super Rod": itemSpriteUrl("Super Rod"),
@@ -2519,22 +2519,19 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers }) {
 
 
 const METHOD_GROUP = m => {
-  if (m === "Surf") return "Surf";
-  if (m === "Old Rod" || m === "Good Rod" || m === "Super Rod") return "Fishing";
+  if (m === "Surf" || m === "Old Rod" || m === "Good Rod" || m === "Super Rod") return m;
   return null;
 };
 
 function MethodDivider({ label }) {
   const color = label === "Surf" ? "#4a8fc4" : "#4a9fa0";
-  const sprites = label === "Surf"
-    ? [METHOD_SPRITE_URL["Surf"]]
-    : [METHOD_SPRITE_URL["Old Rod"], METHOD_SPRITE_URL["Good Rod"], METHOD_SPRITE_URL["Super Rod"]];
+  const sprite = METHOD_SPRITE_URL[label];
   return (
     <div style={{ display:"flex", alignItems:"center", gap:7, margin:"6px 0 2px" }}>
       <div style={{ flex:1, height:1, background:C.border }} />
-      <div style={{ display:"flex", alignItems:"center", gap:3 }}>
-        {sprites.map((src,i) => <img key={i} src={src} alt="" style={{ width:16, height:16, imageRendering:"pixelated" }} />)}
-        <span style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.1em", textTransform:"uppercase", color, marginLeft:2 }}>{label}</span>
+      <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+        {sprite && <img src={sprite} alt="" style={{ width:16, height:16, imageRendering:"pixelated" }} />}
+        <span style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.1em", textTransform:"uppercase", color }}>{label}</span>
       </div>
       <div style={{ flex:1, height:1, background:C.border }} />
     </div>
@@ -2569,7 +2566,10 @@ function PokemonEntry({ p, caught, toggleCaught, version }) {
           {p.name}{p.frOnly&&<Tag color="#c85252">FR</Tag>}{p.lgOnly&&<Tag color={C.lgGreen}>LG</Tag>}
         </span>
         {METHOD_SPRITE_URL[p.method]
-          ? <img src={METHOD_SPRITE_URL[p.method]} alt={p.method} title={p.method} style={{ width:18, height:18, imageRendering:"pixelated", marginLeft:6, verticalAlign:"middle", flexShrink:0 }} />
+          ? <span style={{ display:"inline-flex", alignItems:"center", gap:3, marginLeft:6 }}>
+              <img src={METHOD_SPRITE_URL[p.method]} alt="" style={{ width:16, height:16, imageRendering:"pixelated", flexShrink:0 }} />
+              <span style={{ fontSize:10, color:C.muted }}>{p.method}</span>
+            </span>
           : <span style={{ fontSize:10, color:C.muted, marginLeft:6 }}>{p.method}</span>
         }
         {p.note&&<div style={{ fontSize:10, color:"#b87030", marginTop:2 }}>{p.note}</div>}
