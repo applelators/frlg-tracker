@@ -76,7 +76,8 @@ Area data is being audited part by part against the [Bulbapedia FireRed & LeafGr
 | Part 11 | Saffron City · Silph Co. · Fighting Dojo · Saffron Gym | Audited |
 | Part 12 | Route 19 · Route 20 (East) · Seafoam Islands · Route 20 (West) | Audited |
 | Part 13 | Cinnabar Island · Pokémon Mansion · Cinnabar Gym | Audited |
-| Part 14–21 | Viridian City (Return) through Sevii Islands | Pending audit |
+| Part 14 | One Island · Treasure Beach · Kindle Road · Mt. Ember · Two Island · Cape Brink · Three Isle Port · Three Isle Path · Bond Bridge · Berry Forest | Audited |
+| Part 15–21 | Viridian City (Return) through Sevii Islands | Pending audit |
 
 ---
 
