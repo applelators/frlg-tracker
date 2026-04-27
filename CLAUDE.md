@@ -2,6 +2,8 @@
 
 This file is loaded automatically by Claude Code. It captures the conventions, data pipeline, and known pitfalls for this project so any Claude instance can continue the work consistently.
 
+**Keep this file current.** Update it whenever major changes are made to the repo — new features, structural changes to the data format, new pitfalls discovered, or changes to key conventions. A stale CLAUDE.md is worse than none.
+
 ---
 
 ## Project Overview
