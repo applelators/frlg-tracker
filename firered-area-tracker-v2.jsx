@@ -407,11 +407,6 @@ const AREAS = [
         team:[{name:"Pidgeotto",level:19},{name:"Raticate",level:16},{name:"Kadabra",level:18}]},
     ] },
 
-  { part:"Part 7", id:"digletts-cave", name:"Diglett's Cave",
-    note:"Simple cave between Route 2 and Route 11. Two Pokémon only.",
-    pokemon:[{name:"Diglett",method:"Cave",levels:"15–22",rate:"95%"},{name:"Dugtrio",method:"Cave",levels:"29–31",rate:"5%"}],
-    items:[] },
-
   { part:"Part 7", id:"route11", name:"Route 11",
     note:"Ekans is FR-only at 40%; Sandshrew fills the same slot in LeafGreen. Get the Itemfinder from Oak's aide in the east gate (30 Pokémon). Trade NPC in the gate: Nidorino→Nidorina (FR) or Nidorina→Nidorino (LG).",
     pokemon:[
@@ -442,6 +437,11 @@ const AREAS = [
       {class:"Youngster",name:"Yasu",   team:[{name:"Rattata",  level:17},{name:"Rattata",  level:17},{name:"Raticate",level:17}]},
       {class:"Gamer",    name:"Dirk",   team:[{name:"Voltorb",  level:18},{name:"Magnemite",level:18}]},
     ] },
+
+  { part:"Part 7", id:"digletts-cave", name:"Diglett's Cave",
+    note:"Simple cave between Route 2 and Route 11. Two Pokémon only.",
+    pokemon:[{name:"Diglett",method:"Cave",levels:"15–22",rate:"95%"},{name:"Dugtrio",method:"Cave",levels:"29–31",rate:"5%"}],
+    items:[] },
 
   { part:"Part 7", id:"route2-east", name:"Route 2 (East)",
     note:"Accessible after using Cut on the blocking tree. Mr. Mime trade is here — swap Abra with the boy in the gate. HM05 Flash from Oak's aide requires 10 Pokémon.",
