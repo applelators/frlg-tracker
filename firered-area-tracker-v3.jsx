@@ -1716,6 +1716,12 @@ const ITEM_SPRITE = {
   "Big Pearl":"big-pearl","Water Stone":"water-stone",
 };
 const itemSpriteUrl = name => { const s = ITEM_SPRITE[name]; return s ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${s}.png` : null; };
+const METHOD_SPRITE_URL = {
+  "Surf":      itemSpriteUrl("HM03 Surf"),
+  "Old Rod":   itemSpriteUrl("Old Rod"),
+  "Good Rod":  itemSpriteUrl("Good Rod"),
+  "Super Rod": itemSpriteUrl("Super Rod"),
+};
 
 const TRAINER_CLASS_SPRITE = {
   "Bug Catcher":"bugcatcher","Camper":"camper","Lass":"lass","Youngster":"youngster",
@@ -2457,10 +2463,16 @@ const METHOD_GROUP = m => {
 
 function MethodDivider({ label }) {
   const color = label === "Surf" ? "#4a8fc4" : "#4a9fa0";
+  const sprites = label === "Surf"
+    ? [METHOD_SPRITE_URL["Surf"]]
+    : [METHOD_SPRITE_URL["Old Rod"], METHOD_SPRITE_URL["Good Rod"], METHOD_SPRITE_URL["Super Rod"]];
   return (
     <div style={{ display:"flex", alignItems:"center", gap:7, margin:"6px 0 2px" }}>
       <div style={{ flex:1, height:1, background:C.border }} />
-      <span style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.1em", textTransform:"uppercase", color }}>{label}</span>
+      <div style={{ display:"flex", alignItems:"center", gap:3 }}>
+        {sprites.map((src,i) => <img key={i} src={src} alt="" style={{ width:16, height:16, imageRendering:"pixelated" }} />)}
+        <span style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.1em", textTransform:"uppercase", color, marginLeft:2 }}>{label}</span>
+      </div>
       <div style={{ flex:1, height:1, background:C.border }} />
     </div>
   );
@@ -2493,7 +2505,10 @@ function PokemonEntry({ p, caught, toggleCaught, version }) {
         <span style={{ color:isCaught?C.green:p.lgOnly?C.lgGreen:p.frOnly?"#c85252":C.text, fontWeight:"600", fontSize:12 }}>
           {p.name}{p.frOnly&&<Tag color="#c85252">FR</Tag>}{p.lgOnly&&<Tag color={C.lgGreen}>LG</Tag>}
         </span>
-        <span style={{ fontSize:10, color:C.muted, marginLeft:6 }}>{p.method}</span>
+        {METHOD_SPRITE_URL[p.method]
+          ? <img src={METHOD_SPRITE_URL[p.method]} alt={p.method} title={p.method} style={{ width:18, height:18, imageRendering:"pixelated", marginLeft:6, verticalAlign:"middle", flexShrink:0 }} />
+          : <span style={{ fontSize:10, color:C.muted, marginLeft:6 }}>{p.method}</span>
+        }
         {p.note&&<div style={{ fontSize:10, color:"#b87030", marginTop:2 }}>{p.note}</div>}
       </div>
       <div style={{ textAlign:"right", flexShrink:0, paddingLeft:8, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3 }}>
