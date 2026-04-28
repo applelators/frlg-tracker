@@ -2999,6 +2999,7 @@ function CatchCalcTab({ isMobile }) {
   );
 
   return (
+    <div style={{ flex:1, overflowY:"auto" }}>
     <div style={{ display:"flex", flexDirection:isMobile?"column":"row", gap:16,
                   padding:"16px", maxWidth:960, margin:"0 auto" }}>
 
@@ -3171,6 +3172,7 @@ function CatchCalcTab({ isMobile }) {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
