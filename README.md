@@ -78,7 +78,9 @@ Area data is being audited part by part against the [Bulbapedia FireRed & LeafGr
 | Part 13 | Cinnabar Island · Pokémon Mansion · Cinnabar Gym | Audited |
 | Part 14 | One Island · Treasure Beach · Kindle Road · Mt. Ember · Two Island · Cape Brink · Three Isle Port · Three Isle Path · Bond Bridge · Berry Forest | Audited |
 | Part 15 | Route 21 · Power Plant · Viridian Gym | Audited |
-| Part 16–21 | Route 22 (Return) through Sevii Islands | Pending audit |
+| Part 16 | Route 23 · Victory Road | Audited |
+| Part 17 | Indigo Plateau (Elite Four · Blue Champion) | Audited |
+| Part 18–21 | Sevii Islands (Four Island onward) | Pending audit |
 
 ---
 

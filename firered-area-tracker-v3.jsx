@@ -101,10 +101,30 @@ const AREAS = [
     items:[{name:"Oak's Parcel",hidden:false,note:"From the Poké Mart shopkeeper — deliver to Professor Oak in Pallet Town"},{name:"Potion",hidden:false,note:"Near the city's north exit, west of the small tree"},{name:"Teachy TV",hidden:false,note:"From the old man after delivering Oak's Parcel"},{name:"TM26 Earthquake",hidden:false,note:"From the Viridian Gym Leader after defeating them — not accessible until post-game"}] },
 
   { part:"Part 2", id:"route22", name:"Route 22",
-    note:"Worth visiting early — Mankey is useful against Brock.",
-    pokemon:[{name:"Rattata",method:"Grass",levels:"2–5",rate:"45%"},{name:"Mankey",method:"Grass",levels:"2–5",rate:"45%"},{name:"Spearow",method:"Grass",levels:"3–5",rate:"10%"}],
+    note:"Worth visiting early for Mankey (useful against Brock). Surf and fishing unlocked on the return visit after Viridian Gym. Blue challenges you here a second time before the Pokémon League.",
+    pokemon:[
+      {name:"Rattata",  method:"Grass",     levels:"2–5",   rate:"45%"},
+      {name:"Mankey",   method:"Grass",     levels:"2–5",   rate:"45%"},
+      {name:"Spearow",  method:"Grass",     levels:"3–5",   rate:"10%"},
+      {name:"Psyduck",  method:"Surf",      levels:"20–40", rate:"100%", frOnly:true},
+      {name:"Slowpoke", method:"Surf",      levels:"20–40", rate:"100%", lgOnly:true},
+      {name:"Magikarp", method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Poliwag",  method:"Good Rod",  levels:"5–15",  rate:"60%"},
+      {name:"Goldeen",  method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Magikarp", method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Poliwag",  method:"Super Rod", levels:"15–25", rate:"40%"},
+      {name:"Poliwhirl",method:"Super Rod", levels:"20–30", rate:"40%"},
+      {name:"Gyarados", method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Psyduck",  method:"Super Rod", levels:"15–35", rate:"5%",  frOnly:true},
+      {name:"Slowpoke", method:"Super Rod", levels:"15–35", rate:"5%",  lgOnly:true},
+    ],
     items:[],
-    trainers:[{class:"Rival",name:"Blue",note:"Pidgey + whichever starter counters yours, both Lv.9.",team:[{name:"Pidgey",level:9}]}] },
+    trainers:[
+      {class:"Rival",name:"Blue",note:"Early visit — Lv. 9 Pidgey + the starter that counters yours.",
+        team:[{name:"Pidgey",level:9}]},
+      {class:"Rival",name:"Blue",note:"Pre-League return — team varies by starter. Shown: vs Bulbasaur.",
+        team:[{name:"Pidgeot",level:47},{name:"Rhyhorn",level:45},{name:"Exeggcute",level:45},{name:"Gyarados",level:45},{name:"Alakazam",level:47},{name:"Charizard",level:53}]},
+    ]},
 
   { part:"Part 2", id:"route2-west", name:"Route 2 (West)",
     note:"Pass-through on the way to Viridian Forest. Wild Pokémon are available on first visit.",
@@ -2010,6 +2030,138 @@ const AREAS = [
     ],
     trainers:[]},
 
+  { part:"Part 16", id:"route23", name:"Route 23",
+    note:"A checkpoint gauntlet — you need all eight badges to pass the successive gatekeepers. Connects Viridian City to Victory Road and the Indigo Plateau.",
+    pokemon:[
+      {name:"Mankey",   method:"Grass",     levels:"32–34",  rate:"30%"},
+      {name:"Fearow",   method:"Grass",     levels:"40–44",  rate:"25%"},
+      {name:"Ekans",    method:"Grass",     levels:"32–34",  rate:"20%", frOnly:true},
+      {name:"Sandshrew",method:"Grass",     levels:"32–34",  rate:"20%", lgOnly:true},
+      {name:"Spearow",  method:"Grass",     levels:"32–34",  rate:"15%"},
+      {name:"Arbok",    method:"Grass",     levels:"44",     rate:"5%",  frOnly:true},
+      {name:"Sandslash",method:"Grass",     levels:"44",     rate:"5%",  lgOnly:true},
+      {name:"Primeape", method:"Grass",     levels:"42",     rate:"5%"},
+      {name:"Psyduck",  method:"Surf",      levels:"20–40",  rate:"100%", frOnly:true},
+      {name:"Slowpoke", method:"Surf",      levels:"20–40",  rate:"100%", lgOnly:true},
+      {name:"Magikarp", method:"Old Rod",   levels:"5",      rate:"100%"},
+      {name:"Poliwag",  method:"Good Rod",  levels:"5–15",   rate:"60%"},
+      {name:"Goldeen",  method:"Good Rod",  levels:"5–15",   rate:"20%"},
+      {name:"Magikarp", method:"Good Rod",  levels:"5–15",   rate:"20%"},
+      {name:"Poliwag",  method:"Super Rod", levels:"15–25",  rate:"40%"},
+      {name:"Poliwhirl",method:"Super Rod", levels:"20–30",  rate:"40%"},
+      {name:"Gyarados", method:"Super Rod", levels:"15–25",  rate:"15%"},
+      {name:"Psyduck",  method:"Super Rod", levels:"15–35",  rate:"5%",  frOnly:true},
+      {name:"Slowpoke", method:"Super Rod", levels:"15–35",  rate:"5%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Leppa Berry",  hidden:true, note:"Northwest of Thunder Badge checkpoint"},
+      {name:"Max Ether",    hidden:true, note:"Northeast island area"},
+      {name:"Ultra Ball",   hidden:true, note:"Northeast of lake"},
+      {name:"Aspear Berry", hidden:true, note:"Southwest of Volcano Badge checkpoint"},
+      {name:"Full Restore", hidden:true, note:"East of northern grass patch"},
+      {name:"Sitrus Berry", hidden:true, note:"West-southwest of Victory Road entrance"},
+      {name:"Lum Berry",    hidden:true, note:"Southwest of the stone maze (north section)"},
+      {name:"Max Elixir",   hidden:true, note:"Northwest of the stone maze (north section)"},
+    ],
+    trainers:[]},
+
+  { part:"Part 16", id:"victory-road", name:"Victory Road",
+    note:"Three-floor cave between Route 23 and the Indigo Plateau. Strength and Rock Smash are needed for some items.",
+    floors:[
+      { label:"1F",
+        pokemon:[
+          {name:"Onix",     method:"Cave", levels:"40–43", rate:"30%"},
+          {name:"Machop",   method:"Cave", levels:"32–34", rate:"20%"},
+          {name:"Geodude",  method:"Cave", levels:"32–34", rate:"20%"},
+          {name:"Zubat",    method:"Cave", levels:"32–34", rate:"10%"},
+          {name:"Arbok",    method:"Cave", levels:"44",    rate:"5%",  frOnly:true},
+          {name:"Sandslash",method:"Cave", levels:"44",    rate:"5%",  lgOnly:true},
+          {name:"Golbat",   method:"Cave", levels:"44",    rate:"5%"},
+          {name:"Machoke",  method:"Cave", levels:"44",    rate:"5%"},
+          {name:"Marowak",  method:"Cave", levels:"44",    rate:"5%"},
+        ],
+        items:[
+          {name:"TM02 Dragon Claw",hidden:false, note:"North area (requires Strength)"},
+          {name:"Rare Candy",      hidden:false, note:"North area (requires Strength)"},
+          {name:"Full Restore",    hidden:true,  note:"On rock east of TM02"},
+          {name:"Ultra Ball",      hidden:true,  note:"Near center of floor"},
+        ],
+        trainers:[
+          {class:"Cooltrainer",name:"Naomi",  team:[{name:"Persian",  level:42},{name:"Ponyta",   level:42},{name:"Rapidash", level:42},{name:"Vulpix",   level:42},{name:"Ninetales",level:42}]},
+          {class:"Cooltrainer",name:"Rolando", team:[{name:"Raticate", level:42},{name:"Ivysaur",  level:42},{name:"Wartortle",level:42},{name:"Charmeleon",level:42},{name:"Charizard", level:42}]},
+          {class:"Juggler",    name:"Nelson",  team:[{name:"Drowzee",  level:41},{name:"Hypno",    level:41},{name:"Kadabra",  level:41},{name:"Kadabra",  level:41}]},
+          {class:"Tamer",      name:"Vincent", team:[{name:"Persian",  level:44},{name:"Golduck",  level:44}]},
+        ]},
+      { label:"2F",
+        pokemon:[
+          {name:"Machop",   method:"Cave", levels:"34",    rate:"20%"},
+          {name:"Geodude",  method:"Cave", levels:"34",    rate:"20%"},
+          {name:"Onix",     method:"Cave", levels:"43–46", rate:"20%"},
+          {name:"Zubat",    method:"Cave", levels:"34",    rate:"10%"},
+          {name:"Primeape", method:"Cave", levels:"42",    rate:"10%"},
+          {name:"Arbok",    method:"Cave", levels:"46",    rate:"5%",  frOnly:true},
+          {name:"Sandslash",method:"Cave", levels:"46",    rate:"5%",  lgOnly:true},
+          {name:"Golbat",   method:"Cave", levels:"46",    rate:"5%"},
+          {name:"Machoke",  method:"Cave", levels:"46",    rate:"5%"},
+          {name:"Marowak",  method:"Cave", levels:"46",    rate:"5%"},
+        ],
+        items:[
+          {name:"TM37 Sandstorm",hidden:false, note:"Southwest of Black Belt Daisuke"},
+          {name:"Full Heal",     hidden:false, note:"Southwest of Tamer Vincent's area"},
+          {name:"TM07 Hail",     hidden:false, note:"Northeast area"},
+          {name:"Guard Spec.",   hidden:false, note:"Northwest area"},
+        ],
+        trainers:[
+          {class:"Black Belt",  name:"Daisuke", team:[{name:"Machoke",level:43},{name:"Machop",  level:43},{name:"Machoke",level:43}]},
+          {class:"Juggler",     name:"Gregory", team:[{name:"Mr. Mime",level:48}]},
+          {class:"Cooltrainer", name:"George",  team:[{name:"Exeggutor",level:42},{name:"Sandslash",level:42},{name:"Cloyster",level:42},{name:"Electrode",level:42},{name:"Arcanine",level:42}]},
+          {class:"PokéManiac",  name:"Dawson",  team:[{name:"Charmeleon",level:40},{name:"Lapras",level:40},{name:"Lickitung",level:40}]},
+          {class:"Cooltrainer", name:"Alexa",   team:[{name:"Clefairy",level:42},{name:"Jigglypuff",level:42},{name:"Persian",level:42},{name:"Dewgong",level:42},{name:"Chansey",level:42}]},
+        ]},
+      { label:"3F",
+        pokemon:[
+          {name:"Onix",     method:"Cave", levels:"44–46", rate:"30%"},
+          {name:"Machop",   method:"Cave", levels:"34–36", rate:"20%"},
+          {name:"Geodude",  method:"Cave", levels:"34–36", rate:"20%"},
+          {name:"Zubat",    method:"Cave", levels:"34–36", rate:"10%"},
+          {name:"Arbok",    method:"Cave", levels:"46",    rate:"5%",  frOnly:true},
+          {name:"Sandslash",method:"Cave", levels:"46",    rate:"5%",  lgOnly:true},
+          {name:"Golbat",   method:"Cave", levels:"46",    rate:"5%"},
+          {name:"Machoke",  method:"Cave", levels:"46",    rate:"5%"},
+          {name:"Marowak",  method:"Cave", levels:"46",    rate:"5%"},
+        ],
+        items:[
+          {name:"Max Revive", hidden:false, note:"Northeast area"},
+          {name:"TM50 Overheat",hidden:false, note:"Northwest area"},
+        ],
+        trainers:[
+          {class:"Cooltrainer",name:"Colby",    team:[{name:"Kingler",   level:41},{name:"Poliwhirl",level:41},{name:"Tentacruel",level:41},{name:"Seadra",   level:41},{name:"Blastoise",level:43}]},
+          {class:"Cooltrainer",name:"Caroline", team:[{name:"Bellsprout",level:42},{name:"Weepinbell",level:42},{name:"Victreebel",level:42},{name:"Paras",    level:42},{name:"Parasect", level:42}]},
+          {class:"Cool Couple",name:"Ray & Tyra",team:[{name:"Nidoking", level:45},{name:"Nidoqueen",level:45}]},
+        ]},
+    ]},
+
+  { part:"Part 17", id:"indigo-plateau", name:"Indigo Plateau",
+    note:"Face the Elite Four in order — Lorelei → Bruno → Agatha → Lance — then challenge Blue as Champion. Blue's team varies depending on which starter you chose.",
+    pokemon:[],
+    items:[],
+    trainers:[
+      {class:"Elite Four",name:"Lorelei", note:"Ice-type specialist",
+        team:[{name:"Dewgong",level:52},{name:"Cloyster",level:51},{name:"Slowbro",level:52},{name:"Jynx",level:54},{name:"Lapras",level:54}]},
+      {class:"Elite Four",name:"Bruno",   note:"Fighting-type specialist",
+        team:[{name:"Onix",level:51},{name:"Hitmonchan",level:53},{name:"Hitmonlee",level:53},{name:"Onix",level:54},{name:"Machamp",level:56}]},
+      {class:"Elite Four",name:"Agatha",  note:"Ghost-type specialist",
+        team:[{name:"Gengar",level:54},{name:"Golbat",level:54},{name:"Haunter",level:53},{name:"Arbok",level:56},{name:"Gengar",level:58}]},
+      {class:"Elite Four",name:"Lance",   note:"Dragon-type specialist",
+        team:[{name:"Gyarados",level:56},{name:"Dragonair",level:54},{name:"Dragonair",level:54},{name:"Aerodactyl",level:58},{name:"Dragonite",level:60}]},
+      {class:"Rival",     name:"Blue",    note:"Champion — vs Bulbasaur starter",
+        team:[{name:"Pidgeot",level:59},{name:"Alakazam",level:57},{name:"Rhydon",level:59},{name:"Exeggutor",level:59},{name:"Gyarados",level:61},{name:"Charizard",level:63}]},
+      {class:"Rival",     name:"Blue",    note:"Champion — vs Charmander starter",
+        team:[{name:"Pidgeot",level:59},{name:"Alakazam",level:57},{name:"Rhydon",level:59},{name:"Arcanine",level:59},{name:"Exeggutor",level:61},{name:"Blastoise",level:63}]},
+      {class:"Rival",     name:"Blue",    note:"Champion — vs Squirtle starter",
+        team:[{name:"Pidgeot",level:59},{name:"Alakazam",level:57},{name:"Rhydon",level:59},{name:"Gyarados",level:59},{name:"Arcanine",level:61},{name:"Venusaur",level:63}]},
+    ]},
+
   { part:"Part 15", id:"viridian-gym", name:"Viridian Gym",
     note:"Giovanni's Ground-type gym — spinner tile maze. Defeating Giovanni earns the Earth Badge. TM26 Earthquake is already tracked in Viridian City (Part 2).",
     pokemon:[],
@@ -2151,7 +2303,7 @@ const MAP_CONNECTIONS = [
 ];
 
 // Parts that have been fully audited against the Bulbapedia walkthrough — extend as each part is verified.
-const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11", "Part 12", "Part 13", "Part 14", "Part 15"]);
+const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11", "Part 12", "Part 13", "Part 14", "Part 15", "Part 16", "Part 17"]);
 
 // ─── SPRITES ─────────────────────────────────────────────────────────────────
 const DEX_ID = Object.fromEntries(DEX.map(p => [p.name, p.id]));
@@ -2214,6 +2366,7 @@ const ITEM_SPRITE = {
   "Iapapa Berry":"iapapa-berry","Aspear Berry":"aspear-berry",
   "Thunder Stone":"thunder-stone","TM17 Protect":"tm-normal","TM25 Thunder":"tm-electric",
   "Macho Brace":"macho-brace",
+  "TM02 Dragon Claw":"tm-dragon","TM07 Hail":"tm-ice","Guard Spec.":"guard-spec","TM50 Overheat":"tm-fire",
 };
 const itemSpriteUrl = name => { const s = ITEM_SPRITE[name]; return s ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${s}.png` : null; };
 const METHOD_SPRITE_URL = {
@@ -2238,8 +2391,9 @@ const TRAINER_CLASS_SPRITE = {
   "Burglar":"burglar",
   "Crush Girl":"crushgirl-gen3","Pokémon Ranger":"pokemonranger-gen3",
   "Aroma Lady":"aromalady-gen3","Tuber♀":"tuberf-gen3",
+  "Cool Couple":"coolcouple-gen3","Elite Four":"elite-four-gen3",
 };
-const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Lt. Surge":"lt-surge","Blue":"blue","Giovanni":"giovanni","Erika":"erika","Koga":"koga","Sabrina":"sabrina","Blaine":"blaine"};
+const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Lt. Surge":"lt-surge","Blue":"blue","Giovanni":"giovanni","Erika":"erika","Koga":"koga","Sabrina":"sabrina","Blaine":"blaine","Lorelei":"lorelei","Bruno":"bruno","Agatha":"agatha","Lance":"lance"};
 const trainerSpriteUrl = (cls, name) => { const s = TRAINER_NAME_SPRITE[name] || TRAINER_CLASS_SPRITE[cls]; return s ? `https://play.pokemonshowdown.com/sprites/trainers/${s}.png` : null; };
 
 function pct(a, b) { return b ? Math.round((a / b) * 100) : 0; }
