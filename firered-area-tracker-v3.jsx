@@ -3432,7 +3432,7 @@ function HuntTab({ version, isMobile }) {
                         <div style={{ fontSize:10, color:C.muted, marginTop:1 }}>{loc.part}</div>
                       </div>
                       <div style={{ textAlign:"right", flexShrink:0 }}>
-                        <RateDisplay rate={loc.rate} />
+                        <RateDisplay rate={loc.rate} isMobile={isMobile} />
                       </div>
                     </div>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center",
@@ -3965,7 +3965,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                             <Section title="Wild Pokémon" count={`${pokDone}/${floorVerPoks.length}`} color={C.green}
                               allDone={pokDone===floorVerPoks.length && floorVerPoks.length>0}
                               onMarkAll={() => pokDone===floorVerPoks.length ? clearAllPokemon(floorVerPoks) : markAllPokemon(floorVerPoks)}>
-                              {!hasPoks ? <Empty text="No wild Pokémon here" /> : renderPokemonList(floor.pokemon, caught, toggleCaught, version)}
+                              {!hasPoks ? <Empty text="No wild Pokémon here" /> : renderPokemonList(floor.pokemon, caught, toggleCaught, version, isMobile)}
                             </Section>
                             <Section title="Items" count={`${itmDone}/${(floor.items||[]).length}`} color={C.gold}
                               allDone={itmDone===(floor.items||[]).length && (floor.items||[]).length>0}
@@ -3998,7 +3998,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                       allDone={pokeDone===verPokemon.length && verPokemon.length>0}
                       onMarkAll={() => pokeDone===verPokemon.length ? clearAllPokemon(verPokemon) : markAllPokemon(verPokemon)}>
                       {areaPokemon.length === 0 ? <Empty text="No wild Pokémon here" /> :
-                        renderPokemonList(areaPokemon, caught, toggleCaught, version)
+                        renderPokemonList(areaPokemon, caught, toggleCaught, version, isMobile)
                       }
                     </Section>
                     <Section title="Items" count={`${itemDone}/${areaItems.length}`} color={C.gold}
@@ -4088,7 +4088,7 @@ function MethodDivider({ label }) {
   );
 }
 
-function renderPokemonList(pokemon, caught, toggleCaught, version) {
+function renderPokemonList(pokemon, caught, toggleCaught, version, isMobile) {
   // Sort within each consecutive method block by effective rate descending.
   // Method block order is preserved; only intra-group ordering changes.
   const getPct = p => {
@@ -4117,11 +4117,11 @@ function renderPokemonList(pokemon, caught, toggleCaught, version) {
   return items.map(item =>
     item.type === "divider"
       ? <MethodDivider key={item.key} label={item.label} />
-      : <PokemonEntry key={item.key} p={item.p} caught={caught} toggleCaught={toggleCaught} version={version} />
+      : <PokemonEntry key={item.key} p={item.p} caught={caught} toggleCaught={toggleCaught} version={version} isMobile={isMobile} />
   );
 }
 
-function PokemonEntry({ p, caught, toggleCaught, version }) {
+function PokemonEntry({ p, caught, toggleCaught, version, isMobile }) {
   const isCaught = !!caught[p.name];
   if ((version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly)) return null;
 
@@ -4151,7 +4151,7 @@ function PokemonEntry({ p, caught, toggleCaught, version }) {
         {hasBetter&&<div style={{ fontSize:9, color:"#7ab4d4", marginTop:2 }}>↑ {best.pct}% in {best.areaName}</div>}
       </div>
       <div style={{ textAlign:"right", flexShrink:0, paddingLeft:8, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3 }}>
-        <RateDisplay rate={p.rate} />
+        <RateDisplay rate={p.rate} isMobile={isMobile} />
         {p.levels&&<div style={{ fontSize:10, color:C.muted }}>Lv.{p.levels}</div>}
       </div>
     </Row>
@@ -4319,7 +4319,7 @@ function encMath(pct) {
 // Parses rate strings like "5% FR / 10% LG" into split FR/LG pills,
 // or renders a plain rate badge for simple values like "50%" or "×1".
 // Hover (desktop) or tap (mobile) shows encounter math tooltip.
-function RateDisplay({ rate }) {
+function RateDisplay({ rate, isMobile }) {
   const [pos, setPos] = useState(null);
   const ref = React.useRef(null);
   if (!rate) return null;
@@ -4356,6 +4356,27 @@ function RateDisplay({ rate }) {
     const rateColor = num >= 30 ? "#5ab0d8" : num >= 10 ? "#d4b840" : "#9878cc";
     return <span style={{ fontSize:12, fontWeight:"700", color:rateColor, whiteSpace:"nowrap" }}>{rate}</span>;
   })();
+
+  if (isMobile) {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:2 }}>
+        {badge}
+        {hasMath && (
+          <div style={{ fontSize:9, color:C.muted, textAlign:"right", lineHeight:1.3 }}>
+            {splitMatch ? (
+              <>
+                {frMath && <span style={{ color:"rgba(200,82,82,0.7)" }}>FR ~{frMath.avg} / ≤{frMath.conf95}</span>}
+                {frMath && lgMath && <br />}
+                {lgMath && <span style={{ color:"rgba(63,168,74,0.7)" }}>LG ~{lgMath.avg} / ≤{lgMath.conf95}</span>}
+              </>
+            ) : (
+              <span>~{simpleMath.avg} avg · ≤{simpleMath.conf95} for 95%</span>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
