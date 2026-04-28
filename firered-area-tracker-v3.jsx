@@ -2214,6 +2214,29 @@ for (const area of AREAS) {
   }
 }
 
+// ─── BEST ENCOUNTER AREA MAP ─────────────────────────────────────────────────
+// For each Pokémon × version, the single area with the highest encounter rate.
+// Used in PokemonEntry to flag when a better hunting spot exists elsewhere.
+function _locPct(loc, ver) {
+  if (!loc.rate) return null;
+  const m = loc.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
+  if (m) return parseRatePct(ver === "fr" ? m[1] : m[2]);
+  return parseRatePct(loc.rate);
+}
+const BEST_AREA_MAP = { fr:{}, lg:{} };
+for (const [name, locs] of Object.entries(LOCATION_MAP)) {
+  for (const ver of ["fr","lg"]) {
+    let best = null;
+    for (const loc of locs) {
+      if (ver === "fr" && loc.lgOnly) continue;
+      if (ver === "lg" && loc.frOnly) continue;
+      const pct = _locPct(loc, ver);
+      if (pct && (!best || pct > best.pct)) best = { pct, areaName: loc.areaName };
+    }
+    if (best) BEST_AREA_MAP[ver][name] = best;
+  }
+}
+
 // ─── CATCH CONSTRAINT MAP ─────────────────────────────────────────────────────
 // Identifies Pokémon that cannot be caught with a regular Poké Ball:
 //   "safari"     → only catchable in the Safari Zone (Safari Ball forced)
@@ -4083,8 +4106,16 @@ function renderPokemonList(pokemon, caught, toggleCaught, version) {
 
 function PokemonEntry({ p, caught, toggleCaught, version }) {
   const isCaught = !!caught[p.name];
-  // Hide encounters that don't exist in the selected version
   if ((version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly)) return null;
+
+  // Determine if a better-rate area exists for this Pokémon
+  const splitMatch = p.rate && p.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
+  const currentPct = splitMatch
+    ? parseRatePct(version === "fr" ? splitMatch[1] : splitMatch[2])
+    : parseRatePct(p.rate);
+  const best = BEST_AREA_MAP[version][p.name];
+  const hasBetter = !isCaught && currentPct && best && best.pct > currentPct;
+
   return (
     <Row done={isCaught} onClick={() => toggleCaught(p.name)}>
       {DEX_ID[p.name] && <img src={pokeSpriteUrl(DEX_ID[p.name])} alt={p.name} style={{ width:36, height:36, imageRendering:"pixelated", flexShrink:0, opacity:isCaught?1:0.65, filter:isCaught?"none":"brightness(0)" }} />}
@@ -4100,6 +4131,7 @@ function PokemonEntry({ p, caught, toggleCaught, version }) {
           : <span style={{ fontSize:10, color:C.muted, marginLeft:6 }}>{p.method}</span>
         }
         {p.note&&<div style={{ fontSize:10, color:"#b87030", marginTop:2 }}>{p.note}</div>}
+        {hasBetter&&<div style={{ fontSize:9, color:"#7ab4d4", marginTop:2 }}>↑ {best.pct}% in {best.areaName}</div>}
       </div>
       <div style={{ textAlign:"right", flexShrink:0, paddingLeft:8, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:3 }}>
         <RateDisplay rate={p.rate} />
