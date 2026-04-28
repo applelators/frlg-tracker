@@ -3523,7 +3523,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                               onMarkAll={() => { const kfn = (it,i) => floorItemKey(areaId,floor.label,i); itmDone===(floor.items||[]).length ? clearAllItems(floor.items||[],kfn) : markAllItems(floor.items||[],kfn); }}>
                               {!hasItms ? <Empty text="No items here" /> : floor.items.map((it,i) => {
                                 const key = floorItemKey(areaId, floor.label, i);
-                                return <ItemEntry key={i} it={it} itemKey={key} done={!!items[key]} toggleItem={toggleItem} />;
+                                return <ItemEntry key={i} it={it} itemKey={key} done={!!items[key]} toggleItem={toggleItem} isMobile={isMobile} />;
                               })}
                             </Section>
                           </div>
@@ -3558,7 +3558,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                       {areaItems.length === 0 ? <Empty text="No items here" /> :
                         areaItems.map((it,i) => {
                           const key = flatItemKey(areaId, i);
-                          return <ItemEntry key={i} it={it} itemKey={key} done={!!items[key]} toggleItem={toggleItem} />;
+                          return <ItemEntry key={i} it={it} itemKey={key} done={!!items[key]} toggleItem={toggleItem} isMobile={isMobile} />;
                         })
                       }
                     </Section>
@@ -3683,8 +3683,24 @@ function PokemonEntry({ p, caught, toggleCaught, version }) {
   );
 }
 
-function ItemEntry({ it, itemKey, done, toggleItem }) {
-  const [showImg, setShowImg] = React.useState(false);
+function ItemEntry({ it, itemKey, done, toggleItem, isMobile }) {
+  const [showLightbox, setShowLightbox] = React.useState(false);
+  const [hoverPos, setHoverPos]         = React.useState(null);
+  const btnRef = React.useRef(null);
+
+  const openLightbox  = e => { e.stopPropagation(); setShowLightbox(true); };
+  const closeLightbox = () => setShowLightbox(false);
+
+  const onPinEnter = () => {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    setHoverPos({
+      right: window.innerWidth - r.left + 8,
+      top:   Math.min(Math.max(r.top + r.height / 2, 80), window.innerHeight - 80),
+    });
+  };
+  const onPinLeave = () => setHoverPos(null);
+
   return (
     <>
       <Row done={done} onClick={() => toggleItem(itemKey)}>
@@ -3696,14 +3712,33 @@ function ItemEntry({ it, itemKey, done, toggleItem }) {
           {it.note&&<div style={{ fontSize:10, color:C.muted, marginTop:2, lineHeight:1.5 }}>{it.note}</div>}
         </div>
         {it.img&&(
-          <button onClick={e=>{e.stopPropagation();setShowImg(true);}}
+          <button ref={btnRef}
+            onClick={isMobile ? openLightbox : e => e.stopPropagation()}
+            onMouseEnter={isMobile ? undefined : onPinEnter}
+            onMouseLeave={isMobile ? undefined : onPinLeave}
             style={{ background:"transparent", border:"none", cursor:"pointer", color:C.muted,
                      fontSize:14, padding:"0 4px", flexShrink:0, alignSelf:"center" }}
             title="View location screenshot">📍</button>
         )}
       </Row>
-      {showImg&&(
-        <div onClick={()=>setShowImg(false)}
+
+      {/* Desktop hover popover */}
+      {hoverPos&&(
+        <div style={{ position:"fixed", right:hoverPos.right, top:hoverPos.top,
+                      transform:"translateY(-50%)", zIndex:300, pointerEvents:"none",
+                      background:C.card, border:`1px solid ${C.border}`, borderRadius:8,
+                      padding:8, boxShadow:"0 8px 32px rgba(0,0,0,0.7)", maxWidth:300 }}>
+          <div style={{ fontSize:11, fontWeight:"600", color:C.text, marginBottom:6 }}>
+            {it.hidden&&"★ "}{it.name}
+          </div>
+          <img src={it.img} alt={`${it.name} location`}
+            style={{ width:"100%", display:"block", borderRadius:4 }} />
+        </div>
+      )}
+
+      {/* Mobile tap lightbox */}
+      {showLightbox&&(
+        <div onClick={closeLightbox}
           style={{ position:"fixed", inset:0, zIndex:300, background:"rgba(0,0,0,0.88)",
                    display:"flex", alignItems:"center", justifyContent:"center" }}>
           <div onClick={e=>e.stopPropagation()} style={{ position:"relative", maxWidth:"92vw" }}>
@@ -3711,7 +3746,7 @@ function ItemEntry({ it, itemKey, done, toggleItem }) {
               <span style={{ color:C.text, fontSize:13, fontWeight:"600" }}>
                 {it.hidden&&"★ "}{it.name}
               </span>
-              <button onClick={()=>setShowImg(false)}
+              <button onClick={closeLightbox}
                 style={{ background:"transparent", border:`1px solid ${C.border}`, color:C.muted,
                          borderRadius:6, cursor:"pointer", padding:"2px 10px", fontSize:14, marginLeft:16 }}>✕</button>
             </div>
