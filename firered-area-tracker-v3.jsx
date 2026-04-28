@@ -2301,11 +2301,17 @@ const COMPLETION_SECTIONS = [
     ],
   },
   {
-    id:"trades", title:"In-Game Trades (required for Pokédex)", color:C.gold,
+    id:"trades", title:"In-Game Trades", color:C.gold,
     items:[
-      { id:"trade-farfetchd", label:"Farfetch'd", note:"Trade Spearow → Farfetch'd — man inside building in Vermilion City", auto:"farfetchd" },
-      { id:"trade-jynx",      label:"Jynx",       note:"Trade Poliwhirl → Jynx — woman in Cerulean City house",              auto:"jynx" },
-      { id:"trade-mr-mime",   label:"Mr. Mime",   note:"Trade Clefairy → Mr. Mime — Route 2 gate house",                     auto:"mr-mime" },
+      { id:"trade-mr-mime",   label:"Mr. Mime",               auto:"mr-mime",   note:"Give Abra → Route 2 east gate. Not available in the wild — required for Pokédex." },
+      { id:"trade-jynx",      label:"Jynx",                   auto:"jynx",      note:"Give Poliwhirl → Cerulean City house. Not available in the wild — required for Pokédex." },
+      { id:"trade-farfetchd", label:"Farfetch'd",             auto:"farfetchd", note:"Give Spearow → Vermilion City. Not available in the wild — required for Pokédex." },
+      { id:"trade-lickitung", label:"Lickitung",              auto:"lickitung", note:"Give Golduck (FR) or Slowbro (LG) → Route 18 gate. Not available in the wild — required for Pokédex." },
+      { id:"trade-nidoran",   label:"Nidoran gender swap",    optional:true,    note:"Underground Path (5↔6): give Nidoran♀ (FR) or ♂ (LG) → receive opposite gender. Both catchable in the wild." },
+      { id:"trade-nidevo",    label:"Nidorino / Nidorina",    optional:true,    note:"Route 11 gate: give Nidorino (FR) or Nidorina (LG) → receive the other. Both catchable in the wild (Safari Zone)." },
+      { id:"trade-electrode", label:"Electrode",              optional:true,    note:"Give Raichu → Cinnabar Lab. Catchable in the wild at Power Plant." },
+      { id:"trade-tangela",   label:"Tangela",                optional:true,    note:"Give Venonat → Cinnabar Lab. Catchable in the wild on Route 21." },
+      { id:"trade-seel",      label:"Seel",                   optional:true,    note:"Give Ponyta → Cinnabar Lab. Catchable in the wild in Seafoam Islands." },
     ],
   },
   {
@@ -2912,6 +2918,26 @@ function FireRedTracker() {
 
   const caughtCount = Object.keys(caught).length;
   const area = areaId ? AREAS.find(a => a.id === areaId) : null;
+
+  const { completionDone, completionTotal } = useMemo(() => {
+    const kdc = DEX.filter(p => !p.event && caught[p.name]).length;
+    const as = {
+      "kanto-dex": kdc >= 150,
+      "farfetchd":  !!caught["Farfetch'd"],
+      "jynx":       !!caught["Jynx"],
+      "mr-mime":    !!caught["Mr. Mime"],
+      "lickitung":  !!caught["Lickitung"],
+    };
+    let total = 0, done = 0;
+    for (const sec of COMPLETION_SECTIONS) {
+      for (const item of sec.items) {
+        if (item.disabled || item.optional) continue;
+        total++;
+        if (item.auto ? as[item.auto] : !!checklist[item.id]) done++;
+      }
+    }
+    return { completionDone: done, completionTotal: total };
+  }, [caught, checklist]);
   const accent = version === "lg" ? C.lgGreen : C.frRed;
 
   if (!booted) return <div style={{ background:C.bg, minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", color:C.text, fontFamily:"'DM Sans',system-ui,sans-serif" }}>Loading…</div>;
@@ -2953,6 +2979,12 @@ function FireRedTracker() {
             <div style={{ display:"flex", gap:18, fontSize:11, alignItems:"center" }}>
               <span><span style={{ color:C.green, fontWeight:"700", fontSize:13 }}>{caughtCount}</span><span style={{ color:C.muted }}> / 151 caught</span></span>
               <span><span style={{ color:C.gold, fontWeight:"700", fontSize:13 }}>{Object.keys(items).length}</span><span style={{ color:C.muted }}> items</span></span>
+              <span onClick={() => setTab("completion")}
+                title="View 100% checklist"
+                style={{ cursor:"pointer" }}>
+                <span style={{ color:"var(--frlg-accent)", fontWeight:"700", fontSize:13 }}>{completionDone}/{completionTotal}</span>
+                <span style={{ color:C.muted }}> goals</span>
+              </span>
               <div style={{ display:"flex", gap:4 }}>
                 {[["↓ Export", handleExport, "Export save data to a JSON file"],
                   ["↑ Import", handleImport, "Import save data from a JSON file"]].map(([label, fn, title]) => (
@@ -3439,12 +3471,13 @@ function CompletionTab({ caught, checklist, toggleChecklist, isMobile }) {
     "farfetchd":  !!caught["Farfetch'd"],
     "jynx":       !!caught["Jynx"],
     "mr-mime":    !!caught["Mr. Mime"],
+    "lickitung":  !!caught["Lickitung"],
   };
 
   let totalItems = 0, doneItems = 0;
   for (const sec of COMPLETION_SECTIONS) {
     for (const item of sec.items) {
-      if (item.disabled) continue;
+      if (item.disabled || item.optional) continue;
       totalItems++;
       if (item.auto ? autoState[item.auto] : !!checklist[item.id]) doneItems++;
     }
@@ -3481,7 +3514,7 @@ function CompletionTab({ caught, checklist, toggleChecklist, isMobile }) {
         {/* Sections */}
         <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
           {COMPLETION_SECTIONS.map(sec => {
-            const countable = sec.items.filter(i => !i.disabled);
+            const countable = sec.items.filter(i => !i.disabled && !i.optional);
             const secDone   = countable.filter(i => i.auto ? autoState[i.auto] : !!checklist[i.id]).length;
             const allDone   = secDone === countable.length && countable.length > 0;
 
@@ -3500,6 +3533,7 @@ function CompletionTab({ caught, checklist, toggleChecklist, isMobile }) {
                     const isDone     = !item.disabled && (item.auto ? autoState[item.auto] : !!checklist[item.id]);
                     const isAuto     = !!item.auto;
                     const isDisabled = !!item.disabled;
+                    const isOptional = !!item.optional;
                     const clickable  = !isAuto && !isDisabled;
 
                     return (
@@ -3536,6 +3570,9 @@ function CompletionTab({ caught, checklist, toggleChecklist, isMobile }) {
                             )}
                             {isAuto && !isDisabled && (
                               <span style={{ fontSize:9, color:C.muted, fontStyle:"italic", fontWeight:"400" }}>auto</span>
+                            )}
+                            {isOptional && (
+                              <span style={{ fontSize:9, color:C.muted, fontStyle:"italic", fontWeight:"400" }}>optional</span>
                             )}
                           </div>
                           <div style={{ fontSize:10, color:C.muted, marginTop:2, lineHeight:1.5 }}>
