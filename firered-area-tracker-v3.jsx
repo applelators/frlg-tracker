@@ -2210,7 +2210,7 @@ const LOCATION_MAP = {};
 for (const area of AREAS) {
   for (const p of _allPokemon(area)) {
     if (!LOCATION_MAP[p.name]) LOCATION_MAP[p.name] = [];
-    LOCATION_MAP[p.name].push({ areaId: area.id, areaName: area.name, part: area.part, method: p.method, levels: p.levels, rate: p.rate });
+    LOCATION_MAP[p.name].push({ areaId: area.id, areaName: area.name, part: area.part, method: p.method, levels: p.levels, rate: p.rate, frOnly: !!p.frOnly, lgOnly: !!p.lgOnly });
   }
 }
 
@@ -2904,7 +2904,7 @@ function FireRedTracker() {
 
         {/* Tabs */}
         <div style={{ display:"flex", gap:2, marginTop:10 }}>
-          {[["areas","Areas"],["dex","Pokédex"],["calc","Catch Calc"]].map(([t,label]) => (
+          {[["areas","Areas"],["dex","Pokédex"],["calc","Catch Calc"],["hunt","Hunt"]].map(([t,label]) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding:"8px 20px", border:"none", borderRadius:"6px 6px 0 0", cursor:"pointer",
               fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"600",
@@ -2925,6 +2925,9 @@ function FireRedTracker() {
 
       {/* ── Tab: Catch Calc ── */}
       {tab === "calc" && <CatchCalcTab isMobile={isMobile} />}
+
+      {/* ── Tab: Hunt ── */}
+      {tab === "hunt" && <HuntTab version={version} isMobile={isMobile} />}
     </div>
   );
 }
@@ -3173,6 +3176,180 @@ function CatchCalcTab({ isMobile }) {
         </div>
       </div>
     </div>
+    </div>
+  );
+}
+
+// ─── HUNT TAB ─────────────────────────────────────────────────────────────────
+function HuntTab({ version, isMobile }) {
+  const [search,   setSearch]   = useState("");
+  const [selected, setSelected] = useState(null);
+
+  // All Pokémon that appear in any area, ordered by dex number
+  const allNames = useMemo(() =>
+    Object.keys(LOCATION_MAP).sort((a, b) => (DEX_ID[a] || 999) - (DEX_ID[b] || 999)),
+    []
+  );
+  const filteredNames = search.trim()
+    ? allNames.filter(n => n.toLowerCase().includes(search.toLowerCase().trim()))
+    : allNames;
+
+  // Enriched & sorted locations for the selected Pokémon
+  const locs = useMemo(() => {
+    if (!selected) return [];
+    return (LOCATION_MAP[selected] || [])
+      .filter(loc => {
+        if (version === "fr" && loc.lgOnly) return false;
+        if (version === "lg" && loc.frOnly) return false;
+        return true;
+      })
+      .map(loc => {
+        const splitMatch = loc.rate && loc.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
+        let pct;
+        if (splitMatch) {
+          pct = version === "fr" ? parseRatePct(splitMatch[1]) : parseRatePct(splitMatch[2]);
+        } else {
+          pct = parseRatePct(loc.rate);
+        }
+        return { ...loc, pct, math: pct ? encMath(pct) : null };
+      })
+      .sort((a, b) => (b.pct || -1) - (a.pct || -1));
+  }, [selected, version]);
+
+  const dexId = selected ? DEX_ID[selected] : null;
+  const noMathMethods = new Set(["Gift","Trade","Fossil","Event","Game Corner"]);
+
+  const listPanel = (
+    <div style={{ display:"flex", flexDirection:"column", gap:0,
+                  background:C.card, borderRadius:8, border:`1px solid ${C.border}`,
+                  overflow:"hidden", flexShrink:0,
+                  width: isMobile ? "100%" : 200 }}>
+      <div style={{ padding:"8px 10px", borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
+        <input value={search} onChange={e => { setSearch(e.target.value); setSelected(null); }}
+          placeholder="Search Pokémon…"
+          style={{ width:"100%", boxSizing:"border-box", background:"rgba(0,0,0,0.3)",
+                   border:`1px solid ${C.border}`, borderRadius:6, color:C.text,
+                   fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:12,
+                   padding:"5px 8px", outline:"none" }} />
+      </div>
+      <div style={{ overflowY:"auto", maxHeight: isMobile ? 180 : "calc(100vh - 220px)" }}>
+        {filteredNames.length === 0 && (
+          <div style={{ padding:16, fontSize:12, color:C.muted, textAlign:"center" }}>No results</div>
+        )}
+        {filteredNames.map(name => {
+          const id = DEX_ID[name];
+          const isSel = name === selected;
+          return (
+            <button key={name} onClick={() => setSelected(name)}
+              style={{ width:"100%", display:"flex", alignItems:"center", gap:8,
+                       padding:"6px 10px", background: isSel ? "rgba(var(--frlg-accent-rgb,212,98,26),0.15)" : "transparent",
+                       border:"none", borderBottom:`1px solid ${C.border}30`, cursor:"pointer",
+                       borderLeft: isSel ? "3px solid var(--frlg-accent)" : "3px solid transparent",
+                       textAlign:"left" }}>
+              {id && <img src={pokeSpriteUrl(id)} alt={name}
+                style={{ width:28, height:28, imageRendering:"pixelated", flexShrink:0 }} />}
+              <span style={{ fontSize:12, fontWeight: isSel ? "700" : "400",
+                             color: isSel ? C.text : C.muted }}>{name}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const resultsPanel = (
+    <div style={{ flex:1, minWidth:0 }}>
+      {!selected ? (
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center",
+                      height:200, color:C.muted, fontSize:12, textAlign:"center", padding:24,
+                      background:C.card, borderRadius:8, border:`1px solid ${C.border}` }}>
+          Select a Pokémon to see where to find it and how many encounters to expect.
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:12 }}>
+            {dexId && <img src={pokeSpriteUrl(dexId)} alt={selected}
+              style={{ width:48, height:48, imageRendering:"pixelated" }} />}
+            <div>
+              <div style={{ fontSize:18, fontWeight:"700", color:C.text }}>{selected}</div>
+              {dexId && <div style={{ fontSize:10, color:C.muted, fontFamily:"'Courier New',monospace" }}>
+                #{String(dexId).padStart(3,"0")}
+              </div>}
+            </div>
+          </div>
+
+          {/* Results */}
+          {locs.length === 0 ? (
+            <div style={{ padding:16, background:C.card, borderRadius:8,
+                          border:`1px solid ${C.border}`, fontSize:12, color:C.muted }}>
+              Not found as a wild encounter in any tracked area for {version === "fr" ? "FireRed" : "LeafGreen"}.
+              Obtain via evolution, trading, or breeding.
+            </div>
+          ) : (
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              {locs.map((loc, i) => {
+                const accentLeft = loc.math
+                  ? (loc.pct >= 30 ? "#5ab0d8" : loc.pct >= 10 ? "#d4b840" : "#9878cc")
+                  : C.border;
+                return (
+                  <div key={i} style={{ padding:"10px 14px", background:C.card,
+                                        borderRadius:8, border:`1px solid ${C.border}`,
+                                        borderLeft:`4px solid ${accentLeft}` }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:8 }}>
+                      <div>
+                        <div style={{ fontSize:13, fontWeight:"700", color:C.text }}>{loc.areaName}</div>
+                        <div style={{ fontSize:10, color:C.muted, marginTop:1 }}>{loc.part}</div>
+                      </div>
+                      <div style={{ textAlign:"right", flexShrink:0 }}>
+                        <RateDisplay rate={loc.rate} />
+                      </div>
+                    </div>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center",
+                                  marginTop:6, flexWrap:"wrap", gap:4 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                        {METHOD_SPRITE_URL[loc.method]
+                          ? <img src={METHOD_SPRITE_URL[loc.method]} alt="" style={{ width:14, height:14, imageRendering:"pixelated" }} />
+                          : null}
+                        <span style={{ fontSize:11, color:C.muted }}>
+                          {loc.method}{loc.levels ? ` · Lv.${loc.levels}` : ""}
+                        </span>
+                        {loc.frOnly && <Tag color="#c85252">FR</Tag>}
+                        {loc.lgOnly && <Tag color={C.lgGreen}>LG</Tag>}
+                      </div>
+                      {loc.math && (
+                        <div style={{ fontSize:11, color:C.muted, textAlign:"right" }}>
+                          <span style={{ color:C.text, fontWeight:"600" }}>~{loc.math.avg}</span> avg ·{" "}
+                          <span style={{ color:C.text, fontWeight:"600" }}>≤{loc.math.conf95}</span> for 95%
+                        </div>
+                      )}
+                      {!loc.math && !noMathMethods.has(loc.method) && loc.rate && (
+                        <div style={{ fontSize:11, color:C.muted }}>—</div>
+                      )}
+                      {noMathMethods.has(loc.method) && (
+                        <div style={{ fontSize:11, color:C.muted, fontStyle:"italic" }}>one-time obtain</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              <div style={{ fontSize:10, color:C.muted, padding:"4px 2px" }}>
+                Sorted by highest encounter rate · Hover rate badge for per-encounter odds
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ flex:1, overflowY:"auto" }}>
+      <div style={{ display:"flex", flexDirection: isMobile ? "column" : "row", gap:16,
+                    padding:"16px", maxWidth:960, margin:"0 auto" }}>
+        {listPanel}
+        {resultsPanel}
+      </div>
     </div>
   );
 }
@@ -3826,33 +4003,94 @@ function Tag({ color, children }) {
   return <span style={{ marginLeft:5, fontSize:9, color, border:`1px solid ${color}`, padding:"0 4px", borderRadius:3, verticalAlign:"middle", fontWeight:"600" }}>{children}</span>;
 }
 
+// ─── ENCOUNTER MATH ──────────────────────────────────────────────────────────
+function parseRatePct(str) {
+  if (!str) return null;
+  const m = str.match(/^(\d+(?:\.\d+)?)%/);
+  return m ? parseFloat(m[1]) : null;
+}
+function encMath(pct) {
+  if (!pct || pct <= 0) return null;
+  const p = pct / 100;
+  return {
+    avg:    Math.ceil(1 / p),
+    conf95: Math.ceil(Math.log(0.05) / Math.log(1 - p)),
+  };
+}
+
 // Parses rate strings like "5% FR / 10% LG" into split FR/LG pills,
 // or renders a plain rate badge for simple values like "50%" or "×1".
+// Hover (desktop) or tap (mobile) shows encounter math tooltip.
 function RateDisplay({ rate }) {
+  const [pos, setPos] = useState(null);
+  const ref = React.useRef(null);
   if (!rate) return null;
-  // Detect FR/LG split pattern e.g. "5% FR / 10% LG"
+
   const splitMatch = rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
-  if (splitMatch) {
-    return (
-      <div style={{ display:"flex", flexDirection:"column", gap:3, alignItems:"flex-end" }}>
-        <span style={{ fontSize:11, fontWeight:"700", color:"#c85252", background:"rgba(200,82,82,0.12)", border:"1px solid rgba(200,82,82,0.3)", padding:"1px 6px", borderRadius:4, whiteSpace:"nowrap" }}>
-          FR {splitMatch[1]}
-        </span>
-        <span style={{ fontSize:11, fontWeight:"700", color:C.lgGreen, background:"rgba(63,168,74,0.12)", border:"1px solid rgba(63,168,74,0.3)", padding:"1px 6px", borderRadius:4, whiteSpace:"nowrap" }}>
-          LG {splitMatch[2]}
-        </span>
-      </div>
-    );
-  }
-  // One-time encounters
-  if (rate === "×1") {
-    return <span style={{ fontSize:11, fontWeight:"700", color:"#c8960a", background:"rgba(200,150,10,0.12)", border:"1px solid rgba(200,150,10,0.3)", padding:"1px 6px", borderRadius:4, whiteSpace:"nowrap" }}>×1</span>;
-  }
-  // Regular rate — colored by intensity
-  const numMatch = rate.match(/^(\d+)%/);
-  const num = numMatch ? parseInt(numMatch[1]) : 0;
-  const rateColor = num >= 30 ? "#5ab0d8" : num >= 10 ? "#d4b840" : "#9878cc";
-  return <span style={{ fontSize:12, fontWeight:"700", color:rateColor, whiteSpace:"nowrap" }}>{rate}</span>;
+  const isOneTime  = rate === "×1";
+
+  const frPct     = splitMatch ? parseRatePct(splitMatch[1]) : null;
+  const lgPct     = splitMatch ? parseRatePct(splitMatch[2]) : null;
+  const simplePct = (!splitMatch && !isOneTime) ? parseRatePct(rate) : null;
+  const frMath    = frPct     ? encMath(frPct)     : null;
+  const lgMath    = lgPct     ? encMath(lgPct)     : null;
+  const simpleMath = simplePct ? encMath(simplePct) : null;
+  const hasMath   = !!(frMath || lgMath || simpleMath);
+
+  const show = e => {
+    if (!ref.current || !hasMath) return;
+    e.stopPropagation();
+    const r = ref.current.getBoundingClientRect();
+    setPos({ x: r.left + r.width / 2, y: r.top });
+  };
+  const hide   = ()  => setPos(null);
+  const toggle = e   => { e.stopPropagation(); pos ? hide() : show(e); };
+
+  const badge = splitMatch ? (
+    <div style={{ display:"flex", flexDirection:"column", gap:3, alignItems:"flex-end" }}>
+      <span style={{ fontSize:11, fontWeight:"700", color:"#c85252", background:"rgba(200,82,82,0.12)", border:"1px solid rgba(200,82,82,0.3)", padding:"1px 6px", borderRadius:4, whiteSpace:"nowrap" }}>FR {splitMatch[1]}</span>
+      <span style={{ fontSize:11, fontWeight:"700", color:C.lgGreen, background:"rgba(63,168,74,0.12)", border:"1px solid rgba(63,168,74,0.3)", padding:"1px 6px", borderRadius:4, whiteSpace:"nowrap" }}>LG {splitMatch[2]}</span>
+    </div>
+  ) : isOneTime ? (
+    <span style={{ fontSize:11, fontWeight:"700", color:"#c8960a", background:"rgba(200,150,10,0.12)", border:"1px solid rgba(200,150,10,0.3)", padding:"1px 6px", borderRadius:4, whiteSpace:"nowrap" }}>×1</span>
+  ) : (() => {
+    const num = simplePct || 0;
+    const rateColor = num >= 30 ? "#5ab0d8" : num >= 10 ? "#d4b840" : "#9878cc";
+    return <span style={{ fontSize:12, fontWeight:"700", color:rateColor, whiteSpace:"nowrap" }}>{rate}</span>;
+  })();
+
+  return (
+    <>
+      <span ref={ref}
+        onMouseEnter={show} onMouseLeave={hide} onClick={toggle}
+        style={{ cursor: hasMath ? "help" : "default", display:"inline-flex" }}>
+        {badge}
+      </span>
+      {pos && hasMath && (
+        <div style={{ position:"fixed", left:pos.x, top:pos.y - 8,
+                      transform:"translate(-50%,calc(-100% - 4px))", zIndex:400,
+                      background:C.card, border:`1px solid ${C.border}`, borderRadius:8,
+                      padding:"8px 12px", boxShadow:"0 8px 32px rgba(0,0,0,0.75)",
+                      pointerEvents:"none", minWidth:170 }}>
+          {splitMatch ? (
+            <>
+              {frMath && <div style={{ fontSize:11, color:"#c85252", marginBottom:3 }}>
+                <b>FR</b> — ~{frMath.avg} avg · ≤{frMath.conf95} for 95%
+              </div>}
+              {lgMath && <div style={{ fontSize:11, color:C.lgGreen }}>
+                <b>LG</b> — ~{lgMath.avg} avg · ≤{lgMath.conf95} for 95%
+              </div>}
+            </>
+          ) : (
+            <div style={{ fontSize:11, color:C.text }}>
+              ~{simpleMath.avg} avg · ≤{simpleMath.conf95} for 95%
+            </div>
+          )}
+          <div style={{ fontSize:10, color:C.muted, marginTop:4 }}>encounters to see this Pokémon</div>
+        </div>
+      )}
+    </>
+  );
 }
 
 function Empty({ text }) {
