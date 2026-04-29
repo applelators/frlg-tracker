@@ -32,7 +32,7 @@ const DEX = [
   {id:46, name:"Paras"},       {id:47, name:"Parasect"},
   {id:48, name:"Venonat"},     {id:49, name:"Venomoth"},
   {id:50, name:"Diglett"},     {id:51, name:"Dugtrio"},
-  {id:52, name:"Meowth",  lgOnly:true}, {id:53, name:"Persian",  lgOnly:true},
+  {id:52, name:"Meowth"},               {id:53, name:"Persian"},
   {id:54, name:"Psyduck",  frOnly:true},{id:55, name:"Golduck",  frOnly:true},
   {id:56, name:"Mankey",  frOnly:true}, {id:57, name:"Primeape", frOnly:true},
   {id:58, name:"Growlithe",frOnly:true},{id:59, name:"Arcanine", frOnly:true},
