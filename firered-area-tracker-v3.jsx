@@ -2237,6 +2237,84 @@ for (const [name, locs] of Object.entries(LOCATION_MAP)) {
   }
 }
 
+// ─── EVOLUTION CHAINS ─────────────────────────────────────────────────────────
+// Each entry is either a linear array ["Stage1","Stage2",...] or a branch object
+// { pre:["Base"], post:[["Branch1"],["Branch2"],...] } for Eevee-style splits.
+// EVO_MAP maps every Pokémon name → its chain entry for O(1) lookup in DexDetail.
+const _EVO_CHAINS_RAW = [
+  // No evolution (standalone)
+  ["Farfetch'd"],["Onix"],["Hitmonlee"],["Hitmonchan"],["Lickitung"],["Chansey"],
+  ["Tangela"],["Kangaskhan"],["Mr. Mime"],["Scyther"],["Jynx"],["Electabuzz"],
+  ["Magmar"],["Pinsir"],["Tauros"],["Lapras"],["Ditto"],["Porygon"],
+  ["Aerodactyl"],["Snorlax"],["Articuno"],["Zapdos"],["Moltres"],["Mewtwo"],["Mew"],
+  // Two-stage
+  ["Rattata","Raticate"],
+  ["Spearow","Fearow"],
+  ["Ekans","Arbok"],
+  ["Pikachu","Raichu"],
+  ["Sandshrew","Sandslash"],
+  ["Clefairy","Clefable"],
+  ["Vulpix","Ninetales"],
+  ["Jigglypuff","Wigglytuff"],
+  ["Zubat","Golbat"],
+  ["Paras","Parasect"],
+  ["Venonat","Venomoth"],
+  ["Diglett","Dugtrio"],
+  ["Meowth","Persian"],
+  ["Psyduck","Golduck"],
+  ["Mankey","Primeape"],
+  ["Growlithe","Arcanine"],
+  ["Ponyta","Rapidash"],
+  ["Slowpoke","Slowbro"],
+  ["Magnemite","Magneton"],
+  ["Doduo","Dodrio"],
+  ["Seel","Dewgong"],
+  ["Grimer","Muk"],
+  ["Shellder","Cloyster"],
+  ["Drowzee","Hypno"],
+  ["Krabby","Kingler"],
+  ["Voltorb","Electrode"],
+  ["Exeggcute","Exeggutor"],
+  ["Cubone","Marowak"],
+  ["Koffing","Weezing"],
+  ["Rhyhorn","Rhydon"],
+  ["Horsea","Seadra"],
+  ["Goldeen","Seaking"],
+  ["Staryu","Starmie"],
+  ["Magikarp","Gyarados"],
+  ["Omanyte","Omastar"],
+  ["Kabuto","Kabutops"],
+  ["Dratini","Dragonair","Dragonite"],
+  // Three-stage
+  ["Bulbasaur","Ivysaur","Venusaur"],
+  ["Charmander","Charmeleon","Charizard"],
+  ["Squirtle","Wartortle","Blastoise"],
+  ["Caterpie","Metapod","Butterfree"],
+  ["Weedle","Kakuna","Beedrill"],
+  ["Pidgey","Pidgeotto","Pidgeot"],
+  ["Nidoran♀","Nidorina","Nidoqueen"],
+  ["Nidoran♂","Nidorino","Nidoking"],
+  ["Oddish","Gloom","Vileplume"],
+  ["Poliwag","Poliwhirl","Poliwrath"],
+  ["Abra","Kadabra","Alakazam"],
+  ["Machop","Machoke","Machamp"],
+  ["Bellsprout","Weepinbell","Victreebel"],
+  ["Tentacool","Tentacruel"],
+  ["Geodude","Graveler","Golem"],
+  ["Gastly","Haunter","Gengar"],
+  // Branching
+  { pre:["Eevee"], post:[["Vaporeon"],["Jolteon"],["Flareon"]] },
+];
+const EVO_MAP = {};
+for (const chain of _EVO_CHAINS_RAW) {
+  if (Array.isArray(chain)) {
+    for (const name of chain) EVO_MAP[name] = chain;
+  } else {
+    for (const name of chain.pre) EVO_MAP[name] = chain;
+    for (const branch of chain.post) for (const name of branch) EVO_MAP[name] = chain;
+  }
+}
+
 // ─── CATCH CONSTRAINT MAP ─────────────────────────────────────────────────────
 // Identifies Pokémon that cannot be caught with a regular Poké Ball:
 //   "safari"     → only catchable in the Safari Zone (Safari Ball forced)
@@ -3747,6 +3825,87 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
   );
 }
 
+function EvoNode({ name, isCurrent, caught }) {
+  const id = DEX_ID[name];
+  const isCaught = !!caught[name];
+  return (
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
+                  padding:"5px 7px", borderRadius:7,
+                  background: isCurrent ? "rgba(212,98,26,0.15)" : "rgba(0,0,0,0.18)",
+                  border: `1px solid ${isCurrent ? "rgba(212,98,26,0.5)" : C.border}`,
+                  minWidth:52 }}>
+      {id && <img src={pokeSpriteUrl(id)} alt={name}
+        style={{ width:36, height:36, imageRendering:"pixelated",
+                 opacity: isCaught ? 1 : 0.55,
+                 filter: isCaught ? "none" : "brightness(0)" }} />}
+      <span style={{ fontSize:9, fontWeight:"600",
+                     color: isCurrent ? C.accent : (isCaught ? C.green : C.muted),
+                     textAlign:"center", lineHeight:1.2, maxWidth:56, wordBreak:"break-word" }}>
+        {name}
+      </span>
+      {isCaught && <span style={{ fontSize:8, color:C.green, lineHeight:1 }}>✓</span>}
+    </div>
+  );
+}
+
+function EvoArrow() {
+  return <span style={{ fontSize:14, color:C.border, flexShrink:0, alignSelf:"center" }}>›</span>;
+}
+
+function EvoChainDisplay({ name, caught }) {
+  const chain = EVO_MAP[name];
+  if (!chain) return null;
+  // Single-stage Pokémon — no chain to show
+  if (Array.isArray(chain) && chain.length === 1) return null;
+
+  if (Array.isArray(chain)) {
+    return (
+      <div style={{ marginBottom:14 }}>
+        <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:8, textTransform:"uppercase" }}>Evolution</div>
+        <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap" }}>
+          {chain.map((n, i) => (
+            <React.Fragment key={n}>
+              {i > 0 && <EvoArrow />}
+              <EvoNode name={n} isCurrent={n === name} caught={caught} />
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Branching chain (Eevee-style)
+  const { pre, post } = chain;
+  return (
+    <div style={{ marginBottom:14 }}>
+      <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:8, textTransform:"uppercase" }}>Evolution</div>
+      <div style={{ display:"flex", alignItems:"flex-start", gap:5 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+          {pre.map((n, i) => (
+            <React.Fragment key={n}>
+              {i > 0 && <EvoArrow />}
+              <EvoNode name={n} isCurrent={n === name} caught={caught} />
+            </React.Fragment>
+          ))}
+        </div>
+        <EvoArrow />
+        <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+          {post.map(branch => (
+            <div key={branch[0]} style={{ display:"flex", alignItems:"center", gap:5 }}>
+              {branch.map((n, i) => (
+                <React.Fragment key={n}>
+                  {i > 0 && <EvoArrow />}
+                  <EvoNode name={n} isCurrent={n === name} caught={caught} />
+                </React.Fragment>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DexDetail({ selected, caught, locs, compact }) {
   return (
     <>
@@ -3764,6 +3923,7 @@ function DexDetail({ selected, caught, locs, compact }) {
           {(() => { const cs = CONSTRAINT_STYLE[CATCH_CONSTRAINT_MAP[selected.name]]; return cs ? <div style={{ fontSize:10, color:cs.color, marginTop:4, fontWeight:"500" }}>⚠ {cs.desc}</div> : null; })()}
         </div>
       )}
+      {!compact && <EvoChainDisplay name={selected.name} caught={caught} />}
       <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:6, textTransform:"uppercase" }}>Where to find</div>
       {locs.length === 0 ? (
         <div style={{ fontSize:11, color:C.muted, lineHeight:1.8 }}>
