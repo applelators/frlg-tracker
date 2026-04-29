@@ -4010,11 +4010,11 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
             style={{ width:"100%", background:"rgba(0,0,0,0.25)", border:`1px solid ${C.border}`, color:C.text, padding:"8px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:14, borderRadius:6, boxSizing:"border-box", outline:"none" }} />
         </div>
         {filtered
-          ? filtered.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} />)
+          ? filtered.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} />)
           : Object.entries(groups).map(([part, list]) => (
               <div key={part}>
                 <div style={{ padding:"6px 12px", fontSize:10, letterSpacing:2, color:C.muted, textTransform:"uppercase", background:"rgba(0,0,0,0.2)", borderBottom:`1px solid ${C.border}` }}>{part}</div>
-                {list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} />)}
+                {list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} />)}
               </div>
             ))
         }
@@ -4194,9 +4194,10 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
 }
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
-function AreaRow({ area, areaId, setAreaId, caught, items, trainers }) {
+function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version }) {
   const isSel  = areaId === area.id;
-  const allPoks = flattenPokemon(area);
+  const allPoks = flattenPokemon(area).filter(p =>
+    !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
   const allItms = flattenItems(area);
   const allTrns = flattenTrainers(area);
   const pd  = allPoks.filter(p => caught[p.name]).length;
