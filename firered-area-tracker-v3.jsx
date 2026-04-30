@@ -2543,19 +2543,19 @@ const DT_CANDIDATES = [
   {name:"Nidoking",  types:["Poison","Ground"],      hms:["Cut","Rock Smash","Strength"]},
   {name:"Nidoqueen", types:["Poison","Ground"],      hms:["Cut","Rock Smash","Strength"]},
   {name:"Vaporeon",  types:["Water"],                hms:["Surf"]},
-  {name:"Jolteon",   types:["Electric"],             hms:["Flash"]},
+  {name:"Jolteon",   types:["Electric"],             hms:[]},
   {name:"Charizard", types:["Fire","Flying"],        hms:["Cut","Fly","Strength"]},
   {name:"Blastoise", types:["Water"],                hms:["Surf","Strength"]},
   {name:"Venusaur",  types:["Grass","Poison"],       hms:["Cut","Strength"]},
   {name:"Exeggutor", types:["Grass","Psychic"],      hms:[]},
-  {name:"Raichu",    types:["Electric"],             hms:["Flash"]},
+  {name:"Raichu",    types:["Electric"],             hms:[]},
   {name:"Aerodactyl",types:["Rock","Flying"],        hms:["Fly","Rock Smash","Strength"]},
   {name:"Poliwrath", types:["Water","Fighting"],     hms:["Surf","Strength","Rock Smash"]},
   {name:"Pidgeot",   types:["Normal","Flying"],      hms:["Fly"]},
   {name:"Fearow",    types:["Normal","Flying"],      hms:["Fly","Cut"]},
-  {name:"Hypno",     types:["Psychic"],              hms:["Flash"]},
-  {name:"Magneton",  types:["Electric","Steel"],     hms:["Flash"]},
-  {name:"Electrode", types:["Electric"],             hms:["Flash"]},
+  {name:"Hypno",     types:["Psychic"],              hms:[]},
+  {name:"Magneton",  types:["Electric","Steel"],     hms:[]},
+  {name:"Electrode", types:["Electric"],             hms:[]},
   {name:"Hitmonlee", types:["Fighting"],             hms:["Strength","Rock Smash"]},
   {name:"Hitmonchan",types:["Fighting"],             hms:["Strength","Rock Smash"]},
   {name:"Dewgong",   types:["Water","Ice"],          hms:["Surf","Strength"]},
@@ -2571,14 +2571,14 @@ const DT_CANDIDATES = [
   {name:"Dodrio",    types:["Normal","Flying"],      hms:["Fly"]},
   // ── FireRed exclusive ──────────────────────────────────────────────────────
   {name:"Arcanine",  types:["Fire"],                 hms:["Strength"],                  frOnly:true},
-  {name:"Electabuzz",types:["Electric"],             hms:["Flash"],                     frOnly:true},
+  {name:"Electabuzz",types:["Electric"],             hms:[],                            frOnly:true},
   {name:"Cloyster",  types:["Water","Ice"],          hms:["Surf"],                      frOnly:true},
   {name:"Golduck",   types:["Water"],                hms:["Surf","Cut","Strength"],     frOnly:true},
   {name:"Scyther",   types:["Bug","Flying"],         hms:["Cut"],                       frOnly:true},
   {name:"Vileplume", types:["Grass","Poison"],       hms:[],                            frOnly:true},
   // ── LeafGreen exclusive ────────────────────────────────────────────────────
-  {name:"Starmie",   types:["Water","Psychic"],      hms:["Surf","Flash","Strength"],   lgOnly:true},
-  {name:"Slowbro",   types:["Water","Psychic"],      hms:["Surf","Flash","Strength"],   lgOnly:true},
+  {name:"Starmie",   types:["Water","Psychic"],      hms:["Surf","Strength"],           lgOnly:true},
+  {name:"Slowbro",   types:["Water","Psychic"],      hms:["Surf","Strength"],           lgOnly:true},
   {name:"Sandslash", types:["Ground"],               hms:["Cut","Rock Smash","Strength"],lgOnly:true},
   {name:"Ninetales", types:["Fire"],                 hms:[],                            lgOnly:true},
   {name:"Victreebel",types:["Grass","Poison"],       hms:[],                            lgOnly:true},
@@ -2657,7 +2657,7 @@ function buildDreamTeam(favoriteName, version) {
   const inTeam = new Set([finalFav]);
   const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favoriteName);
   if (!isDragoniteLine) { team.push("Dragonite"); inTeam.add("Dragonite"); }
-  const requiredHMs = ["Fly","Surf","Strength","Cut","Flash","Rock Smash"];
+  const requiredHMs = ["Fly","Surf","Strength","Cut","Rock Smash"];
   const getCoverage = () => {
     const s = new Set();
     for (const n of team) {
@@ -2766,7 +2766,7 @@ function getDreamHMs(name) {
 // Strategy: process rarest coverage first; consolidate onto whichever team member
 // is already the HM carrier, tiebroken by total HM capability then team order.
 function assignHMs(team) {
-  const ALL_HMs = ["Fly","Surf","Strength","Cut","Flash","Rock Smash"];
+  const ALL_HMs = ["Fly","Surf","Strength","Cut","Rock Smash"];
   const canLearn = {};
   team.forEach(name => { canLearn[name] = new Set(getDreamHMs(name)); });
 
@@ -2777,8 +2777,14 @@ function assignHMs(team) {
   const load = {};
   team.forEach(n => { load[n] = 0; });
 
-  // Process HMs with fewest carriers first so forced assignments happen before tiebreaks
-  const sorted = ALL_HMs.filter(hm => candidates[hm].length > 0)
+  // Priority override: Lapras always carries Surf when present
+  if (team.includes("Lapras") && (candidates["Surf"] || []).includes("Lapras")) {
+    assignments["Surf"] = "Lapras";
+    load["Lapras"]++;
+  }
+
+  // Process remaining HMs — fewest carriers first so forced assignments win
+  const sorted = ALL_HMs.filter(hm => !assignments[hm] && candidates[hm] && candidates[hm].length > 0)
     .sort((a, b) => candidates[a].length - candidates[b].length);
 
   for (const hm of sorted) {
