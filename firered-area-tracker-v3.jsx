@@ -2696,27 +2696,65 @@ function buildDreamTeam(favoriteName, version) {
   return team;
 }
 
-function getDreamMoves(name) {
+function getDreamMoves(name, suppressedMoves, hms) {
+  suppressedMoves = suppressedMoves || new Set();
+  hms = hms || [];
   const finalForm = DT_FINAL_FORM[name] || name;
   const learnset = (LEARNSETS && (LEARNSETS[finalForm] || LEARNSETS[name])) || [];
   const tmTips   = DT_TM_TIPS[finalForm] || DT_TM_TIPS[name] || [];
   const result = [], used = new Set();
+  // 1. HMs this Pokémon carries — fill slots first so they appear in the moveset
+  for (const hm of hms) {
+    if (result.length >= 4) break;
+    result.push({ move:hm, src:"HM", kind:"hm" });
+    used.add(hm);
+  }
+  // 2. TM tips — skip any one-time TM assigned to a different team member
   for (const t of tmTips) {
     if (result.length >= 4) break;
+    if (suppressedMoves.has(t.move)) continue;
     result.push({ move:t.move, src:t.src, kind:"tm", oneTime:!!t.oneTime });
     used.add(t.move);
   }
+  // 3. Strong level-up moves
   const goodMoves = [...learnset].filter(m => MOVE_TIERS && MOVE_TIERS.good && MOVE_TIERS.good.has(m.move)).sort((a,b) => b.lv - a.lv);
   for (const m of goodMoves) {
     if (result.length >= 4) break;
     if (!used.has(m.move)) { result.push({ move:m.move, src:`Level ${m.lv}`, kind:"level" }); used.add(m.move); }
   }
+  // 4. Any remaining level-up moves to round out 4 slots
   const allMoves = [...learnset].sort((a,b) => b.lv - a.lv);
   for (const m of allMoves) {
     if (result.length >= 4) break;
     if (!used.has(m.move)) { result.push({ move:m.move, src:`Level ${m.lv}`, kind:"level" }); used.add(m.move); }
   }
   return result;
+}
+
+// For each contested one-time TM, pick the single best recipient on the team.
+// Priority: (1) earlier position in DT_TM_TIPS for that Pokémon (it matters more to them),
+// (2) fewer total TM tips (less flexibility), (3) earlier in team order.
+function assignOneTimeTMs(team) {
+  const wanted = {}; // moveName → [{name, tipIndex, totalTips}]
+  team.forEach(pName => {
+    const finalForm = DT_FINAL_FORM[pName] || pName;
+    const tips = DT_TM_TIPS[finalForm] || DT_TM_TIPS[pName] || [];
+    tips.forEach((t, tipIndex) => {
+      if (!t.oneTime) return;
+      if (!wanted[t.move]) wanted[t.move] = [];
+      wanted[t.move].push({ name:pName, tipIndex, totalTips:tips.length });
+    });
+  });
+  const winners = {};
+  Object.entries(wanted).forEach(([move, candidates]) => {
+    const sorted = [...candidates].sort((a, b) => {
+      if (a.tipIndex !== b.tipIndex) return a.tipIndex - b.tipIndex;
+      if (a.totalTips !== b.totalTips) return a.totalTips - b.totalTips;
+      return team.indexOf(a.name) - team.indexOf(b.name);
+    });
+    winners[move] = sorted[0].name;
+  });
+  return winners;
 }
 
 function getDreamHMs(name) {
@@ -3653,18 +3691,8 @@ function DreamTeamTab({ isMobile, version }) {
     return (version === "FR" && cand.lgOnly) || (version === "LG" && cand.frOnly);
   };
 
-  // Map of one-time TM move name → [team member names that want it]
-  const oneTimeConflicts = {};
-  if (team) {
-    team.forEach(n => {
-      getDreamMoves(n).forEach(m => {
-        if (m.kind === "tm" && m.oneTime) {
-          if (!oneTimeConflicts[m.move]) oneTimeConflicts[m.move] = [];
-          if (!oneTimeConflicts[m.move].includes(n)) oneTimeConflicts[m.move].push(n);
-        }
-      });
-    });
-  }
+  // Assign each contested one-time TM to a single best recipient
+  const tmWinners = team ? assignOneTimeTMs(team) : {};
 
   return (
     <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
@@ -3698,7 +3726,10 @@ function DreamTeamTab({ isMobile, version }) {
             const dexEntry  = DEX.find(p => p.name === name);
             const candInfo  = DT_CANDIDATES.find(c => c.name === finalForm);
             const hms       = getDreamHMs(name);
-            const moves     = getDreamMoves(name);
+            const suppressedMoves = new Set(
+              Object.entries(tmWinners).filter(([,winner]) => winner !== name).map(([move]) => move)
+            );
+            const moves     = getDreamMoves(name, suppressedMoves, hms);
             const acq       = getDreamAcquisition(name);
             const evoNote   = EVO_DELAY[name];
             const isPreEvo  = !!DT_FINAL_FORM[name];
@@ -3730,20 +3761,18 @@ function DreamTeamTab({ isMobile, version }) {
                 <div>
                   <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:5 }}>Moveset{isPreEvo ? ` (as ${finalForm})` : ""}</div>
                   {moves.map((m, i) => {
+                    const isHM      = m.kind === "hm";
                     const isOneTime = m.kind === "tm" && m.oneTime;
-                    const conflicts = isOneTime && oneTimeConflicts[m.move] && oneTimeConflicts[m.move].length > 1
-                      ? oneTimeConflicts[m.move].filter(n => n !== name)
-                      : null;
+                    const moveColor = isHM      ? "#4a8fc4"
+                                    : isOneTime ? "#e8a020"
+                                    : m.kind === "tm" ? C.gold
+                                    : (MOVE_TIERS && MOVE_TIERS.good && MOVE_TIERS.good.has(m.move)) ? C.green
+                                    : C.text;
                     return (
-                      <div key={i} style={{ marginBottom:3 }}>
-                        <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
-                          <span style={{ fontSize:11, fontWeight:"600", minWidth:0, color: isOneTime ? "#e8a020" : m.kind === "tm" ? C.gold : (MOVE_TIERS && MOVE_TIERS.good && MOVE_TIERS.good.has(m.move)) ? C.green : C.text }}>{m.move}</span>
-                          <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
-                          {isOneTime && <span style={{ fontSize:8, color:"#e8a020", background:"rgba(232,160,32,0.12)", border:"1px solid rgba(232,160,32,0.3)", borderRadius:3, padding:"0 4px", flexShrink:0, whiteSpace:"nowrap" }}>1× only</span>}
-                        </div>
-                        {conflicts && (
-                          <div style={{ fontSize:9, color:"#e8a020", marginTop:1 }}>⚠ Also wanted by {conflicts.join(", ")}</div>
-                        )}
+                      <div key={i} style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:3 }}>
+                        <span style={{ fontSize:11, fontWeight:"600", minWidth:0, color:moveColor }}>{m.move}</span>
+                        <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
+                        {isOneTime && <span style={{ fontSize:8, color:"#e8a020", background:"rgba(232,160,32,0.12)", border:"1px solid rgba(232,160,32,0.3)", borderRadius:3, padding:"0 4px", flexShrink:0, whiteSpace:"nowrap" }}>1× only</span>}
                       </div>
                     );
                   })}
