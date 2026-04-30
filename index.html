@@ -15,6 +15,28 @@
     ::-webkit-scrollbar-thumb { background: #3a2a1c; border-radius: 99px; }
     ::-webkit-scrollbar-thumb:hover { background: #4e3a28; }
   </style>
+  <script>
+    // Runs synchronously before React — purges any saved dream team that contains
+    // a Pokémon exclusive to the other version.  Covers all key generations
+    // (v1/v2/v3) so cached JSX can never restore a stale team.
+    (function () {
+      var ver = localStorage.getItem('frlg-version') || 'FR';
+      var bad = ver === 'FR'
+        ? ['Starmie','Slowbro','Sandslash','Ninetales','Victreebel']
+        : ['Arcanine','Electabuzz','Cloyster','Golduck','Scyther','Vileplume'];
+      ['frlg-dream-team','frlg-dream-team-v2','frlg-dream-team-v3'].forEach(function (key) {
+        try {
+          var d = JSON.parse(localStorage.getItem(key));
+          if (d && Array.isArray(d.team)) {
+            var conflict = d.team.some(function (n) {
+              return n !== d.favorite && bad.indexOf(n) !== -1;
+            });
+            if (conflict) localStorage.removeItem(key);
+          }
+        } catch (e) {}
+      });
+    }());
+  </script>
 </head>
 <body>
   <div id="root"></div>
@@ -22,10 +44,18 @@
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-  <script type="text/babel" src="firered-area-tracker-v3.jsx"></script>
-  <script type="text/babel">
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<FireRedTracker />);
+  <script>
+    // Fetch JSX with a timestamp so every load gets the current file,
+    // bypassing Babel standalone's internal script cache.
+    fetch('firered-area-tracker-v3.jsx?t=' + Date.now())
+      .then(function (r) { return r.text(); })
+      .then(function (jsx) {
+        var code = Babel.transform(jsx, { presets: ['react'] }).code;
+        (0, eval)(code);
+        var root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(FireRedTracker));
+      })
+      .catch(function (e) { console.error('Failed to load tracker:', e); });
   </script>
 </body>
 </html>

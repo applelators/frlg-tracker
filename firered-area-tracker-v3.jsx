@@ -98,7 +98,7 @@ const AREAS = [
   { part:"Part 2", id:"viridian-city", name:"Viridian City",
     note:"Deliver Oak's Parcel to unlock the old man's Pokémon-catching tutorial on Route 2.",
     pokemon:[],
-    items:[{name:"Oak's Parcel",hidden:false,note:"From the Poké Mart shopkeeper — deliver to Professor Oak in Pallet Town"},{name:"Potion",hidden:false,note:"Near the city's north exit, west of the small tree"},{name:"Teachy TV",hidden:false,note:"From the old man after delivering Oak's Parcel"},{name:"TM26 Earthquake",hidden:false,note:"From the Viridian Gym Leader after defeating them — not accessible until post-game"}] },
+    items:[{name:"Oak's Parcel",hidden:false,note:"From the Poké Mart shopkeeper — deliver to Professor Oak in Pallet Town"},{name:"Potion",hidden:false,note:"Near the city's north exit, west of the small tree"},{name:"Teachy TV",hidden:false,note:"From the old man after delivering Oak's Parcel"}] },
 
   { part:"Part 2", id:"route22", name:"Route 22",
     note:"Worth visiting early for Mankey (useful against Brock). Surf and fishing unlocked on the return visit after Viridian Gym. Blue challenges you here a second time before the Pokémon League.",
@@ -214,8 +214,8 @@ const AREAS = [
           {name:"Paras",method:"Cave",levels:"5–10",rate:"100%",note:"Mushroom room off main path"},
         ],
         items:[
-          {name:"Tiny Mushroom",hidden:true,note:"Recurring throughout B1F/B2F (★ Itemfinder)"},
-          {name:"Big Mushroom", hidden:true,note:"Recurring throughout B1F/B2F (★ Itemfinder)"},
+          {name:"Tiny Mushroom",hidden:true,recurring:true,note:"Spawns throughout B1F/B2F (★ Itemfinder)"},
+          {name:"Big Mushroom", hidden:true,recurring:true,note:"Spawns throughout B1F/B2F (★ Itemfinder)"},
         ],
         trainers:[]},
       { label:"B2F",
@@ -473,7 +473,7 @@ const AREAS = [
       { label:"Harbour",
         pokemon:[],
         items:[
-          {name:"Lava Cookie",hidden:true,note:"⚠ SE corner near the truck — requires Surf, only while ship is moored (★ Itemfinder)"},
+          {name:"Lava Cookie",hidden:true,optional:true,surf:true,note:"⚠ SE corner near the truck — requires Surf, only accessible via glitch (★ Itemfinder)"},
         ],
         trainers:[]},
     ]},
@@ -570,7 +570,7 @@ const AREAS = [
     ],
     trainers:[
       {class:"Picnicker", name:"Heidi",team:[{name:"Pikachu", level:20},{name:"Clefairy",level:20}]},
-      {class:"PokéManiac",name:"Mark", team:[{name:"Rhyhorn", level:29},{name:"Lickitung",level:29}]},
+      {class:"PokéManiac",name:"Mark", note:"Requires Surf — only accessible on the Part 15 return trip to reach the Power Plant.", team:[{name:"Rhyhorn", level:29},{name:"Lickitung",level:29}]},
     ] },
 
   { part:"Part 8", id:"rock-tunnel", name:"Rock Tunnel",
@@ -908,7 +908,7 @@ const AREAS = [
       {name:"Hyper Potion", hidden:true, note:"5 east, 2 north of Fisherman Elliot (★ Itemfinder)",img:"screenshots/hidden/route12-3.png"},
       {name:"Iron",         hidden:false,note:"SW of Fishing Guru's house (requires Cut)"},
       {name:"Rare Candy",   hidden:true, note:"In the tall grass patch (requires Cut, ★ Itemfinder)",img:"screenshots/hidden/route12-5.png"},
-      {name:"TM48 Skill Swap",hidden:false,note:"Southeast of Lavender Town gate (requires Surf)"},
+      {name:"TM48 Skill Swap",hidden:false,surf:true,note:"Southeast of Lavender Town gate (requires Surf)"},
     ],
     trainers:[
       {class:"Fisherman",   name:"Ned",    team:[{name:"Goldeen", level:22},{name:"Poliwag",level:22},{name:"Goldeen",level:22}]},
@@ -1075,8 +1075,8 @@ const AREAS = [
           {name:"Slowpoke", method:"Super Rod",levels:"15",   rate:"10%"},
         ],
         items:[
-          {name:"Nugget",    hidden:false,note:"Central island (requires Surf)"},
-          {name:"Leaf Stone",hidden:true, note:"Central island, three steps east of the Nugget (★ Itemfinder, requires Surf)",img:"screenshots/hidden/safari-zone-center-1.png"},
+          {name:"Nugget",    hidden:false,surf:true,note:"Central island (requires Surf)"},
+          {name:"Leaf Stone",hidden:true, surf:true,note:"Central island, three steps east of the Nugget (★ Itemfinder, requires Surf)",img:"screenshots/hidden/safari-zone-center-1.png"},
         ],
         trainers:[]},
       { label:"Area 1",
@@ -1143,8 +1143,8 @@ const AREAS = [
           {name:"TM32 Double Team",hidden:false,note:"Southeast of the Secret House"},
           {name:"Revive",          hidden:true, note:"In the dirt patch in front of the Secret House (★ Itemfinder)",img:"screenshots/hidden/safari-zone-area-3-2.png"},
           {name:"HM03 Surf",       hidden:false,note:"Secret House — received from a safari official"},
-          {name:"Max Potion",      hidden:false,note:"In the tall grass patch (requires Surf)"},
-          {name:"Max Revive",      hidden:false,note:"Southeast side of the rocky ridge (requires Surf)"},
+          {name:"Max Potion",      hidden:false,surf:true,note:"In the tall grass patch (requires Surf)"},
+          {name:"Max Revive",      hidden:false,surf:true,note:"Southeast side of the rocky ridge (requires Surf)"},
         ],
         trainers:[]},
     ] },
@@ -1743,14 +1743,14 @@ const AREAS = [
       {name:"Slowpoke",   method:"Super Rod", levels:"25–35", rate:"1%",  lgOnly:true},
     ],
     items:[
-      {name:"Ultra Ball", hidden:true,  note:"East of northernmost grass"},
-      {name:"Ultra Ball", hidden:true,  note:"Southeast corner"},
-      {name:"Pearl",      hidden:true,  note:"West side, southernmost sandy patch"},
-      {name:"Pearl",      hidden:true,  note:"Two steps east/north of first Pearl"},
-      {name:"Big Pearl",  hidden:true,  note:"Middle northwest sandy patch"},
-      {name:"Stardust",   hidden:true,  note:"Middle shore"},
-      {name:"Stardust",   hidden:true,  note:"Southwest corner northwest patch"},
-      {name:"Star Piece", hidden:true,  note:"Four steps north, one west of southeast corner"},
+      {name:"Ultra Ball", hidden:true,recurring:true,  note:"East of northernmost grass"},
+      {name:"Ultra Ball", hidden:true,recurring:true,  note:"Southeast corner"},
+      {name:"Pearl",      hidden:true,recurring:true,  note:"West side, southernmost sandy patch"},
+      {name:"Pearl",      hidden:true,recurring:true,  note:"Two steps east/north of first Pearl"},
+      {name:"Big Pearl",  hidden:true,recurring:true,  note:"Middle northwest sandy patch"},
+      {name:"Stardust",   hidden:true,recurring:true,  note:"Middle shore"},
+      {name:"Stardust",   hidden:true,recurring:true,  note:"Southwest corner northwest patch"},
+      {name:"Star Piece", hidden:true,recurring:true,  note:"Four steps north, one west of southeast corner"},
     ],
     trainers:[
       {class:"Swimmer♀", name:"Amara", team:[{name:"Seel",level:36},{name:"Seel",level:36},{name:"Dewgong",level:36}]},
@@ -1788,7 +1788,7 @@ const AREAS = [
     ],
     items:[
       {name:"HM06 Rock Smash", hidden:false, note:"From old man at Ember Spa"},
-      {name:"Max Repel",       hidden:false, note:"East rocky ridge (requires Surf)"},
+      {name:"Max Repel",       hidden:false, surf:true,note:"East rocky ridge (requires Surf)"},
       {name:"Ether",           hidden:false, note:"Rocky area south of Ember Spa (requires Rock Smash)"},
       {name:"Carbos",          hidden:false, note:"Southern point rocky ridge (requires Rock Smash)"},
     ],
@@ -1874,7 +1874,7 @@ const AREAS = [
     note:"Accessible from Two Island. The Move Maniac re-teaches forgotten moves for 2 Tiny Mushroom or 1 Big Mushroom.",
     pokemon:[],
     items:[
-      {name:"PP Max",     hidden:true, note:"East lake sandy spot (requires Surf and Itemfinder)",img:"screenshots/hidden/cape-brink-0.png"},
+      {name:"PP Max",     hidden:true, surf:true,note:"East lake sandy spot (requires Surf and Itemfinder)",img:"screenshots/hidden/cape-brink-0.png"},
       {name:"Rare Candy", hidden:true, note:"Behind Move Tutor house",img:"screenshots/hidden/cape-brink-1.png"},
     ],
     trainers:[]},
@@ -1928,8 +1928,8 @@ const AREAS = [
     ],
     items:[
       {name:"Max Repel", hidden:true, note:"Northwest of Aroma Lady Violet",img:"screenshots/hidden/bond-bridge-0.png"},
-      {name:"Pearl",     hidden:true, note:"Southwest corner near Tuber Alexis"},
-      {name:"Stardust",  hidden:true, note:"One square west, two north of bridge's northwest corner"},
+      {name:"Pearl",     hidden:true,recurring:true, note:"Southwest corner near Tuber Alexis"},
+      {name:"Stardust",  hidden:true,recurring:true, note:"One square west, two north of bridge's northwest corner"},
     ],
     trainers:[
       {class:"Twins",      name:"Joy & Meg", team:[{name:"Clefairy",level:37},{name:"Clefairy",level:37}]},
@@ -1971,22 +1971,22 @@ const AREAS = [
       {name:"Slowpoke",  method:"Super Rod", levels:"15–35", rate:"5%",  lgOnly:true},
     ],
     items:[
-      {name:"Razz Berry",  hidden:true, note:"Southwest of first cuttable tree"},
-      {name:"Oran Berry",  hidden:true, note:"Northwest of first cuttable tree",img:"screenshots/hidden/berry-forest-1.png"},
-      {name:"Persim Berry",hidden:true, note:"Northeast of ledge near entrance",img:"screenshots/hidden/berry-forest-2.png"},
-      {name:"Pinap Berry", hidden:true, note:"Northeast of Oran Berry",img:"screenshots/hidden/berry-forest-3.png"},
-      {name:"Chesto Berry",hidden:true, note:"Northeastern corner"},
-      {name:"Aspear Berry",hidden:true, note:"Northeast of northernmost water",img:"screenshots/hidden/berry-forest-5.png"},
-      {name:"Rawst Berry", hidden:true, note:"Northwest of Aspear Berry"},
-      {name:"Bluk Berry",  hidden:true, note:"Southeast of cuttable tree",img:"screenshots/hidden/berry-forest-7.png"},
-      {name:"Nanab Berry", hidden:true, note:"Northeast of middle water"},
-      {name:"Cheri Berry", hidden:true, note:"North of middle water",img:"screenshots/hidden/berry-forest-9.png"},
-      {name:"Wepear Berry",hidden:true, note:"North of middle water",img:"screenshots/hidden/berry-forest-10.png"},
-      {name:"Pecha Berry", hidden:true, note:"North of southernmost water"},
-      {name:"Lum Berry",   hidden:true, note:"Northwest area"},
+      {name:"Razz Berry",  hidden:true,recurring:true, note:"Southwest of first cuttable tree"},
+      {name:"Oran Berry",  hidden:true,recurring:true, note:"Northwest of first cuttable tree",img:"screenshots/hidden/berry-forest-1.png"},
+      {name:"Persim Berry",hidden:true,recurring:true, note:"Northeast of ledge near entrance",img:"screenshots/hidden/berry-forest-2.png"},
+      {name:"Pinap Berry", hidden:true,recurring:true, note:"Northeast of Oran Berry",img:"screenshots/hidden/berry-forest-3.png"},
+      {name:"Chesto Berry",hidden:true,recurring:true, note:"Northeastern corner"},
+      {name:"Aspear Berry",hidden:true,recurring:true, note:"Northeast of northernmost water",img:"screenshots/hidden/berry-forest-5.png"},
+      {name:"Rawst Berry", hidden:true,recurring:true, note:"Northwest of Aspear Berry"},
+      {name:"Bluk Berry",  hidden:true,recurring:true, note:"Southeast of cuttable tree",img:"screenshots/hidden/berry-forest-7.png"},
+      {name:"Nanab Berry", hidden:true,recurring:true, note:"Northeast of middle water"},
+      {name:"Cheri Berry", hidden:true,recurring:true, note:"North of middle water",img:"screenshots/hidden/berry-forest-9.png"},
+      {name:"Wepear Berry",hidden:true,recurring:true, note:"North of middle water",img:"screenshots/hidden/berry-forest-10.png"},
+      {name:"Pecha Berry", hidden:true,recurring:true, note:"North of southernmost water"},
+      {name:"Lum Berry",   hidden:true,recurring:true, note:"Northwest area"},
       {name:"Full Heal",   hidden:false,note:"North of northernmost water"},
       {name:"Max Ether",   hidden:false,note:"West of Rawst Berry"},
-      {name:"Max Elixir",  hidden:false,note:"Southeast dead-end (requires Cut and Surf)"},
+      {name:"Max Elixir",  hidden:false,surf:true,note:"Southeast dead-end (requires Cut and Surf)"},
       {name:"Iapapa Berry",hidden:false,note:"From Lostelle after rescue"},
     ],
     trainers:[]},
@@ -2011,7 +2011,7 @@ const AREAS = [
       {name:"Slowpoke",   method:"Super Rod", levels:"25–35", rate:"1%",  lgOnly:true},
     ],
     items:[
-      {name:"Pearl", hidden:true, note:"Small island near Swimmer Spencer (recurring pickup)"},
+      {name:"Pearl", hidden:true,recurring:true, note:"Small island near Swimmer Spencer"},
     ],
     trainers:[
       {class:"Fisherman",   name:"Wade",     team:[{name:"Magikarp",level:27},{name:"Magikarp",level:27},{name:"Magikarp",level:27},{name:"Magikarp",level:27},{name:"Magikarp",level:27},{name:"Magikarp",level:27}]},
@@ -2183,9 +2183,10 @@ const AREAS = [
     ]},
 
   { part:"Part 15", id:"viridian-gym", name:"Viridian Gym",
-    note:"Giovanni's Ground-type gym — spinner tile maze. Defeating Giovanni earns the Earth Badge. TM26 Earthquake is already tracked in Viridian City (Part 2).",
+    note:"Giovanni's Ground-type gym — spinner tile maze. Defeating Giovanni earns the Earth Badge.",
     pokemon:[],
     items:[
+      {name:"TM26 Earthquake", hidden:false, note:"Reward for defeating Giovanni"},
       {name:"Macho Brace", hidden:true, note:"On the spot where Giovanni stood (requires Itemfinder)",img:"screenshots/hidden/viridian-gym-0.png"},
     ],
     trainers:[
@@ -2518,6 +2519,227 @@ const EVO_DELAY = {
   "Clefairy":   "Consider delaying Moon Stone until Lv. 29 (Metronome) or Lv. 33 (Cosmic Power).",
   "Exeggcute":  "Optional: delay Leaf Stone until Lv. 43 (SolarBeam) to avoid using TM22.",
 };
+
+// ─── DREAM TEAM BUILDER DATA ──────────────────────────────────────────────────
+const DT_LEGENDARY = new Set(["Articuno","Zapdos","Moltres","Mewtwo","Mew"]);
+
+const DT_HM_COMPAT = {
+  "Cut":        new Set(["Bulbasaur","Ivysaur","Venusaur","Caterpie","Metapod","Butterfree","Weedle","Kakuna","Beedrill","Rattata","Raticate","Ekans","Arbok","Sandshrew","Sandslash","Oddish","Gloom","Vileplume","Paras","Parasect","Diglett","Dugtrio","Meowth","Persian","Psyduck","Golduck","Tentacool","Tentacruel","Farfetch'd","Seel","Dewgong","Krabby","Kingler","Scyther","Pinsir","Kabuto","Kabutops","Charizard","Bellsprout","Weepinbell","Victreebel"]),
+  "Fly":        new Set(["Charizard","Pidgey","Pidgeotto","Pidgeot","Spearow","Fearow","Zubat","Golbat","Doduo","Dodrio","Aerodactyl","Dragonite"]),
+  "Surf":       new Set(["Squirtle","Wartortle","Blastoise","Psyduck","Golduck","Poliwag","Poliwhirl","Poliwrath","Tentacool","Tentacruel","Slowpoke","Slowbro","Seel","Dewgong","Shellder","Cloyster","Krabby","Kingler","Horsea","Seadra","Goldeen","Seaking","Staryu","Starmie","Lapras","Vaporeon","Dratini","Dragonair","Dragonite","Jynx","Omanyte","Omastar","Kabuto","Kabutops"]),
+  "Strength":   new Set(["Bulbasaur","Ivysaur","Venusaur","Charmander","Charmeleon","Charizard","Squirtle","Wartortle","Blastoise","Sandshrew","Sandslash","Nidorina","Nidoqueen","Nidorino","Nidoking","Mankey","Primeape","Poliwag","Poliwhirl","Poliwrath","Machop","Machoke","Geodude","Graveler","Golem","Slowpoke","Slowbro","Drowzee","Hypno","Krabby","Kingler","Marowak","Hitmonlee","Hitmonchan","Rhyhorn","Rhydon","Chansey","Kangaskhan","Starmie","Tauros","Gyarados","Lapras","Snorlax","Dratini","Dragonair","Dragonite","Arcanine","Dewgong","Cloyster","Seel"]),
+  "Flash":      new Set(["Butterfree","Pikachu","Raichu","Clefairy","Clefable","Jigglypuff","Wigglytuff","Abra","Kadabra","Slowpoke","Slowbro","Gastly","Haunter","Gengar","Drowzee","Hypno","Magnemite","Magneton","Doduo","Dodrio","Electrode","Starmie","Jynx","Electabuzz","Porygon","Vaporeon","Jolteon","Flareon"]),
+  "Rock Smash": new Set(["Squirtle","Wartortle","Blastoise","Poliwag","Poliwhirl","Poliwrath","Machop","Machoke","Geodude","Graveler","Golem","Primeape","Hitmonlee","Hitmonchan","Rhyhorn","Rhydon","Snorlax","Krabby","Kingler","Kabutops","Aerodactyl"]),
+};
+
+// Neutral Pokémon are listed first so they always outrank version-exclusive picks
+// by pool-position score, even if the version check is somehow skipped.
+// FR-exclusive follow neutral, LG-exclusive come last.
+const DT_CANDIDATES = [
+  // ── Neutral (catchable in both versions) ───────────────────────────────────
+  {name:"Lapras",    types:["Water","Ice"],          hms:["Surf","Strength"]},
+  {name:"Snorlax",   types:["Normal"],               hms:["Strength","Rock Smash"]},
+  {name:"Gyarados",  types:["Water","Flying"],       hms:["Surf","Strength"]},
+  {name:"Nidoking",  types:["Poison","Ground"],      hms:["Cut","Rock Smash","Strength"]},
+  {name:"Nidoqueen", types:["Poison","Ground"],      hms:["Cut","Rock Smash","Strength"]},
+  {name:"Vaporeon",  types:["Water"],                hms:["Surf"]},
+  {name:"Jolteon",   types:["Electric"],             hms:["Flash"]},
+  {name:"Charizard", types:["Fire","Flying"],        hms:["Cut","Fly","Strength"]},
+  {name:"Blastoise", types:["Water"],                hms:["Surf","Strength"]},
+  {name:"Venusaur",  types:["Grass","Poison"],       hms:["Cut","Strength"]},
+  {name:"Exeggutor", types:["Grass","Psychic"],      hms:[]},
+  {name:"Raichu",    types:["Electric"],             hms:["Flash"]},
+  {name:"Aerodactyl",types:["Rock","Flying"],        hms:["Fly","Rock Smash","Strength"]},
+  {name:"Poliwrath", types:["Water","Fighting"],     hms:["Surf","Strength","Rock Smash"]},
+  {name:"Pidgeot",   types:["Normal","Flying"],      hms:["Fly"]},
+  {name:"Fearow",    types:["Normal","Flying"],      hms:["Fly","Cut"]},
+  {name:"Hypno",     types:["Psychic"],              hms:["Flash"]},
+  {name:"Magneton",  types:["Electric","Steel"],     hms:["Flash"]},
+  {name:"Electrode", types:["Electric"],             hms:["Flash"]},
+  {name:"Hitmonlee", types:["Fighting"],             hms:["Strength","Rock Smash"]},
+  {name:"Hitmonchan",types:["Fighting"],             hms:["Strength","Rock Smash"]},
+  {name:"Dewgong",   types:["Water","Ice"],          hms:["Surf","Strength"]},
+  {name:"Tentacruel",types:["Water","Poison"],       hms:["Surf","Cut"]},
+  {name:"Kabutops",  types:["Rock","Water"],         hms:["Surf","Cut","Rock Smash","Strength"]},
+  {name:"Omastar",   types:["Rock","Water"],         hms:["Surf","Strength"]},
+  {name:"Rhydon",    types:["Ground","Rock"],        hms:["Strength","Rock Smash"]},
+  {name:"Flareon",   types:["Fire"],                 hms:[]},
+  {name:"Tauros",    types:["Normal"],               hms:["Strength"]},
+  {name:"Kangaskhan",types:["Normal"],               hms:["Strength"]},
+  {name:"Weezing",   types:["Poison"],               hms:[]},
+  {name:"Kingler",   types:["Water"],                hms:["Surf","Cut","Strength","Rock Smash"]},
+  {name:"Dodrio",    types:["Normal","Flying"],      hms:["Fly"]},
+  // ── FireRed exclusive ──────────────────────────────────────────────────────
+  {name:"Arcanine",  types:["Fire"],                 hms:["Strength"],                  frOnly:true},
+  {name:"Electabuzz",types:["Electric"],             hms:["Flash"],                     frOnly:true},
+  {name:"Cloyster",  types:["Water","Ice"],          hms:["Surf"],                      frOnly:true},
+  {name:"Golduck",   types:["Water"],                hms:["Surf","Cut","Strength"],     frOnly:true},
+  {name:"Scyther",   types:["Bug","Flying"],         hms:["Cut"],                       frOnly:true},
+  {name:"Vileplume", types:["Grass","Poison"],       hms:[],                            frOnly:true},
+  // ── LeafGreen exclusive ────────────────────────────────────────────────────
+  {name:"Starmie",   types:["Water","Psychic"],      hms:["Surf","Flash","Strength"],   lgOnly:true},
+  {name:"Slowbro",   types:["Water","Psychic"],      hms:["Surf","Flash","Strength"],   lgOnly:true},
+  {name:"Sandslash", types:["Ground"],               hms:["Cut","Rock Smash","Strength"],lgOnly:true},
+  {name:"Ninetales", types:["Fire"],                 hms:[],                            lgOnly:true},
+  {name:"Victreebel",types:["Grass","Poison"],       hms:[],                            lgOnly:true},
+];
+
+const DT_TM_TIPS = {
+  "Charizard":  [{move:"Flamethrower",src:"TM35 — Game Corner, Celadon City"},{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Blastoise":  [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"}],
+  "Venusaur":   [{move:"Sludge Bomb",src:"TM36 — Rocket Hideout B4F (one-time)"},{move:"SolarBeam",src:"TM22 — Safari Zone Area 3 (one-time)"}],
+  "Nidoking":   [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Nidoqueen":  [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"},{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Raichu":     [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Thunder",src:"TM25 — Game Corner, Celadon City"}],
+  "Starmie":    [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"},{move:"Psychic",src:"TM29 — Game Corner or Route 7 (one-time)"}],
+  "Lapras":     [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"}],
+  "Gyarados":   [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"}],
+  "Snorlax":    [{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Vaporeon":   [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"}],
+  "Jolteon":    [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Thunder",src:"TM25 — Game Corner, Celadon City"}],
+  "Flareon":    [{move:"Fire Blast",src:"TM38 — Celadon Dept. Store (buyable)"}],
+  "Arcanine":   [{move:"Flamethrower",src:"TM35 — Game Corner, Celadon City"},{move:"ExtremeSpeed",src:"Lv. 49 as Growlithe — evolve after learning it"}],
+  "Slowbro":    [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"},{move:"Psychic",src:"TM29 — Game Corner or Route 7 (one-time)"}],
+  "Exeggutor":  [{move:"Psychic",src:"TM29 — Game Corner or Route 7 (one-time)"},{move:"SolarBeam",src:"TM22 — Safari Zone Area 3 (one-time)"}],
+  "Hypno":      [{move:"Psychic",src:"TM29 — Game Corner or Route 7 (one-time)"}],
+  "Electabuzz": [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Thunder",src:"TM25 — Game Corner, Celadon City"}],
+  "Magneton":   [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Thunder",src:"TM25 — Game Corner, Celadon City"}],
+  "Electrode":  [{move:"Thunderbolt",src:"TM24 — Game Corner, Celadon City"},{move:"Thunder",src:"TM25 — Game Corner, Celadon City"}],
+  "Sandslash":  [{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Aerodactyl": [{move:"Iron Tail",src:"TM23 — Silph Co. (one-time)"}],
+  "Pidgeot":    [{move:"Hyper Beam",src:"TM15 — Game Corner, Celadon City"}],
+  "Poliwrath":  [{move:"Brick Break",src:"TM31 — Silph Co. 7F (one-time)"}],
+  "Cloyster":   [{move:"Blizzard",src:"TM14 — Celadon Dept. Store (buyable)"}],
+  "Omastar":    [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"}],
+  "Rhydon":     [{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Golduck":    [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"},{move:"Psychic",src:"TM29 — Game Corner or Route 7 (one-time)"}],
+  "Ninetales":  [{move:"Flamethrower",src:"TM35 — Game Corner, Celadon City"}],
+  "Vileplume":  [{move:"SolarBeam",src:"TM22 — Safari Zone Area 3 (one-time)"}],
+  "Victreebel": [{move:"SolarBeam",src:"TM22 — Safari Zone Area 3 (one-time)"}],
+  "Tauros":     [{move:"Earthquake",src:"TM26 — Viridian Gym reward (one-time)"}],
+  "Dewgong":    [{move:"Ice Beam",src:"TM13 — Game Corner, Celadon City"}],
+  "Tentacruel": [{move:"Sludge Bomb",src:"TM36 — Rocket Hideout B4F (one-time)"}],
+  "Hitmonchan": [{move:"Ice Punch",src:"Level 46 (level-up)"}],
+  "Hitmonlee":  [{move:"Hi Jump Kick",src:"Level 41 (level-up)"}],
+};
+
+const DT_FINAL_FORM = {
+  "Bulbasaur":"Venusaur","Ivysaur":"Venusaur",
+  "Charmander":"Charizard","Charmeleon":"Charizard",
+  "Squirtle":"Blastoise","Wartortle":"Blastoise",
+  "Caterpie":"Butterfree","Metapod":"Butterfree",
+  "Weedle":"Beedrill","Kakuna":"Beedrill",
+  "Pidgey":"Pidgeot","Pidgeotto":"Pidgeot",
+  "Rattata":"Raticate","Spearow":"Fearow","Ekans":"Arbok",
+  "Pikachu":"Raichu","Sandshrew":"Sandslash",
+  "Nidoran♀":"Nidoqueen","Nidorina":"Nidoqueen",
+  "Nidoran♂":"Nidoking","Nidorino":"Nidoking",
+  "Clefairy":"Clefable","Vulpix":"Ninetales","Jigglypuff":"Wigglytuff",
+  "Oddish":"Vileplume","Gloom":"Vileplume",
+  "Paras":"Parasect","Venonat":"Venomoth",
+  "Diglett":"Dugtrio","Meowth":"Persian","Psyduck":"Golduck","Mankey":"Primeape",
+  "Growlithe":"Arcanine",
+  "Poliwag":"Poliwhirl","Poliwhirl":"Poliwrath",
+  "Bellsprout":"Weepinbell","Weepinbell":"Victreebel",
+  "Tentacool":"Tentacruel","Ponyta":"Rapidash","Slowpoke":"Slowbro",
+  "Magnemite":"Magneton","Doduo":"Dodrio","Seel":"Dewgong","Grimer":"Muk",
+  "Shellder":"Cloyster","Drowzee":"Hypno","Krabby":"Kingler","Voltorb":"Electrode",
+  "Exeggcute":"Exeggutor","Cubone":"Marowak",
+  "Horsea":"Seadra","Goldeen":"Seaking","Staryu":"Starmie",
+  "Magikarp":"Gyarados","Eevee":"Vaporeon",
+  "Omanyte":"Omastar","Kabuto":"Kabutops",
+  "Dratini":"Dragonite","Dragonair":"Dragonite",
+};
+
+function buildDreamTeam(favoriteName, version) {
+  const finalFav = DT_FINAL_FORM[favoriteName] || favoriteName;
+  const team = [favoriteName];
+  const inTeam = new Set([finalFav]);
+  const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favoriteName);
+  if (!isDragoniteLine) { team.push("Dragonite"); inTeam.add("Dragonite"); }
+  const requiredHMs = ["Fly","Surf","Strength","Cut","Flash","Rock Smash"];
+  const getCoverage = () => {
+    const s = new Set();
+    for (const n of team) {
+      const form = DT_FINAL_FORM[n] || n;
+      for (const [hm, learners] of Object.entries(DT_HM_COMPAT)) {
+        if (learners.has(form)) s.add(hm);
+      }
+    }
+    return s;
+  };
+  while (team.length < 6) {
+    const covered = getCoverage();
+    const missing = requiredHMs.filter(h => !covered.has(h));
+    let best = null, bestScore = -Infinity;
+    for (let ci = 0; ci < DT_CANDIDATES.length; ci++) {
+      const cand = DT_CANDIDATES[ci];
+      if (inTeam.has(cand.name)) continue;
+      // Hard-exclude Pokémon exclusive to the other version from auto-selection
+      if (version === "FR" && cand.lgOnly) continue;
+      if (version === "LG" && cand.frOnly) continue;
+      const hmScore  = cand.hms.filter(h => missing.includes(h)).length * 10;
+      const poolScore = (DT_CANDIDATES.length - ci) * 0.1;
+      const teamTypes = new Set(team.flatMap(n => {
+        const f = DT_FINAL_FORM[n] || n;
+        const c = DT_CANDIDATES.find(x => x.name === f);
+        return c ? c.types : [];
+      }));
+      const typeScore = cand.types.some(t => !teamTypes.has(t)) ? 5 : 0;
+      const score = hmScore + typeScore + poolScore;
+      if (score > bestScore) { best = cand; bestScore = score; }
+    }
+    if (!best) break;
+    team.push(best.name);
+    inTeam.add(best.name);
+  }
+  return team;
+}
+
+function getDreamMoves(name) {
+  const finalForm = DT_FINAL_FORM[name] || name;
+  const learnset = (LEARNSETS && (LEARNSETS[finalForm] || LEARNSETS[name])) || [];
+  const tmTips   = DT_TM_TIPS[finalForm] || DT_TM_TIPS[name] || [];
+  const result = [], used = new Set();
+  for (const t of tmTips) {
+    if (result.length >= 4) break;
+    result.push({ move:t.move, src:t.src, kind:"tm" });
+    used.add(t.move);
+  }
+  const goodMoves = [...learnset].filter(m => MOVE_TIERS && MOVE_TIERS.good && MOVE_TIERS.good.has(m.move)).sort((a,b) => b.lv - a.lv);
+  for (const m of goodMoves) {
+    if (result.length >= 4) break;
+    if (!used.has(m.move)) { result.push({ move:m.move, src:`Level ${m.lv}`, kind:"level" }); used.add(m.move); }
+  }
+  const allMoves = [...learnset].sort((a,b) => b.lv - a.lv);
+  for (const m of allMoves) {
+    if (result.length >= 4) break;
+    if (!used.has(m.move)) { result.push({ move:m.move, src:`Level ${m.lv}`, kind:"level" }); used.add(m.move); }
+  }
+  return result;
+}
+
+function getDreamHMs(name) {
+  const form = DT_FINAL_FORM[name] || name;
+  return Object.entries(DT_HM_COMPAT).filter(([,s]) => s.has(form)).map(([hm]) => hm);
+}
+
+function getDreamAcquisition(name) {
+  const direct = LOCATION_MAP[name];
+  if (direct && direct.length > 0) {
+    const l = direct[0];
+    return `${l.areaName}${l.levels ? ` — ${l.method}, Lv. ${l.levels}` : ` — ${l.method}`}`;
+  }
+  for (const [base, final] of Object.entries(DT_FINAL_FORM)) {
+    if (final !== name) continue;
+    const baseLocs = LOCATION_MAP[base];
+    if (baseLocs && baseLocs.length > 0) {
+      const l = baseLocs[0];
+      return `Catch ${base} at ${l.areaName}${l.levels ? ` (${l.method}, Lv. ${l.levels})` : ` (${l.method})`} → evolve to ${name}`;
+    }
+  }
+  return "See Pokédex for location details";
+}
 
 // ─── CATCH CONSTRAINT MAP ─────────────────────────────────────────────────────
 // Identifies Pokémon that cannot be caught with a regular Poké Ball:
@@ -3337,7 +3559,7 @@ function FireRedTracker() {
 
         {/* Tabs */}
         <div style={{ display:"flex", gap:2, marginTop:10 }}>
-          {[["areas","Areas"],["dex","Pokédex"],["calc","Catch Calc"],["hunt","Hunt"],["completion","100%"]].map(([t,label]) => (
+          {[["areas","Areas"],["dex","Pokédex"],["team","Dream Team"],["calc","Catch Calc"],["hunt","Hunt"],["completion","100%"]].map(([t,label]) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding:"8px 20px", border:"none", borderRadius:"6px 6px 0 0", cursor:"pointer",
               fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"600",
@@ -3356,6 +3578,9 @@ function FireRedTracker() {
       {/* ── Tab: Areas ── */}
       {tab === "areas" && <AreasTab caught={caught} toggleCaught={toggleCaught} items={items} toggleItem={toggleItem} trainers={trainers} toggleTrainer={toggleTrainer} areaId={areaId} setAreaId={setAreaId} area={area} search={search} setSearch={setSearch} version={version} isMobile={isMobile} choiceGroups={choiceGroups} />}
 
+      {/* ── Tab: Dream Team ── */}
+      {tab === "team" && <DreamTeamTab isMobile={isMobile} version={version} />}
+
       {/* ── Tab: Catch Calc ── */}
       {tab === "calc" && <CatchCalcTab isMobile={isMobile} />}
 
@@ -3364,6 +3589,155 @@ function FireRedTracker() {
 
       {/* ── Tab: 100% Completion ── */}
       {tab === "completion" && <CompletionTab caught={caught} checklist={checklist} toggleChecklist={toggleChecklist} isMobile={isMobile} />}
+    </div>
+  );
+}
+
+// ─── DREAM TEAM TAB ───────────────────────────────────────────────────────────
+function DreamTeamTab({ isMobile, version }) {
+  const [favorite, setFavorite] = React.useState("");
+  const [team, setTeam]         = React.useState(null);
+
+  React.useEffect(() => {
+    try {
+      const r = localStorage.getItem("frlg-dream-team-v3");
+      if (r) {
+        const d = JSON.parse(r);
+        setFavorite(d.favorite || "");
+        const savedTeam = d.team || null;
+        // Validate: discard if version mismatches OR if auto-selected members contain
+        // a Pokémon exclusive to the other version (catches teams built by old code).
+        const lgOnly = new Set(DT_CANDIDATES.filter(c => c.lgOnly).map(c => c.name));
+        const frOnly = new Set(DT_CANDIDATES.filter(c => c.frOnly).map(c => c.name));
+        const hasConflict = savedTeam && savedTeam.some(n => {
+          if (n === d.favorite) return false; // user explicitly chose this
+          const form = DT_FINAL_FORM[n] || n;
+          return (version === "FR" && lgOnly.has(form)) ||
+                 (version === "LG" && frOnly.has(form));
+        });
+        setTeam(d.version === version && !hasConflict ? savedTeam : null);
+      }
+    } catch {}
+  }, []);
+
+  // Clear stale team when the user switches version
+  React.useEffect(() => {
+    try {
+      const r = localStorage.getItem("frlg-dream-team-v3");
+      if (r) { const d = JSON.parse(r); if (d.version && d.version !== version) setTeam(null); }
+    } catch {}
+  }, [version]);
+
+  const eligible = React.useMemo(() => DEX.filter(p => !DT_LEGENDARY.has(p.name)), []);
+
+  const handleBuild = () => {
+    if (!favorite) return;
+    const t = buildDreamTeam(favorite, version);
+    setTeam(t);
+    try { localStorage.setItem("frlg-dream-team-v3", JSON.stringify({ favorite, team: t, version })); } catch {}
+  };
+
+  const versionLabel = (cand) => {
+    if (cand.frOnly) return "FR";
+    if (cand.lgOnly) return "LG";
+    return null;
+  };
+  const needsTrade = (cand) => {
+    if (!cand) return false;
+    return (version === "FR" && cand.lgOnly) || (version === "LG" && cand.frOnly);
+  };
+
+  return (
+    <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
+      <div style={{ marginBottom:16 }}>
+        <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:4, textTransform:"uppercase" }}>Dream Team Builder</div>
+        <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>Builds the best 6-Pokémon FireRed team around your favourite. Always includes Dragonite (the region pseudo-legendary), full HM coverage, no trade evolutions, Kanto only.</div>
+      </div>
+      <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap", alignItems:"center" }}>
+        <select value={favorite} onChange={e => { setFavorite(e.target.value); setTeam(null); }}
+          style={{ flex:1, minWidth:180, background:"rgba(0,0,0,0.3)", border:`1px solid ${C.border}`, color:favorite ? C.text : C.muted, padding:"9px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, borderRadius:6, outline:"none" }}>
+          <option value="">Choose your favourite Pokémon…</option>
+          {eligible.map(p => {
+            const cand = DT_CANDIDATES.find(c => c.name === (DT_FINAL_FORM[p.name] || p.name));
+            const vl = cand ? versionLabel(cand) : null;
+            const trade = cand ? needsTrade(cand) : false;
+            const suffix = trade ? ` (${vl} — needs trade)` : vl ? ` (${vl})` : "";
+            return <option key={p.id} value={p.name}>#{String(p.id).padStart(3,"0")} {p.name}{suffix}</option>;
+          })}
+        </select>
+        <button onClick={handleBuild} disabled={!favorite}
+          style={{ padding:"9px 22px", background:favorite ? "var(--frlg-accent)" : "rgba(0,0,0,0.2)", color:favorite ? "#fff" : C.muted, border:"none", borderRadius:6, cursor:favorite ? "pointer" : "default", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"700", whiteSpace:"nowrap" }}>
+          Build Team
+        </button>
+      </div>
+      {team ? (
+        <div style={{ display:"grid", gridTemplateColumns:isMobile ? "1fr" : "repeat(3,1fr)", gap:12 }}>
+          {team.map((name, idx) => {
+            const isFav     = name === favorite;
+            const isPseudo  = ["Dratini","Dragonair","Dragonite"].includes(name);
+            const finalForm = DT_FINAL_FORM[name] || name;
+            const dexEntry  = DEX.find(p => p.name === name);
+            const candInfo  = DT_CANDIDATES.find(c => c.name === finalForm);
+            const hms       = getDreamHMs(name);
+            const moves     = getDreamMoves(name);
+            const acq       = getDreamAcquisition(name);
+            const evoNote   = EVO_DELAY[name];
+            const isPreEvo  = !!DT_FINAL_FORM[name];
+            const vl        = candInfo ? versionLabel(candInfo) : null;
+            const trade     = candInfo ? needsTrade(candInfo) : false;
+            return (
+              <div key={idx} style={{ background:C.card, border:`1px solid ${isFav ? "var(--frlg-accent)" : trade ? "#e07b3a" : isPseudo ? "#a87acc" : C.border}`, borderRadius:10, padding:"14px", display:"flex", flexDirection:"column", gap:9 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  {dexEntry && <img src={pokeSpriteUrl(dexEntry.id)} alt={name} style={{ width:48, height:48, imageRendering:"pixelated", flexShrink:0 }} />}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap", marginBottom:2 }}>
+                      <span style={{ fontSize:13, fontWeight:"700" }}>{name}</span>
+                      {isFav   && <span style={{ fontSize:8, color:"var(--frlg-accent)", background:"rgba(var(--frlg-accent-rgb,212,98,26),0.12)", border:"1px solid rgba(var(--frlg-accent-rgb,212,98,26),0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>★ FAV</span>}
+                      {isPseudo && !isFav && <span style={{ fontSize:8, color:"#a87acc", background:"rgba(168,122,204,0.12)", border:"1px solid #a87acc55", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>PSEUDO</span>}
+                      {vl && !trade && <span style={{ fontSize:8, color: vl === "FR" ? "#d4621a" : "#3fa84a", background: vl === "FR" ? "rgba(212,98,26,0.12)" : "rgba(63,168,74,0.12)", border:`1px solid ${vl === "FR" ? "rgba(212,98,26,0.4)" : "rgba(63,168,74,0.4)"}`, padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>{vl}</span>}
+                      {trade && <span style={{ fontSize:8, color:"#e07b3a", background:"rgba(224,123,58,0.12)", border:"1px solid rgba(224,123,58,0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>⇄ TRADE ({vl})</span>}
+                    </div>
+                    <div style={{ fontSize:9, color:C.muted }}>
+                      {dexEntry ? `#${String(dexEntry.id).padStart(3,"0")}` : ""}
+                      {candInfo ? ` · ${candInfo.types.join("/")}` : (finalForm !== name ? ` · → ${finalForm}` : "")}
+                    </div>
+                  </div>
+                </div>
+                {hms.length > 0 && (
+                  <div style={{ display:"flex", gap:3, flexWrap:"wrap" }}>
+                    {hms.map(hm => <span key={hm} style={{ fontSize:8, color:"#4a8fc4", background:"rgba(74,143,196,0.10)", border:"1px solid rgba(74,143,196,0.3)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>{hm}</span>)}
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:5 }}>Moveset{isPreEvo ? ` (as ${finalForm})` : ""}</div>
+                  {moves.map((m, i) => (
+                    <div key={i} style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:3 }}>
+                      <span style={{ fontSize:11, fontWeight:"600", minWidth:0, color:m.kind === "tm" ? C.gold : (MOVE_TIERS && MOVE_TIERS.good && MOVE_TIERS.good.has(m.move)) ? C.green : C.text }}>{m.move}</span>
+                      <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
+                    </div>
+                  ))}
+                  {moves.length === 0 && <div style={{ fontSize:10, color:C.muted }}>No moveset data available.</div>}
+                </div>
+                <div>
+                  <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>Where to Get</div>
+                  <div style={{ fontSize:10, color:C.text, lineHeight:1.5 }}>{acq}</div>
+                </div>
+                {evoNote && (
+                  <div style={{ fontSize:10, color:"#c8960a", lineHeight:1.5, padding:"5px 8px", background:"rgba(200,150,10,0.08)", borderRadius:5, borderLeft:"2px solid #c8960a" }}>
+                    ⏳ {evoNote}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ textAlign:"center", color:C.muted, padding:"60px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
+          <div style={{ fontSize:40, opacity:0.25 }}>⚔</div>
+          <div style={{ fontSize:14, fontWeight:"600", color:C.text, opacity:0.5 }}>Your dream team awaits</div>
+          <div style={{ fontSize:12, maxWidth:380, lineHeight:1.8 }}>Pick your favourite and hit <strong style={{ color:C.text }}>Build Team</strong> to get a complete, HM-ready team with recommended movesets.</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -3937,6 +4311,7 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
   const caughtCount = Object.keys(caught).length;
   const filters = [["all","All"],["caught","Caught"],["missing","Missing"],["fr","FR Only"],["lg","LG Only"],["event","Event"],["noball","No Poké Ball"]];
   const isOtherVersionDex = (p) => (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly);
+  const [dexSearch, setDexSearch] = React.useState("");
 
   const filtered = DEX.filter(p => {
     if (dexFilter === "caught")  return caught[p.name];
@@ -3947,6 +4322,9 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
     if (dexFilter === "noball")  return !!CATCH_CONSTRAINT_MAP[p.name];
     return !isOtherVersionDex(p);
   });
+
+  const searchTerm = dexSearch.trim().toLowerCase();
+  const displayed = searchTerm ? filtered.filter(p => p.name.toLowerCase().includes(searchTerm)) : filtered;
 
   const selected = dexSelected ? DEX.find(p => p.name === dexSelected) : null;
   const locs = dexSelected ? (LOCATION_MAP[dexSelected] || []) : [];
@@ -3976,13 +4354,26 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
             <span style={{ fontWeight:"600", color:C.text }}>{pct(caughtCount,151)}%</span>
           </div>
         </div>
+        {/* Search input */}
+        <div style={{ marginTop:8, position:"relative" }}>
+          <input value={dexSearch} onChange={e => setDexSearch(e.target.value)}
+            placeholder="Search Pokémon…"
+            style={{ width:"100%", background:"rgba(0,0,0,0.25)", border:`1px solid ${C.border}`, color:C.text,
+                     padding:"7px 32px 7px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13,
+                     borderRadius:6, boxSizing:"border-box", outline:"none" }} />
+          {dexSearch
+            ? <button onClick={() => setDexSearch("")} style={{ position:"absolute", right:8, top:"50%", transform:"translateY(-50%)", background:"transparent", border:"none", color:C.muted, cursor:"pointer", fontSize:16, padding:"0 2px", lineHeight:1, fontFamily:"sans-serif" }}>×</button>
+            : <span style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", fontSize:13, color:C.muted, pointerEvents:"none" }}>🔍</span>
+          }
+        </div>
+        {searchTerm && <div style={{ marginTop:5, fontSize:11, color:C.muted }}>{displayed.length} result{displayed.length !== 1 ? "s" : ""}</div>}
       </div>
 
       <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
         {/* Grid */}
         <div style={{ flex:1, overflowY:"auto", padding:"12px 16px", paddingBottom: isMobile && selected ? 220 : 12 }}>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(86px,1fr))", gap:6 }}>
-            {filtered.map(p => {
+            {displayed.map(p => {
               const isCaught = !!caught[p.name];
               const isSel = dexSelected === p.name;
               return (
@@ -4009,7 +4400,7 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
               );
             })}
           </div>
-          {filtered.length === 0 && <div style={{ textAlign:"center", padding:40, color:C.muted, fontSize:12 }}>No Pokémon match this filter.</div>}
+          {displayed.length === 0 && <div style={{ textAlign:"center", padding:40, color:C.muted, fontSize:12 }}>{searchTerm ? `No Pokémon match "${dexSearch}".` : "No Pokémon match this filter."}</div>}
           <LivingDexPanel caught={caught} />
         </div>
 
@@ -4240,10 +4631,17 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const verPokemon      = areaPokemon.filter(p => !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
   const relevantPokemon = verPokemon.filter(p => !isPassedPokemon(p));
   const pokeDone        = relevantPokemon.filter(p => caught[p.name]).length;
+  const nonTradePokemon  = relevantPokemon.filter(p => p.method !== "Trade");
+  const pendingTrades    = relevantPokemon.filter(p => p.method === "Trade" && !caught[p.name]);
+  const nonTradePokeDone = nonTradePokemon.filter(p => caught[p.name]).length;
   const relevantItems   = areaItems.filter(it => !isPassedItem(it));
   const itemDone        = area && !area.floors
     ? areaItems.reduce((n, it, i) => n + (!isPassedItem(it) && items[flatItemKey(areaId, i)] ? 1 : 0), 0)
     : area?.floors?.reduce((n, floor) => n + (floor.items||[]).reduce((m, it, i) => m + (!isPassedItem(it) && items[floorItemKey(areaId, floor.label, i)] ? 1 : 0), 0), 0) ?? 0;
+  const nonOptionalItems    = relevantItems.filter(it => !it.optional && !it.recurring);
+  const nonOptionalItemDone = area && !area.floors
+    ? areaItems.reduce((n, it, i) => n + (!isPassedItem(it) && !it.optional && !it.recurring && items[flatItemKey(areaId, i)] ? 1 : 0), 0)
+    : area?.floors?.reduce((n, floor) => n + (floor.items||[]).reduce((m, it, i) => m + (!isPassedItem(it) && !it.optional && !it.recurring && items[floorItemKey(areaId, floor.label, i)] ? 1 : 0), 0), 0) ?? 0;
   const trainerDone     = areaTrainers.filter(t => trainers[`${areaId}|${t.class}|${t.name}`]).length;
 
   // Prev / Next navigation
@@ -4303,8 +4701,8 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
               const atype = getAreaType(area);
               const tint = AREA_TINT[atype];
               const typeLabel = { route:"Route", cave:"Cave / Dungeon", water:"Water / Ship", safari:"Safari Zone", special:"Special", city:"City / Town" }[atype] || atype;
-              const allDone = relevantPokemon.length + relevantItems.length + areaTrainers.length > 0 &&
-                pokeDone === relevantPokemon.length && itemDone === relevantItems.length && trainerDone === areaTrainers.length;
+              const allDone = nonTradePokemon.length + nonOptionalItems.length + areaTrainers.length > 0 &&
+                nonTradePokeDone === nonTradePokemon.length && nonOptionalItemDone === nonOptionalItems.length && trainerDone === areaTrainers.length;
               return (
                 <div style={{ position:"sticky", top:0, zIndex:10, background:C.bg, borderBottom:`1px solid ${C.border}`, padding:"12px 20px 10px", boxShadow:"0 2px 8px rgba(0,0,0,0.3)" }}>
                   {/* Mobile back button */}
@@ -4320,6 +4718,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                         <span style={{ fontSize:9, color:C.muted, letterSpacing:2, textTransform:"uppercase" }}>{area.part}</span>
                         <span style={{ fontSize:9, color:tint.bar, background:`${tint.bar}22`, border:`1px solid ${tint.bar}55`, padding:"1px 7px", borderRadius:99, letterSpacing:0.5, textTransform:"uppercase", fontWeight:"700" }}>{typeLabel}</span>
                         {allDone && <span style={{ fontSize:9, color:C.green, background:"rgba(74,175,116,0.12)", border:`1px solid ${C.green}55`, padding:"1px 7px", borderRadius:99, fontWeight:"700", letterSpacing:0.5 }}>✓ COMPLETE</span>}
+                        {pendingTrades.length > 0 && <span style={{ fontSize:9, color:"#c8960a", background:"rgba(200,150,10,0.10)", border:"1px solid rgba(200,150,10,0.4)", padding:"1px 7px", borderRadius:99, fontWeight:"700", letterSpacing:0.5 }}>⇄ TRADE</span>}
                       </div>
                       <h2 style={{ margin:0, fontSize:19, fontWeight:"700" }}>{area.name}</h2>
                     </div>
@@ -4463,14 +4862,20 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, ch
   const isSel  = areaId === area.id;
   const isPok  = p  => !!(p.choiceGroup  && choiceGroups?.[p.choiceGroup]  && choiceGroups[p.choiceGroup]  !== p.choiceId);
   const isItm  = it => !!(it.choiceGroup && choiceGroups?.[it.choiceGroup] && choiceGroups[it.choiceGroup] !== it.choiceId);
-  const allPoks = flattenPokemon(area).filter(p =>
+  const allPoksWithTrades = flattenPokemon(area).filter(p =>
     !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPok(p));
+  const tradePoks = allPoksWithTrades.filter(p => p.method === "Trade");
+  const allPoks   = allPoksWithTrades.filter(p => p.method !== "Trade");
+  const hasPendingTrades = tradePoks.some(p => !caught[p.name]);
+  const hasPendingSurfItems = area.floors
+    ? area.floors.some(f => (f.items||[]).some((it, i) => it.surf && !items[floorItemKey(area.id, f.label, i)]))
+    : (area.items||[]).some((it, i) => it.surf && !items[flatItemKey(area.id, i)]);
   const allTrns = flattenTrainers(area);
   const pd  = allPoks.filter(p => caught[p.name]).length;
   // Item done/total excluding passed choice-group entries
   const { id_, itTotal } = (() => {
     let done = 0, total = 0;
-    const countFloor = (its, keyFn) => its.forEach((it, i) => { if (isItm(it)) return; total++; if (items[keyFn(i)]) done++; });
+    const countFloor = (its, keyFn) => its.forEach((it, i) => { if (isItm(it) || it.optional || it.recurring) return; total++; if (items[keyFn(i)]) done++; });
     if (area.floors) area.floors.forEach(f => countFloor(f.items || [], i => floorItemKey(area.id, f.label, i)));
     else countFloor(area.items || [], i => flatItemKey(area.id, i));
     return { id_: done, itTotal: total };
@@ -4484,11 +4889,15 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, ch
         padding:"8px 12px", cursor:"pointer",
         borderBottom:`1px solid rgba(58,42,28,0.5)`,
         borderLeft: isSel ? `3px solid var(--frlg-accent)` : `3px solid ${tint.bar}`,
-        background: isSel ? "rgba(var(--frlg-accent-rgb,212,98,26),0.10)" : tint.bg,
+        background: isSel ? "rgba(var(--frlg-accent-rgb,212,98,26),0.18)" : tint.bg,
         transition:"background 0.1s" }}
       onMouseEnter={e => { if (!isSel) e.currentTarget.style.background="rgba(255,255,255,0.04)"; }}
       onMouseLeave={e => { if (!isSel) e.currentTarget.style.background=tint.bg; }}>
-      <div style={{ fontSize:12, fontWeight: isSel ? "600" : "400", color: allDone ? C.green : isSel ? C.text : "#c4a888", lineHeight:1.4 }}>{allDone ? "✓ " : ""}{area.name}</div>
+      <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+        <span style={{ fontSize:12, fontWeight: isSel ? "700" : "400", color: allDone ? C.green : isSel ? "var(--frlg-accent)" : "#c4a888", lineHeight:1.4, flex:1 }}>{allDone ? "✓ " : ""}{area.name}</span>
+        {hasPendingTrades && <span style={{ fontSize:9, color:"#c8960a", background:"rgba(200,150,10,0.12)", border:"1px solid rgba(200,150,10,0.35)", padding:"1px 5px", borderRadius:99, fontWeight:"700", flexShrink:0 }}>⇄</span>}
+        {hasPendingSurfItems && <span style={{ fontSize:9, color:"#4a8fc4", background:"rgba(74,143,196,0.12)", border:"1px solid rgba(74,143,196,0.35)", padding:"1px 5px", borderRadius:99, fontWeight:"700", flexShrink:0 }}>≈</span>}
+      </div>
       {total > 0 && (
         <div style={{ display:"flex", gap:10, marginTop:3, fontSize:10, color:C.muted }}>
           <span style={{ color: pd===allPoks.length && allPoks.length>0 ? C.green : C.muted }}>{pd}/{allPoks.length} pkm</span>
@@ -4620,6 +5029,8 @@ function ItemEntry({ it, itemKey, done, toggleItem, isMobile, choiceGroups }) {
         <div style={{ flex:1 }}>
           <span style={{ fontSize:12, fontWeight:"600", color:it.hidden?C.gold:C.text }}>
             {it.hidden&&<span style={{ color:C.gold, marginRight:4 }}>★</span>}{it.name}
+            {it.recurring&&<span style={{ fontSize:9, color:"#6bb8d4", marginLeft:6, fontWeight:"700", letterSpacing:0.5 }}>↻</span>}
+            {it.surf&&<span style={{ fontSize:9, color:"#4a8fc4", marginLeft:6, fontWeight:"700", letterSpacing:0.5 }}>≈</span>}
           </span>
           {it.note&&<div style={{ fontSize:10, color:C.muted, marginTop:2, lineHeight:1.5 }}>{it.note}</div>}
         </div>
