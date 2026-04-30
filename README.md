@@ -50,7 +50,7 @@ Connect the GitHub repo to Cloudflare Pages with no build command and no output 
   - Mark-all / clear buttons on each section header
   - Area-type color coding in the sidebar (route / cave / water / safari / special / city)
   - ← → navigation arrows in the area detail header for sequential stepping
-- **Pokédex tab** — full 151-Pokémon grid with sprites; uncaught Pokémon shown as black silhouettes; click any Pokémon to see its caught status and every area it appears in
+- **Pokédex tab** — full 151-Pokémon Kanto grid with sprites; uncaught Pokémon shown as black silhouettes; click any Pokémon to see its caught status and every area it appears in; a collapsible **National Pokédex (Post-Game)** section shows Gen II Pokémon obtainable in the Sevii Islands (not counted toward 100% completion)
 - **Living Dex panel** — collapsible panel listing trade evolutions, fossil choices, Fighting Dojo, version exclusives, and event Pokémon with their caught state
 - **Shared Pokémon state** — catching a Pokémon in any area marks it caught everywhere, including the Pokédex tab
 - **Progress saved automatically** between sessions via browser localStorage
@@ -80,7 +80,10 @@ Area data is being audited part by part against the [Bulbapedia FireRed & LeafGr
 | Part 15 | Route 21 · Power Plant · Viridian Gym | Audited |
 | Part 16 | Route 23 · Victory Road | Audited |
 | Part 17 | Indigo Plateau (Elite Four · Blue Champion) | Audited |
-| Part 18–21 | Sevii Islands (Four Island onward) | Pending audit |
+| Part 18 | Four Island · Icefall Cave · Water Path · Green Path · Pattern Bush · Altering Cave · Ruin Valley · Dotted Hole | Audited |
+| Part 19 | Five Isle Meadow · Rocket Warehouse · Memorial Pillar · Water Labyrinth · Resort Gorgeous · Lost Cave · Seven Island · Canyon Entrance · Sevault Canyon · Tanoby Key · Tanoby Ruins · Trainer Tower | Audited |
+| Part 20 | Cerulean Cave · Indigo Plateau Round 2 | Audited |
+| Part 21 | Birth Island · Navel Rock (event-only islands) | N/A |
 
 ---
 

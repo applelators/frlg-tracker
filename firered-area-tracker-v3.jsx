@@ -80,6 +80,55 @@ const DEX = [
   {id:150,name:"Mewtwo"},      {id:151,name:"Mew",event:true},
 ];
 
+// ─── NATIONAL DEX (Gen II Pokémon obtainable in FRLG post-game) ──────────────
+// Not counted toward 100% completion. Shown in a separate section of the Pokédex tab.
+const NATIONAL_DEX = [
+  {id:161,name:"Sentret"},
+  {id:162,name:"Furret"},
+  {id:165,name:"Ledyba"},
+  {id:166,name:"Ledian"},
+  {id:167,name:"Spinarak"},
+  {id:168,name:"Ariados"},
+  {id:169,name:"Crobat"},
+  {id:175,name:"Togepi"},
+  {id:176,name:"Togetic"},
+  {id:177,name:"Natu"},
+  {id:178,name:"Xatu"},
+  {id:183,name:"Marill",    lgOnly:true},
+  {id:184,name:"Azumarill", lgOnly:true},
+  {id:186,name:"Politoed"},
+  {id:187,name:"Hoppip"},
+  {id:188,name:"Skiploom"},
+  {id:189,name:"Jumpluff"},
+  {id:193,name:"Yanma"},
+  {id:194,name:"Wooper",    frOnly:true},
+  {id:195,name:"Quagsire",  frOnly:true},
+  {id:198,name:"Murkrow",   frOnly:true},
+  {id:200,name:"Misdreavus",lgOnly:true},
+  {id:201,name:"Unown"},
+  {id:202,name:"Wobbuffet"},
+  {id:208,name:"Steelix"},
+  {id:211,name:"Qwilfish",  frOnly:true},
+  {id:212,name:"Scizor",    frOnly:true},
+  {id:214,name:"Heracross"},
+  {id:215,name:"Sneasel",   frOnly:true},
+  {id:220,name:"Swinub"},
+  {id:221,name:"Piloswine"},
+  {id:223,name:"Remoraid",  lgOnly:true},
+  {id:224,name:"Octillery", lgOnly:true},
+  {id:225,name:"Delibird",  lgOnly:true},
+  {id:226,name:"Mantine"},
+  {id:227,name:"Skarmory",  frOnly:true},
+  {id:230,name:"Kingdra",   frOnly:true},
+  {id:231,name:"Phanpy"},
+  {id:232,name:"Donphan"},
+  {id:233,name:"Porygon2"},
+  {id:242,name:"Blissey"},
+  {id:246,name:"Larvitar"},
+  {id:247,name:"Pupitar"},
+  {id:248,name:"Tyranitar"},
+];
+
 // ─── AREA DATA ────────────────────────────────────────────────────────────────
 // Pokémon are tracked GLOBALLY by name. Items are tracked per-area.
 // Gift/Trade/Fossil Pokémon are included in pokemon arrays so they sync to the Pokédex.
@@ -2202,6 +2251,605 @@ const AREAS = [
         team:[{name:"Rhyhorn",level:45},{name:"Dugtrio",level:42},{name:"Nidoqueen",level:44},{name:"Nidoking",level:45},{name:"Rhyhorn",level:50}]},
     ]},
 
+// ─── PART 18 — Four Island · Icefall Cave · Six Island ───────────────────────
+
+  { part:"Part 18", id:"four-island", name:"Four Island",
+    note:"Kinnow Island — hub of the second set of Sevii Islands. Surf and fish off the beaches for Kanto and Johto Pokémon. Blue appears here but does not battle.",
+    pokemon:[
+      {name:"Wooper",    method:"Surf",      levels:"5–25",  rate:"70%", frOnly:true},
+      {name:"Marill",    method:"Surf",      levels:"5–25",  rate:"70%", lgOnly:true},
+      {name:"Psyduck",   method:"Surf",      levels:"5–35",  rate:"30%", frOnly:true},
+      {name:"Slowpoke",  method:"Surf",      levels:"5–35",  rate:"30%", lgOnly:true},
+      {name:"Magikarp",  method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Poliwag",   method:"Good Rod",  levels:"5–15",  rate:"60%"},
+      {name:"Goldeen",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Magikarp",  method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Poliwag",   method:"Super Rod", levels:"15–25", rate:"40%"},
+      {name:"Poliwhirl", method:"Super Rod", levels:"20–30", rate:"40%"},
+      {name:"Gyarados",  method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Psyduck",   method:"Super Rod", levels:"15–35", rate:"5%",  frOnly:true},
+      {name:"Slowpoke",  method:"Super Rod", levels:"15–35", rate:"5%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Ultra Ball",  hidden:true,  note:"Beach north of the port"},
+      {name:"Star Piece",  hidden:false, note:"Northernmost beach (requires Rock Smash)"},
+      {name:"Pearl",       hidden:true,  note:"Beach east of the port"},
+      {name:"Stardust",    hidden:true,  note:"South of Icefall Cave entrance (requires Surf)"},
+    ],
+    trainers:[] },
+
+  { part:"Part 18", id:"icefall-cave", name:"Icefall Cave",
+    note:"Icy cave on Four Island's northwest coast. HM07 Waterfall is obtained here. Lorelei appears in the Back Cave for a cutscene.",
+    floors:[
+      { label:"Entrance",
+        pokemon:[
+          {name:"Seel",     method:"Cave", levels:"43–47", rate:"40%"},
+          {name:"Golbat",   method:"Cave", levels:"45–48", rate:"25%"},
+          {name:"Dewgong",  method:"Cave", levels:"49–53", rate:"20%"},
+          {name:"Zubat",    method:"Cave", levels:"40",    rate:"10%"},
+          {name:"Psyduck",  method:"Cave", levels:"41",    rate:"5%",  frOnly:true},
+          {name:"Slowpoke", method:"Cave", levels:"41",    rate:"5%",  lgOnly:true},
+          {name:"Seel",     method:"Surf", levels:"5–35",  rate:"60%"},
+          {name:"Psyduck",  method:"Surf", levels:"5–35",  rate:"30%", frOnly:true},
+          {name:"Slowpoke", method:"Surf", levels:"5–35",  rate:"30%", lgOnly:true},
+          {name:"Dewgong",  method:"Surf", levels:"35–40", rate:"5%"},
+          {name:"Wooper",   method:"Surf", levels:"5–15",  rate:"5%",  frOnly:true},
+          {name:"Marill",   method:"Surf", levels:"5–15",  rate:"5%",  lgOnly:true},
+        ],
+        items:[],
+        trainers:[
+          {class:"Team Rocket Grunt",name:"Grunt 1",team:[{name:"Zubat",level:38},{name:"Zubat",level:38},{name:"Golbat",level:38}]},
+        ] },
+      { label:"1F",
+        pokemon:[
+          {name:"Swinub",   method:"Cave", levels:"23–31", rate:"50%"},
+          {name:"Golbat",   method:"Cave", levels:"45–48", rate:"25%"},
+          {name:"Zubat",    method:"Cave", levels:"40",    rate:"10%"},
+          {name:"Seel",     method:"Cave", levels:"45",    rate:"10%"},
+          {name:"Sneasel",  method:"Cave", levels:"30",    rate:"5%",  frOnly:true},
+          {name:"Delibird", method:"Cave", levels:"30",    rate:"5%",  lgOnly:true},
+        ],
+        items:[
+          {name:"Ultra Ball",     hidden:false, note:"Center area, northeast of the ice patch"},
+          {name:"HM07 Waterfall", hidden:false, note:"Southern ledge, accessed via the frozen waterfall in B1F"},
+        ],
+        trainers:[] },
+      { label:"Back Cave",
+        pokemon:[
+          {name:"Tentacool",  method:"Surf",      levels:"5–45",  rate:"95%"},
+          {name:"Tentacruel", method:"Surf",      levels:"35–45", rate:"4%"},
+          {name:"Lapras",     method:"Surf",      levels:"30–45", rate:"1%"},
+          {name:"Magikarp",   method:"Old Rod",   levels:"5",     rate:"100%"},
+          {name:"Horsea",     method:"Good Rod",  levels:"5–15",  rate:"80%", frOnly:true},
+          {name:"Krabby",     method:"Good Rod",  levels:"5–15",  rate:"80%", lgOnly:true},
+          {name:"Magikarp",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+          {name:"Shellder",   method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+          {name:"Horsea",     method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+          {name:"Krabby",     method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+          {name:"Staryu",     method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+          {name:"Gyarados",   method:"Super Rod", levels:"15–25", rate:"15%"},
+          {name:"Seadra",     method:"Super Rod", levels:"25–35", rate:"4%",  frOnly:true},
+          {name:"Kingler",    method:"Super Rod", levels:"25–35", rate:"4%",  lgOnly:true},
+          {name:"Psyduck",    method:"Super Rod", levels:"25–35", rate:"1%",  frOnly:true},
+          {name:"Slowpoke",   method:"Super Rod", levels:"25–35", rate:"1%",  lgOnly:true},
+        ],
+        items:[
+          {name:"Never-Melt Ice", hidden:false, note:"East side of B1F"},
+          {name:"Full Restore",   hidden:false, note:"Near the southern ladder in B1F"},
+        ],
+        trainers:[] },
+    ] },
+
+  { part:"Part 18", id:"water-path", name:"Water Path",
+    note:"Coastal route on Six Island connecting the Pokémon Center to the rest of the island. Grass encounters include Johto Pokémon.",
+    pokemon:[
+      {name:"Spearow",    method:"Grass",     levels:"44",    rate:"20%"},
+      {name:"Sentret",    method:"Grass",     levels:"10–15", rate:"30%"},
+      {name:"Meowth",     method:"Grass",     levels:"41",    rate:"10%"},
+      {name:"Oddish",     method:"Grass",     levels:"44",    rate:"10%", frOnly:true},
+      {name:"Gloom",      method:"Grass",     levels:"48",    rate:"5%",  frOnly:true},
+      {name:"Bellsprout", method:"Grass",     levels:"44",    rate:"10%", lgOnly:true},
+      {name:"Weepinbell", method:"Grass",     levels:"48",    rate:"5%",  lgOnly:true},
+      {name:"Fearow",     method:"Grass",     levels:"48–50", rate:"15%"},
+      {name:"Persian",    method:"Grass",     levels:"47–50", rate:"5%"},
+      {name:"Psyduck",    method:"Grass",     levels:"41",    rate:"5%",  frOnly:true},
+      {name:"Slowpoke",   method:"Grass",     levels:"41",    rate:"5%",  lgOnly:true},
+      {name:"Tentacool",  method:"Surf",      levels:"5–40",  rate:"95%"},
+      {name:"Tentacruel", method:"Surf",      levels:"35–40", rate:"5%"},
+      {name:"Magikarp",   method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Horsea",     method:"Good Rod",  levels:"5–15",  rate:"80%", frOnly:true},
+      {name:"Krabby",     method:"Good Rod",  levels:"5–15",  rate:"80%", lgOnly:true},
+      {name:"Magikarp",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Horsea",     method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Krabby",     method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Qwilfish",   method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Remoraid",   method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Gyarados",   method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Seadra",     method:"Super Rod", levels:"25–35", rate:"4%",  frOnly:true},
+      {name:"Kingler",    method:"Super Rod", levels:"25–35", rate:"4%",  lgOnly:true},
+      {name:"Psyduck",    method:"Super Rod", levels:"25–35", rate:"1%",  frOnly:true},
+      {name:"Slowpoke",   method:"Super Rod", levels:"25–35", rate:"1%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Pinap Berry",  hidden:true,  note:"Grassy area southeast of Six Island entrance"},
+      {name:"Aspear Berry", hidden:true,  note:"Grassy area, southeast of Pinap Berry"},
+      {name:"Dragon Scale", hidden:false, note:"Small land mass southeast of Aspear Berry (requires Surf)"},
+      {name:"Oran Berry",   hidden:true,  note:"Northwest of northern house (requires Surf)"},
+      {name:"Elixir",       hidden:false, note:"Small land east of southern house (requires Surf)"},
+    ],
+    trainers:[
+      {class:"Juggler",    name:"Edward",   team:[{name:"Voltorb",level:46},{name:"Voltorb",level:46},{name:"Electrode",level:47},{name:"Mr. Mime",level:48}]},
+      {class:"Hiker",      name:"Earl",     team:[{name:"Onix",level:49},{name:"Machoke",level:49}]},
+      {class:"Swimmer♀",   name:"Denise",   team:[{name:"Chinchou",level:49},{name:"Lanturn",level:49}]},
+      {class:"Swimmer♂",   name:"Samir",    team:[{name:"Gyarados",level:50}]},
+      {class:"Twins",      name:"Miu & Mia",team:[{name:"Pikachu",level:50},{name:"Pikachu",level:50}]},
+      {class:"Aroma Lady", name:"Rose",     team:[{name:"Sunkern",level:49},{name:"Sunflora",level:49}]},
+    ] },
+
+  { part:"Part 18", id:"green-path", name:"Green Path",
+    note:"Short water route on Six Island's northeastern coast connecting Water Path to Outcast Island. Only surf and fishing encounters.",
+    pokemon:[
+      {name:"Tentacool",  method:"Surf",      levels:"5–40",  rate:"95%"},
+      {name:"Tentacruel", method:"Surf",      levels:"35–40", rate:"5%"},
+      {name:"Magikarp",   method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Horsea",     method:"Good Rod",  levels:"5–15",  rate:"80%", frOnly:true},
+      {name:"Krabby",     method:"Good Rod",  levels:"5–15",  rate:"80%", lgOnly:true},
+      {name:"Magikarp",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Horsea",     method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Qwilfish",   method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Krabby",     method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Remoraid",   method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Gyarados",   method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Seadra",     method:"Super Rod", levels:"25–35", rate:"4%",  frOnly:true},
+      {name:"Kingler",    method:"Super Rod", levels:"25–35", rate:"4%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Ultra Ball", hidden:true, note:"One step south and east of Psychic Jaclyn"},
+    ],
+    trainers:[
+      {class:"Psychic",name:"Jaclyn",team:[{name:"Natu",level:48},{name:"Slowbro",level:48},{name:"Kadabra",level:49}]},
+    ] },
+
+  { part:"Part 18", id:"pattern-bush", name:"Pattern Bush",
+    note:"Dense forest on Six Island. Ledyba is far more common in LeafGreen (30%) than FireRed (5%); Spinarak is the reverse. Heracross appears at a steady 20% in both.",
+    pokemon:[
+      {name:"Heracross",  method:"Grass", levels:"15–30", rate:"20%"},
+      {name:"Caterpie",   method:"Grass", levels:"6",     rate:"10%"},
+      {name:"Weedle",     method:"Grass", levels:"6",     rate:"10%"},
+      {name:"Kakuna",     method:"Grass", levels:"9",     rate:"20%"},
+      {name:"Metapod",    method:"Grass", levels:"9",     rate:"5%"},
+      {name:"Spinarak",   method:"Grass", levels:"9–14",  rate:"30% FR / 5% LG"},
+      {name:"Ledyba",     method:"Grass", levels:"9–14",  rate:"5% FR / 30% LG"},
+    ],
+    items:[],
+    trainers:[
+      {class:"Youngster",       name:"Cordell", team:[{name:"Farfetch'd",level:48},{name:"Farfetch'd",level:48}]},
+      {class:"Pokémon Breeder", name:"Bethany", team:[{name:"Chansey",level:50}]},
+      {class:"Bug Catcher",     name:"Garret",  team:[{name:"Heracross",level:49}]},
+      {class:"Lass",            name:"Joana",   team:[{name:"Snubbull",level:49}]},
+      {class:"Youngster",       name:"Nash",    team:[{name:"Weepinbell",level:47},{name:"Weepinbell",level:47},{name:"Victreebel",level:49}]},
+      {class:"Bug Catcher",     name:"Vance",   team:[{name:"Venonat",level:48},{name:"Venomoth",level:48}]},
+      {class:"Ruin Maniac",     name:"Layton",  team:[{name:"Sandslash",level:48},{name:"Onix",level:48},{name:"Sandslash",level:48}]},
+      {class:"Picnicker",       name:"Marcy",   team:[{name:"Paras",level:48},{name:"Paras",level:48},{name:"Parasect",level:49}]},
+      {class:"Bug Catcher",     name:"Jonah",   team:[{name:"Yanma",level:45},{name:"Beedrill",level:45},{name:"Yanma",level:46},{name:"Beedrill",level:47}]},
+      {class:"Lass",            name:"Dalia",   team:[{name:"Hoppip",level:46},{name:"Hoppip",level:47},{name:"Skiploom",level:47},{name:"Skiploom",level:48}]},
+      {class:"Pokémon Breeder", name:"Allison", team:[{name:"Clefairy",level:48},{name:"Clefairy",level:48},{name:"Clefable",level:48}]},
+      {class:"Camper",          name:"Riley",   team:[{name:"Pinsir",level:49},{name:"Heracross",level:50}]},
+    ] },
+
+  { part:"Part 18", id:"altering-cave", name:"Altering Cave",
+    note:"Mysterious cave on Outcast Island. The planned Mystery Gift event distributions (Mareep, Smeargle, and others) were never officially released, so only Zubat appears in any unmodified game.",
+    pokemon:[
+      {name:"Zubat", method:"Cave", levels:"6–16", rate:"100%"},
+    ],
+    items:[],
+    trainers:[] },
+
+  { part:"Part 18", id:"ruin-valley", name:"Ruin Valley",
+    note:"Archaeological site on Six Island featuring rare Johto Pokémon. Natu and Yanma appear in the grass. Strength is required to reach all items.",
+    pokemon:[
+      {name:"Natu",      method:"Grass",     levels:"15–20", rate:"25%"},
+      {name:"Spearow",   method:"Grass",     levels:"44",    rate:"20%"},
+      {name:"Yanma",     method:"Grass",     levels:"18",    rate:"10%"},
+      {name:"Meowth",    method:"Grass",     levels:"43",    rate:"10%"},
+      {name:"Wooper",    method:"Grass",     levels:"15",    rate:"10%", frOnly:true},
+      {name:"Marill",    method:"Grass",     levels:"15",    rate:"10%", lgOnly:true},
+      {name:"Wobbuffet", method:"Grass",     levels:"25",    rate:"5%"},
+      {name:"Fearow",    method:"Grass",     levels:"49",    rate:"10%"},
+      {name:"Persian",   method:"Grass",     levels:"49–52", rate:"5%"},
+      {name:"Psyduck",   method:"Grass",     levels:"41",    rate:"5%",  frOnly:true},
+      {name:"Slowpoke",  method:"Grass",     levels:"41",    rate:"5%",  lgOnly:true},
+      {name:"Wooper",    method:"Surf",      levels:"5–25",  rate:"100%",frOnly:true},
+      {name:"Marill",    method:"Surf",      levels:"5–25",  rate:"100%",lgOnly:true},
+      {name:"Magikarp",  method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Poliwag",   method:"Good Rod",  levels:"5–15",  rate:"60%"},
+      {name:"Goldeen",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Magikarp",  method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Poliwag",   method:"Super Rod", levels:"15–25", rate:"40%"},
+      {name:"Poliwhirl", method:"Super Rod", levels:"20–30", rate:"40%"},
+      {name:"Gyarados",  method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Psyduck",   method:"Super Rod", levels:"15–35", rate:"5%",  frOnly:true},
+      {name:"Slowpoke",  method:"Super Rod", levels:"15–35", rate:"5%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Sun Stone",    hidden:false, note:"Southeastern corner (requires Strength)"},
+      {name:"HP Up",        hidden:false, note:"Southwestern corner (requires Strength)"},
+      {name:"Full Restore", hidden:false, note:"Southeast of Hiker Daryl (requires Strength)"},
+    ],
+    trainers:[
+      {class:"Hiker",       name:"Daryl",  team:[{name:"Sudowoodo",level:50}]},
+      {class:"PokéManiac",  name:"Hector", team:[{name:"Rhyhorn",level:49},{name:"Kangaskhan",level:49}]},
+      {class:"Ruin Maniac", name:"Stanly", team:[{name:"Graveler",level:48},{name:"Onix",level:48},{name:"Graveler",level:48}]},
+      {class:"Ruin Maniac", name:"Foster", team:[{name:"Golem",level:50}]},
+      {class:"Ruin Maniac", name:"Larry",  team:[{name:"Machoke",level:49},{name:"Machoke",level:49}]},
+    ] },
+
+  { part:"Part 18", id:"dotted-hole", name:"Dotted Hole",
+    note:"Puzzle dungeon on Six Island — solve the Braille-inscribed doors on each of four floors with the right directional push to reach the pedestal. Gideon steals the Sapphire the moment you claim it.",
+    pokemon:[],
+    items:[
+      {name:"Sapphire", hidden:false, note:"At the bottom of the puzzle — stolen by Gideon immediately; recovered later from the Rocket Warehouse", warn:true},
+    ],
+    trainers:[] },
+
+// ─── PART 19 — Five Island · Seven Island ────────────────────────────────────
+
+  { part:"Part 19", id:"five-isle-meadow", name:"Five Isle Meadow",
+    note:"Grassy meadow on Five Island north of the Rocket Warehouse. Sentret and Hoppip appear at a high rate.",
+    pokemon:[
+      {name:"Sentret",    method:"Grass",     levels:"10–15", rate:"30%"},
+      {name:"Pidgey",     method:"Grass",     levels:"44",    rate:"20%"},
+      {name:"Pidgeotto",  method:"Grass",     levels:"48–50", rate:"15%"},
+      {name:"Hoppip",     method:"Grass",     levels:"10–15", rate:"15%"},
+      {name:"Meowth",     method:"Grass",     levels:"41",    rate:"10%"},
+      {name:"Persian",    method:"Grass",     levels:"47–50", rate:"5%"},
+      {name:"Psyduck",    method:"Grass",     levels:"41",    rate:"5%",  frOnly:true},
+      {name:"Slowpoke",   method:"Grass",     levels:"41",    rate:"5%",  lgOnly:true},
+      {name:"Tentacool",  method:"Surf",      levels:"5–40",  rate:"65%"},
+      {name:"Hoppip",     method:"Surf",      levels:"5–15",  rate:"30%"},
+      {name:"Tentacruel", method:"Surf",      levels:"35–40", rate:"5%"},
+      {name:"Magikarp",   method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Horsea",     method:"Good Rod",  levels:"5–15",  rate:"80%", frOnly:true},
+      {name:"Krabby",     method:"Good Rod",  levels:"5–15",  rate:"80%", lgOnly:true},
+      {name:"Magikarp",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Horsea",     method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Qwilfish",   method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Krabby",     method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Remoraid",   method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Gyarados",   method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Seadra",     method:"Super Rod", levels:"25–35", rate:"4%",  frOnly:true},
+      {name:"Kingler",    method:"Super Rod", levels:"25–35", rate:"4%",  lgOnly:true},
+      {name:"Psyduck",    method:"Super Rod", levels:"25–35", rate:"1%",  frOnly:true},
+      {name:"Slowpoke",   method:"Super Rod", levels:"25–35", rate:"1%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Max Potion", hidden:false, note:"Clearing north of the Rocket Warehouse (requires Cut)"},
+      {name:"PP Up",      hidden:false, note:"Southwest of the Rocket Warehouse (requires Surf)"},
+    ],
+    trainers:[
+      {class:"Team Rocket Grunt",name:"Grunt 1",team:[{name:"Rattata",level:48},{name:"Grimer",level:48},{name:"Muk",level:48}]},
+      {class:"Team Rocket Grunt",name:"Grunt 2",team:[{name:"Ekans",level:48},{name:"Gloom",level:48},{name:"Gloom",level:48}]},
+      {class:"Team Rocket Grunt",name:"Grunt 3",team:[{name:"Koffing",level:49},{name:"Weezing",level:49}]},
+    ] },
+
+  { part:"Part 19", id:"rocket-warehouse", name:"Rocket Warehouse",
+    note:"Team Rocket's secret base on Five Island. Defeat Admins Ariana and Archer, then Scientist Gideon, to recover the stolen Sapphire and deliver it to Celio.",
+    pokemon:[],
+    items:[
+      {name:"Up-Grade",         hidden:false, note:"Northwest room"},
+      {name:"Pearl",            hidden:false, note:"West-central edge of the maze"},
+      {name:"Net Ball",         hidden:true,  note:"Lone box west of maze center"},
+      {name:"Big Pearl",        hidden:false, note:"South-central edge of the maze"},
+      {name:"TM36 Sludge Bomb", hidden:false, note:"North-central room, on a table"},
+      {name:"Nest Ball",        hidden:true,  note:"Northeast room, on a box"},
+      {name:"Sapphire",         hidden:false, note:"Recovered from Gideon in the northeast room — deliver to Celio on One Island", warn:true},
+    ],
+    trainers:[
+      {class:"Team Rocket Grunt",name:"Grunt 1",team:[{name:"Houndour",level:49},{name:"Houndour",level:49}]},
+      {class:"Team Rocket Grunt",name:"Grunt 2",team:[{name:"Machop",level:48},{name:"Machop",level:48},{name:"Machoke",level:48}]},
+      {class:"Team Rocket Grunt",name:"Grunt 3",team:[{name:"Hypno",level:49},{name:"Hypno",level:49}]},
+      {class:"Rocket Admin",name:"Ariana",team:[{name:"Muk",level:52},{name:"Arbok",level:53},{name:"Vileplume",level:54}]},
+      {class:"Rocket Admin",name:"Archer", team:[{name:"Golbat",level:53},{name:"Weezing",level:54},{name:"Houndoom",level:55}]},
+      {class:"Scientist",  name:"Gideon", team:[{name:"Voltorb",level:46},{name:"Electrode",level:46},{name:"Magnemite",level:46},{name:"Magneton",level:46},{name:"Porygon",level:46}]},
+    ] },
+
+  { part:"Part 19", id:"memorial-pillar", name:"Memorial Pillar",
+    note:"Small island chain between Five Island and Resort Gorgeous. Bird Keeper trainers roam the northern island. Metal Coat is found on the southern island.",
+    pokemon:[
+      {name:"Hoppip",     method:"Grass",     levels:"6–16",  rate:"100%"},
+      {name:"Tentacool",  method:"Surf",      levels:"5–40",  rate:"65%"},
+      {name:"Hoppip",     method:"Surf",      levels:"5–15",  rate:"30%"},
+      {name:"Tentacruel", method:"Surf",      levels:"35–40", rate:"5%"},
+      {name:"Magikarp",   method:"Old Rod",   levels:"5",     rate:"100%"},
+      {name:"Horsea",     method:"Good Rod",  levels:"5–15",  rate:"80%", frOnly:true},
+      {name:"Krabby",     method:"Good Rod",  levels:"5–15",  rate:"80%", lgOnly:true},
+      {name:"Magikarp",   method:"Good Rod",  levels:"5–15",  rate:"20%"},
+      {name:"Horsea",     method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Qwilfish",   method:"Super Rod", levels:"15–25", rate:"40%", frOnly:true},
+      {name:"Krabby",     method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Remoraid",   method:"Super Rod", levels:"15–25", rate:"40%", lgOnly:true},
+      {name:"Gyarados",   method:"Super Rod", levels:"15–25", rate:"15%"},
+      {name:"Seadra",     method:"Super Rod", levels:"25–35", rate:"4%",  frOnly:true},
+      {name:"Kingler",    method:"Super Rod", levels:"25–35", rate:"4%",  lgOnly:true},
+      {name:"Psyduck",    method:"Super Rod", levels:"25–35", rate:"1%",  frOnly:true},
+      {name:"Slowpoke",   method:"Super Rod", levels:"25–35", rate:"1%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Razz Berry",  hidden:true,  note:"Northern island, east of Bird Keeper Milo"},
+      {name:"Sitrus Berry",hidden:true,  note:"Northern island, southeast of Bird Keeper Chaz"},
+      {name:"Bluk Berry",  hidden:true,  note:"Northern island, south of Bird Keeper Chaz"},
+      {name:"TM42 Facade", hidden:false, note:"Southern island — given by NPC after sharing Lemonade"},
+      {name:"Metal Coat",  hidden:false, note:"Southern island, grassy area southwest of the memorial"},
+      {name:"Big Pearl",   hidden:true,  note:"Southern island, southwest beach"},
+    ],
+    trainers:[
+      {class:"Bird Keeper",name:"Milo",  team:[{name:"Pidgey",level:47},{name:"Pidgeotto",level:49}]},
+      {class:"Bird Keeper",name:"Chaz",  team:[{name:"Spearow",level:47},{name:"Fearow",level:49}]},
+      {class:"Bird Keeper",name:"Harold",team:[{name:"Hoothoot",level:47},{name:"Noctowl",level:49}]},
+    ] },
+
+  { part:"Part 19", id:"water-labyrinth", name:"Water Labyrinth",
+    note:"Maze of water channels on Five Island. Pokémon Breeder Alize gives a Togepi Egg if your lead Pokémon has maximum friendship.",
+    pokemon:[
+      {name:"Tentacool",  method:"Surf",     levels:"5–40",  rate:"65%"},
+      {name:"Hoppip",     method:"Surf",     levels:"5–15",  rate:"30%"},
+      {name:"Tentacruel", method:"Surf",     levels:"35–40", rate:"5%"},
+      {name:"Magikarp",   method:"Old Rod",  levels:"5",     rate:"100%"},
+      {name:"Horsea",     method:"Good Rod", levels:"5–15",  rate:"80%", frOnly:true},
+      {name:"Krabby",     method:"Good Rod", levels:"5–15",  rate:"80%", lgOnly:true},
+      {name:"Magikarp",   method:"Good Rod", levels:"5–15",  rate:"20%"},
+      {name:"Togepi",     method:"Gift",     levels:"5",     note:"Egg from Breeder Alize — requires max friendship on lead Pokémon"},
+    ],
+    items:[],
+    trainers:[
+      {class:"Pokémon Breeder",name:"Alize",team:[{name:"Pikachu",level:48},{name:"Clefairy",level:48},{name:"Marill",level:48}]},
+    ] },
+
+  { part:"Part 19", id:"resort-gorgeous", name:"Resort Gorgeous",
+    note:"Exclusive resort on Five Island. Lady Selphy is hiding in Lost Cave — find her and escort her back here for rare item rewards. Painters train with Smeargle.",
+    pokemon:[
+      {name:"Tentacool",  method:"Surf",     levels:"5–40",  rate:"65%"},
+      {name:"Hoppip",     method:"Surf",     levels:"5–15",  rate:"30%"},
+      {name:"Tentacruel", method:"Surf",     levels:"35–40", rate:"5%"},
+      {name:"Magikarp",   method:"Old Rod",  levels:"5",     rate:"100%"},
+      {name:"Horsea",     method:"Good Rod", levels:"5–15",  rate:"80%", frOnly:true},
+      {name:"Krabby",     method:"Good Rod", levels:"5–15",  rate:"80%", lgOnly:true},
+      {name:"Magikarp",   method:"Good Rod", levels:"5–15",  rate:"20%"},
+    ],
+    items:[
+      {name:"Nest Ball",  hidden:true,  note:"Western island, west of a rock (recurring)"},
+      {name:"Stardust",   hidden:true,  note:"Center island, northwest area — two patches (recurring)"},
+      {name:"Star Piece", hidden:true,  note:"South of Selphy's house (recurring)"},
+    ],
+    trainers:[
+      {class:"Painter",   name:"Rayna",   team:[{name:"Smeargle",level:50}]},
+      {class:"Lady",      name:"Jacki",   team:[{name:"Hoppip",level:48},{name:"Skiploom",level:50}]},
+      {class:"Painter",   name:"Celina",  team:[{name:"Smeargle",level:50}]},
+      {class:"Lady",      name:"Gillian", team:[{name:"Mareep",level:47},{name:"Mareep",level:48},{name:"Flaaffy",level:49}]},
+      {class:"Youngster", name:"Destin",  team:[{name:"Raticate",level:48},{name:"Pidgeotto",level:48}]},
+      {class:"Swimmer♂",  name:"Toby",   team:[{name:"Poliwhirl",level:48},{name:"Tentacool",level:48},{name:"Tentacruel",level:48}]},
+    ] },
+
+  { part:"Part 19", id:"lost-cave", name:"Lost Cave",
+    note:"Fourteen-room maze cave south of Resort Gorgeous on Five Island. Navigate through the rooms to find Lady Selphy. Ghost-type Pokémon throughout. Murkrow appears in FireRed; Misdreavus in LeafGreen.",
+    pokemon:[
+      {name:"Gastly",     method:"Cave", levels:"25–35", rate:"35%"},
+      {name:"Zubat",      method:"Cave", levels:"25–35", rate:"25%"},
+      {name:"Haunter",    method:"Cave", levels:"35–45", rate:"21%"},
+      {name:"Golbat",     method:"Cave", levels:"35–40", rate:"14%"},
+      {name:"Murkrow",    method:"Cave", levels:"28–32", rate:"5%",  frOnly:true},
+      {name:"Misdreavus", method:"Cave", levels:"23–27", rate:"5%",  lgOnly:true},
+    ],
+    items:[],
+    trainers:[] },
+
+  { part:"Part 19", id:"seven-island", name:"Seven Island",
+    note:"Navel Rock Island — hub for Seven Island. Sevault Canyon, Tanoby Key, and Trainer Tower are all accessed from here.",
+    pokemon:[],
+    items:[],
+    trainers:[] },
+
+  { part:"Part 19", id:"canyon-entrance", name:"Canyon Entrance",
+    note:"Gateway route to Sevault Canyon on Seven Island. Phanpy appears in the grass.",
+    pokemon:[
+      {name:"Spearow",  method:"Grass", levels:"44",    rate:"20%"},
+      {name:"Sentret",  method:"Grass", levels:"10–15", rate:"30%"},
+      {name:"Phanpy",   method:"Grass", levels:"10–15", rate:"15%"},
+      {name:"Fearow",   method:"Grass", levels:"48–50", rate:"15%"},
+      {name:"Meowth",   method:"Grass", levels:"41",    rate:"10%"},
+      {name:"Persian",  method:"Grass", levels:"47–50", rate:"5%"},
+      {name:"Psyduck",  method:"Grass", levels:"41",    rate:"5%",  frOnly:true},
+      {name:"Slowpoke", method:"Grass", levels:"41",    rate:"5%",  lgOnly:true},
+    ],
+    items:[
+      {name:"Rawst Berry", hidden:true, note:"Northeast of Young Couple Eve & Jon"},
+    ],
+    trainers:[
+      {class:"Aroma Lady",    name:"Miah",    team:[{name:"Bellossom",level:50},{name:"Bellossom",level:50}]},
+      {class:"Juggler",       name:"Mason",   team:[{name:"Voltorb",level:47},{name:"Voltorb",level:47},{name:"Pineco",level:47},{name:"Pineco",level:47}]},
+      {class:"Pokémon Ranger",name:"Nicolas", team:[{name:"Weepinbell",level:51},{name:"Victreebel",level:51}]},
+      {class:"Pokémon Ranger",name:"Madeline",team:[{name:"Gloom",level:51},{name:"Vileplume",level:51}]},
+      {class:"Young Couple",  name:"Eve & Jon",team:[{name:"Golduck",level:50},{name:"Psyduck",level:50}]},
+    ] },
+
+  { part:"Part 19", id:"sevault-canyon", name:"Sevault Canyon",
+    note:"Deep canyon on Seven Island with rare Johto Pokémon. Skarmory is FireRed-only. Larvitar is the rarest encounter. Strength and Rock Smash open shortcuts.",
+    pokemon:[
+      {name:"Geodude",  method:"Grass",      levels:"46",    rate:"20%"},
+      {name:"Fearow",   method:"Grass",      levels:"50",    rate:"15% FR / 10% LG"},
+      {name:"Phanpy",   method:"Grass",      levels:"15–20", rate:"20%"},
+      {name:"Cubone",   method:"Grass",      levels:"46",    rate:"10%"},
+      {name:"Marowak",  method:"Grass",      levels:"52",    rate:"10%"},
+      {name:"Meowth",   method:"Grass",      levels:"43",    rate:"10%"},
+      {name:"Spearow",  method:"Grass",      levels:"50",    rate:"10% FR / 15% LG"},
+      {name:"Onix",     method:"Grass",      levels:"54",    rate:"5%"},
+      {name:"Skarmory", method:"Grass",      levels:"30",    rate:"5%",  frOnly:true},
+      {name:"Larvitar", method:"Grass",      levels:"15–20", rate:"5%"},
+      {name:"Persian",  method:"Grass",      levels:"49–52", rate:"5%"},
+      {name:"Geodude",  method:"Rock Smash", levels:"25–40", rate:"65%"},
+      {name:"Graveler", method:"Rock Smash", levels:"30–50", rate:"35%"},
+    ],
+    items:[
+      {name:"Nugget",      hidden:false, note:"Southeast of the Tanoby Key entrance"},
+      {name:"Max Elixir",  hidden:false, note:"Tall grass halfway through the canyon"},
+      {name:"King's Rock", hidden:false, note:"Behind three boulders (requires Strength and Rock Smash)"},
+      {name:"Lucky Punch", hidden:false, note:"Inside the Chansey Dance house"},
+      {name:"Cheri Berry", hidden:true,  note:"South of the Chansey Dance house"},
+    ],
+    trainers:[
+      {class:"Cool Couple",   name:"Lex & Nya", team:[{name:"Tauros",level:52},{name:"Miltank",level:52}]},
+      {class:"Tamer",         name:"Evan",      team:[{name:"Sandslash",level:48},{name:"Lickitung",level:48},{name:"Ursaring",level:49}]},
+      {class:"Pokémon Ranger",name:"Jackson",   team:[{name:"Tangela",level:49},{name:"Exeggcute",level:49},{name:"Exeggutor",level:49}]},
+      {class:"Pokémon Ranger",name:"Katelyn",   team:[{name:"Chansey",level:52}]},
+      {class:"Crush Girl",    name:"Cyndy",     team:[{name:"Primeape",level:48},{name:"Hitmontop",level:48},{name:"Machoke",level:48}]},
+      {class:"Cooltrainer",   name:"Leroy",     team:[{name:"Rhydon",level:47},{name:"Slowbro",level:48},{name:"Machoke",level:48},{name:"Kangaskhan",level:47},{name:"Ursaring",level:50}]},
+      {class:"Cooltrainer",   name:"Michelle",  team:[{name:"Persian",level:47},{name:"Dewgong",level:47},{name:"Ninetales",level:48},{name:"Rapidash",level:48},{name:"Girafarig",level:50}]},
+    ] },
+
+  { part:"Part 19", id:"tanoby-key", name:"Tanoby Key",
+    note:"Small puzzle area at the base of Sevault Canyon. Push seven boulders into the holes using Strength to unlock the Tanoby Chambers across the sea.",
+    pokemon:[],
+    items:[],
+    trainers:[] },
+
+  { part:"Part 19", id:"tanoby-ruins", name:"Tanoby Ruins",
+    note:"Seven chambers (Monean · Liptoo · Weepth · Dilford · Scufib · Rixy · Viapois) scattered across the sea south of Seven Island. All 26 Unown letter forms plus ! are distributed across the chambers. Requires completing the Tanoby Key puzzle first.",
+    pokemon:[
+      {name:"Unown", method:"Cave", levels:"25", rate:"1–99%", note:"All 26 letter forms + ! distributed across the seven chambers"},
+    ],
+    items:[],
+    trainers:[] },
+
+  { part:"Part 19", id:"trainer-tower", name:"Trainer Tower",
+    note:"Challenge facility on Seven Island with four modes: Single, Double, Knockout, and Mixed. All trainer Pokémon are scaled to the player's party level. Surf the waters nearby to find Mantine. Complete each mode for held-item prizes.",
+    pokemon:[
+      {name:"Tentacool",  method:"Surf", levels:"5–40",  rate:"60%"},
+      {name:"Tentacruel", method:"Surf", levels:"35–40", rate:"35%"},
+      {name:"Mantine",    method:"Surf", levels:"5–40",  rate:"5%"},
+    ],
+    items:[
+      {name:"Up-Grade",     hidden:false, note:"Single mode completion reward"},
+      {name:"Dragon Scale", hidden:false, note:"Double mode completion reward"},
+      {name:"Metal Coat",   hidden:false, note:"Knockout mode completion reward"},
+      {name:"King's Rock",  hidden:false, note:"Mixed mode completion reward"},
+      {name:"Nanab Berry",  hidden:true,  note:"Exterior, near the entrance"},
+      {name:"Pearl",        hidden:true,  note:"Exterior (recurring)"},
+      {name:"Big Pearl",    hidden:true,  note:"Exterior (recurring)"},
+    ],
+    trainers:[] },
+
+// ─── PART 20 — Cerulean Cave · Indigo Plateau Round 2 ────────────────────────
+
+  { part:"Part 20", id:"cerulean-cave", name:"Cerulean Cave",
+    note:"Unlocked after becoming Champion. Three floors packed with high-level Pokémon including Ditto, Wobbuffet, and Kadabra. Mewtwo waits at the deepest point of B1F.",
+    floors:[
+      { label:"1F",
+        pokemon:[
+          {name:"Parasect",  method:"Cave",       levels:"49–58", rate:"25%"},
+          {name:"Magneton",  method:"Cave",       levels:"49",    rate:"20%"},
+          {name:"Golbat",    method:"Cave",       levels:"46–55", rate:"14%"},
+          {name:"Primeape",  method:"Cave",       levels:"52–61", rate:"11%"},
+          {name:"Ditto",     method:"Cave",       levels:"52–61", rate:"11%"},
+          {name:"Machoke",   method:"Cave",       levels:"46",    rate:"10%"},
+          {name:"Electrode", method:"Cave",       levels:"58",    rate:"5%"},
+          {name:"Wobbuffet", method:"Cave",       levels:"55",    rate:"4%"},
+          {name:"Psyduck",   method:"Surf",       levels:"30–50", rate:"65%", frOnly:true},
+          {name:"Slowpoke",  method:"Surf",       levels:"30–50", rate:"65%", lgOnly:true},
+          {name:"Golduck",   method:"Surf",       levels:"40–55", rate:"35%", frOnly:true},
+          {name:"Slowbro",   method:"Surf",       levels:"40–55", rate:"35%", lgOnly:true},
+          {name:"Magikarp",  method:"Old Rod",    levels:"5",     rate:"100%"},
+          {name:"Poliwag",   method:"Good Rod",   levels:"5–15",  rate:"60%"},
+          {name:"Goldeen",   method:"Good Rod",   levels:"5–15",  rate:"20%"},
+          {name:"Magikarp",  method:"Good Rod",   levels:"5–15",  rate:"20%"},
+          {name:"Poliwag",   method:"Super Rod",  levels:"15–25", rate:"40%"},
+          {name:"Poliwhirl", method:"Super Rod",  levels:"20–30", rate:"40%"},
+          {name:"Gyarados",  method:"Super Rod",  levels:"15–25", rate:"15%"},
+          {name:"Psyduck",   method:"Super Rod",  levels:"15–35", rate:"5%",  frOnly:true},
+          {name:"Slowpoke",  method:"Super Rod",  levels:"15–35", rate:"5%",  lgOnly:true},
+          {name:"Geodude",   method:"Rock Smash", levels:"30–50", rate:"65%"},
+          {name:"Graveler",  method:"Rock Smash", levels:"40–55", rate:"35%"},
+        ],
+        items:[
+          {name:"Nugget",      hidden:false, note:"Western ridge, north side"},
+          {name:"Ultra Ball",  hidden:true,  note:"Two steps east of the north ladder on the western ridge"},
+          {name:"Max Elixir",  hidden:false, note:"Middle ridge, northwest of the eastern ladder"},
+          {name:"Full Restore",hidden:false, note:"Southwest area"},
+        ],
+        trainers:[] },
+      { label:"2F",
+        pokemon:[
+          {name:"Golbat",    method:"Cave",       levels:"49–58", rate:"25%"},
+          {name:"Machoke",   method:"Cave",       levels:"49",    rate:"20%"},
+          {name:"Parasect",  method:"Cave",       levels:"52–61", rate:"14%"},
+          {name:"Kadabra",   method:"Cave",       levels:"55–64", rate:"11%"},
+          {name:"Ditto",     method:"Cave",       levels:"55–64", rate:"11%"},
+          {name:"Magneton",  method:"Cave",       levels:"52",    rate:"10%"},
+          {name:"Wobbuffet", method:"Cave",       levels:"58",    rate:"5%"},
+          {name:"Electrode", method:"Cave",       levels:"61",    rate:"4%"},
+          {name:"Geodude",   method:"Rock Smash", levels:"35–55", rate:"65%"},
+          {name:"Graveler",  method:"Rock Smash", levels:"45–60", rate:"35%"},
+        ],
+        items:[
+          {name:"Full Restore",hidden:false, note:"Northeast section (via northeast 1F ladder, requires Rock Smash)"},
+          {name:"PP Up",       hidden:false, note:"Southwest section (via southwest 1F ladder, requires Rock Smash)"},
+          {name:"Ultra Ball",  hidden:false, note:"East section (via east 1F ladder, requires Rock Smash)"},
+        ],
+        trainers:[] },
+      { label:"B1F",
+        pokemon:[
+          {name:"Kadabra",   method:"Cave",       levels:"58–67", rate:"25%"},
+          {name:"Ditto",     method:"Cave",       levels:"58–67", rate:"25%"},
+          {name:"Parasect",  method:"Cave",       levels:"55–64", rate:"14%"},
+          {name:"Golbat",    method:"Cave",       levels:"52–61", rate:"11%"},
+          {name:"Machoke",   method:"Cave",       levels:"52",    rate:"10%"},
+          {name:"Magneton",  method:"Cave",       levels:"55",    rate:"10%"},
+          {name:"Electrode", method:"Cave",       levels:"64",    rate:"4%"},
+          {name:"Wobbuffet", method:"Cave",       levels:"61",    rate:"1%"},
+          {name:"Mewtwo",    method:"Cave",       levels:"70",    rate:"—",   warn:true, note:"One-time encounter at the deepest point of B1F — save before approaching"},
+          {name:"Psyduck",   method:"Surf",       levels:"40–60", rate:"65%", frOnly:true},
+          {name:"Slowpoke",  method:"Surf",       levels:"40–60", rate:"65%", lgOnly:true},
+          {name:"Golduck",   method:"Surf",       levels:"50–65", rate:"35%", frOnly:true},
+          {name:"Slowbro",   method:"Surf",       levels:"50–65", rate:"35%", lgOnly:true},
+          {name:"Magikarp",  method:"Old Rod",    levels:"5",     rate:"100%"},
+          {name:"Poliwag",   method:"Good Rod",   levels:"5–15",  rate:"60%"},
+          {name:"Goldeen",   method:"Good Rod",   levels:"5–15",  rate:"20%"},
+          {name:"Magikarp",  method:"Good Rod",   levels:"5–15",  rate:"20%"},
+          {name:"Poliwag",   method:"Super Rod",  levels:"15–25", rate:"40%"},
+          {name:"Poliwhirl", method:"Super Rod",  levels:"20–30", rate:"40%"},
+          {name:"Gyarados",  method:"Super Rod",  levels:"15–35", rate:"16%"},
+          {name:"Psyduck",   method:"Super Rod",  levels:"15–25", rate:"4%",  frOnly:true},
+          {name:"Slowpoke",  method:"Super Rod",  levels:"15–25", rate:"4%",  lgOnly:true},
+          {name:"Geodude",   method:"Rock Smash", levels:"40–60", rate:"65%"},
+          {name:"Graveler",  method:"Rock Smash", levels:"50–65", rate:"35%"},
+        ],
+        items:[
+          {name:"Max Revive", hidden:false, note:"Northeast corner"},
+          {name:"Ultra Ball", hidden:false, note:"Larger central ridge"},
+        ],
+        trainers:[] },
+    ] },
+
+  { part:"Part 20", id:"indigo-plateau-r2", name:"Indigo Plateau — Round 2",
+    note:"Elite Four rematch, available after becoming Champion. All trainers field significantly stronger Pokémon including Johto species. Rematches can be repeated indefinitely.",
+    pokemon:[],
+    items:[],
+    trainers:[
+      {class:"Elite Four",name:"Lorelei",note:"Ice-type specialist — Round 2",
+        team:[{name:"Dewgong",level:64},{name:"Cloyster",level:63},{name:"Piloswine",level:63},{name:"Jynx",level:66},{name:"Lapras",level:66}]},
+      {class:"Elite Four",name:"Bruno",  note:"Fighting-type specialist — Round 2",
+        team:[{name:"Steelix",level:65},{name:"Hitmonchan",level:65},{name:"Hitmonlee",level:65},{name:"Steelix",level:66},{name:"Machamp",level:68}]},
+      {class:"Elite Four",name:"Agatha", note:"Ghost-type specialist — Round 2",
+        team:[{name:"Gengar",level:66},{name:"Crobat",level:66},{name:"Misdreavus",level:65},{name:"Arbok",level:68},{name:"Gengar",level:70}]},
+      {class:"Elite Four",name:"Lance",  note:"Dragon-type specialist — Round 2",
+        team:[{name:"Gyarados",level:68},{name:"Dragonite",level:66},{name:"Kingdra",level:66},{name:"Aerodactyl",level:70},{name:"Dragonite",level:72}]},
+      {class:"Rival",name:"Blue",note:"Champion Round 2 — vs Bulbasaur starter",
+        team:[{name:"Heracross",level:72},{name:"Alakazam",level:73},{name:"Tyranitar",level:72},{name:"Exeggutor",level:72},{name:"Gyarados",level:72},{name:"Charizard",level:75}]},
+      {class:"Rival",name:"Blue",note:"Champion Round 2 — vs Charmander starter",
+        team:[{name:"Heracross",level:72},{name:"Alakazam",level:73},{name:"Tyranitar",level:72},{name:"Exeggutor",level:72},{name:"Gyarados",level:72},{name:"Blastoise",level:75}]},
+      {class:"Rival",name:"Blue",note:"Champion Round 2 — vs Squirtle starter",
+        team:[{name:"Heracross",level:72},{name:"Alakazam",level:73},{name:"Tyranitar",level:72},{name:"Exeggutor",level:72},{name:"Gyarados",level:72},{name:"Venusaur",level:75}]},
+    ] },
+
 ];
 
 // ─── BUILD LOCATION MAP ── (which areas each Pokémon appears in)
@@ -3051,7 +3699,7 @@ const MAP_CONNECTIONS = [
 ];
 
 // Parts that have been fully audited against the Bulbapedia walkthrough — extend as each part is verified.
-const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11", "Part 12", "Part 13", "Part 14", "Part 15", "Part 16", "Part 17"]);
+const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11", "Part 12", "Part 13", "Part 14", "Part 15", "Part 16", "Part 17", "Part 18", "Part 19", "Part 20"]);
 
 // ─── CATCH RATE DATA ──────────────────────────────────────────────────────────
 // Gen III base catch rates for all 151 Kanto Pokémon (FRLG)
@@ -3139,6 +3787,8 @@ const CATCH_RATE_DATA = [
 
 // ─── SPRITES ─────────────────────────────────────────────────────────────────
 const DEX_ID = Object.fromEntries(DEX.map(p => [p.name, p.id]));
+const NATIONAL_DEX_ID = Object.fromEntries(NATIONAL_DEX.map(p => [p.name, p.id]));
+const allDexId = name => DEX_ID[name] || NATIONAL_DEX_ID[name] || null;
 const pokeSpriteUrl = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
 
 const ITEM_SPRITE = {
@@ -3224,6 +3874,8 @@ const TRAINER_CLASS_SPRITE = {
   "Crush Girl":"crushgirl-gen3","Pokémon Ranger":"pokemonranger-gen3",
   "Aroma Lady":"aromalady-gen3","Tuber♀":"tuberf-gen3",
   "Cool Couple":"coolcouple-gen3","Elite Four":"elite-four-gen3",
+  "Ruin Maniac":"ruinmaniac","Lady":"lady-gen3",
+  "Painter":"painter-gen3","Rocket Admin":"teamrocket",
 };
 const TRAINER_NAME_SPRITE  = {"Brock":"brock","Misty":"misty","Lt. Surge":"lt-surge","Blue":"blue","Giovanni":"giovanni","Erika":"erika","Koga":"koga","Sabrina":"sabrina","Blaine":"blaine","Lorelei":"lorelei","Bruno":"bruno","Agatha":"agatha","Lance":"lance"};
 const trainerSpriteUrl = (cls, name) => { const s = TRAINER_NAME_SPRITE[name] || TRAINER_CLASS_SPRITE[cls]; return s ? `https://play.pokemonshowdown.com/sprites/trainers/${s}.png` : null; };
@@ -4150,7 +4802,7 @@ function HuntTab({ version, isMobile }) {
       .sort((a, b) => (b.pct || -1) - (a.pct || -1));
   }, [selected, version]);
 
-  const dexId = selected ? DEX_ID[selected] : null;
+  const dexId = selected ? allDexId(selected) : null;
   const noMathMethods = new Set(["Gift","Trade","Fossil","Event","Game Corner"]);
 
   const listPanel = (
@@ -4171,7 +4823,7 @@ function HuntTab({ version, isMobile }) {
           <div style={{ padding:16, fontSize:12, color:C.muted, textAlign:"center" }}>No results</div>
         )}
         {filteredNames.map(name => {
-          const id = DEX_ID[name];
+          const id = allDexId(name);
           const isSel = name === selected;
           return (
             <button key={name} onClick={() => setSelected(name)}
@@ -4430,6 +5082,58 @@ function CompletionTab({ caught, checklist, toggleChecklist, isMobile }) {
   );
 }
 
+// ─── NATIONAL POKÉDEX PANEL ──────────────────────────────────────────────────
+function NationalDexPanel({ caught, toggleCaught, setDexSelected, version }) {
+  const [collapsed, setCollapsed] = React.useState(false);
+  const caughtCount = NATIONAL_DEX.filter(p => caught[p.name]).length;
+  const isOtherVer = p => (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly);
+
+  return (
+    <div style={{ marginTop:20, border:`1px solid ${C.border}`, borderRadius:8, overflow:"hidden" }}>
+      <div onClick={() => setCollapsed(c => !c)}
+        style={{ padding:"10px 14px", background:C.card, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", userSelect:"none" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <span style={{ fontWeight:"700", fontSize:13, color:C.text }}>National Pokédex (Post-Game)</span>
+          <span style={{ fontSize:11, color:C.muted }}>{caughtCount} / {NATIONAL_DEX.length} — not counted toward completion</span>
+        </div>
+        <span style={{ color:C.muted, fontSize:11 }}>{collapsed ? "▶" : "▼"}</span>
+      </div>
+      {!collapsed && (
+        <div style={{ padding:"10px 12px", background:"rgba(0,0,0,0.12)" }}>
+          <div style={{ fontSize:10, color:C.muted, marginBottom:8, lineHeight:1.5 }}>
+            Gen II Pokémon found in the Sevii Islands post-game. Includes wild catches, gifts, and evolutions of Kanto Pokémon achievable in FRLG.
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(72px,1fr))", gap:5 }}>
+            {NATIONAL_DEX.map(p => {
+              const isCaught = !!caught[p.name];
+              const isDimmed = isOtherVer(p);
+              return (
+                <div key={p.id}
+                  onClick={() => { if (!isDimmed) { toggleCaught(p.name); setDexSelected(p.name); } }}
+                  style={{
+                    background: isCaught ? "rgba(74,175,116,0.10)" : C.card,
+                    border:`1px solid ${isCaught ? C.green : p.lgOnly ? C.lgGreen : p.frOnly ? "#c85252" : C.border}`,
+                    borderRadius:7, padding:"6px 4px 5px", cursor:isDimmed?"default":"pointer",
+                    textAlign:"center", opacity:isDimmed?0.3:1, position:"relative", transition:"all 0.1s",
+                  }}>
+                  {isCaught && <div style={{ position:"absolute", top:3, left:4, fontSize:8, color:C.green, fontWeight:"700" }}>✓</div>}
+                  {p.frOnly && <div style={{ position:"absolute", top:3, right:3, fontSize:7, color:"#c85252", fontWeight:"600" }}>FR</div>}
+                  {p.lgOnly && <div style={{ position:"absolute", top:3, right:3, fontSize:7, color:C.lgGreen, fontWeight:"600" }}>LG</div>}
+                  <img src={pokeSpriteUrl(p.id)} alt={p.name}
+                    style={{ width:36, height:36, imageRendering:"pixelated", display:"block", margin:"0 auto",
+                             opacity:isCaught?1:0.7, filter:isCaught?"none":"brightness(0)" }} />
+                  <div style={{ fontSize:8, color:C.muted, fontFamily:"'Courier New',monospace" }}>#{String(p.id).padStart(3,"0")}</div>
+                  <div style={{ fontSize:9, color:isCaught?C.green:C.text, fontWeight:isCaught?"600":"400", lineHeight:1.2, wordBreak:"break-word" }}>{p.name}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── POKÉDEX TAB ──────────────────────────────────────────────────────────────
 function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, setDexSelected, version, isMobile }) {
   const caughtCount = Object.keys(caught).length;
@@ -4526,6 +5230,7 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
           </div>
           {displayed.length === 0 && <div style={{ textAlign:"center", padding:40, color:C.muted, fontSize:12 }}>{searchTerm ? `No Pokémon match "${dexSearch}".` : "No Pokémon match this filter."}</div>}
           <LivingDexPanel caught={caught} />
+          <NationalDexPanel caught={caught} toggleCaught={toggleCaught} setDexSelected={setDexSelected} version={version} />
         </div>
 
         {/* Detail panel — desktop only */}
@@ -4569,7 +5274,7 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
 }
 
 function EvoNode({ name, isCurrent, caught }) {
-  const id = DEX_ID[name];
+  const id = allDexId(name);
   const isCaught = !!caught[name];
   return (
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3,
@@ -5104,7 +5809,7 @@ function PokemonEntry({ p, caught, toggleCaught, version, isMobile, choiceGroups
 
   return (
     <Row done={isCaught} passed={isPassed} onClick={isPassed ? undefined : () => toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined)}>
-      {DEX_ID[p.name] && <img src={pokeSpriteUrl(DEX_ID[p.name])} alt={p.name} style={{ width:36, height:36, imageRendering:"pixelated", flexShrink:0, opacity:isCaught?1:0.65, filter:isCaught?"none":"brightness(0)" }} />}
+      {allDexId(p.name) && <img src={pokeSpriteUrl(allDexId(p.name))} alt={p.name} style={{ width:36, height:36, imageRendering:"pixelated", flexShrink:0, opacity:isCaught?1:0.65, filter:isCaught?"none":"brightness(0)" }} />}
       <div style={{ flex:1 }}>
         <span style={{ color:isCaught?C.green:p.lgOnly?C.lgGreen:p.frOnly?"#c85252":C.text, fontWeight:"600", fontSize:12 }}>
           {p.name}{p.frOnly&&<Tag color="#c85252">FR</Tag>}{p.lgOnly&&<Tag color={C.lgGreen}>LG</Tag>}
@@ -5219,7 +5924,7 @@ function TrainerEntry({ t, areaId, done, toggleTrainer }) {
         {t.team?.length>0&&(
           <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
             {t.team.map((p,j)=>{
-              const pid=DEX_ID[p.name];
+              const pid=allDexId(p.name);
               return (
                 <div key={j} style={{ textAlign:"center" }}>
                   {pid&&<img src={pokeSpriteUrl(pid)} alt={p.name} style={{ width:32, height:32, imageRendering:"pixelated", display:"block", margin:"0 auto" }} />}
@@ -5413,7 +6118,8 @@ function MiniBar({ label, done, total, color }) {
 
 // Expose data for overlay.html
 if (typeof window !== 'undefined') {
-  window.__FRLG_AREAS      = AREAS;
-  window.__FRLG_DEX_ID     = DEX_ID;
-  window.__FRLG_ITEM_SPRITE = ITEM_SPRITE;
+  window.__FRLG_AREAS         = AREAS;
+  window.__FRLG_DEX_ID        = DEX_ID;
+  window.__FRLG_NATIONAL_DEX_ID = NATIONAL_DEX_ID;
+  window.__FRLG_ITEM_SPRITE   = ITEM_SPRITE;
 }
