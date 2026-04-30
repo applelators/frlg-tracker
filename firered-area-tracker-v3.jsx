@@ -2762,6 +2762,39 @@ function getDreamHMs(name) {
   return Object.entries(DT_HM_COMPAT).filter(([,s]) => s.has(form)).map(([hm]) => hm);
 }
 
+// For each HM required by the team, assign it to exactly one Pokémon.
+// Strategy: process rarest coverage first; consolidate onto whichever team member
+// is already the HM carrier, tiebroken by total HM capability then team order.
+function assignHMs(team) {
+  const ALL_HMs = ["Fly","Surf","Strength","Cut","Flash","Rock Smash"];
+  const canLearn = {};
+  team.forEach(name => { canLearn[name] = new Set(getDreamHMs(name)); });
+
+  const candidates = {};
+  ALL_HMs.forEach(hm => { candidates[hm] = team.filter(n => canLearn[n].has(hm)); });
+
+  const assignments = {};
+  const load = {};
+  team.forEach(n => { load[n] = 0; });
+
+  // Process HMs with fewest carriers first so forced assignments happen before tiebreaks
+  const sorted = ALL_HMs.filter(hm => candidates[hm].length > 0)
+    .sort((a, b) => candidates[a].length - candidates[b].length);
+
+  for (const hm of sorted) {
+    const avail = candidates[hm];
+    const winner = avail.reduce((best, cur) => {
+      if (load[cur] !== load[best]) return load[cur] > load[best] ? cur : best;
+      const curCap = canLearn[cur].size, bestCap = canLearn[best].size;
+      if (curCap !== bestCap) return curCap > bestCap ? cur : best;
+      return team.indexOf(cur) > team.indexOf(best) ? cur : best;
+    });
+    assignments[hm] = winner;
+    load[winner]++;
+  }
+  return assignments;
+}
+
 function getDreamAcquisition(name) {
   const direct = LOCATION_MAP[name];
   if (direct && direct.length > 0) {
@@ -3692,7 +3725,9 @@ function DreamTeamTab({ isMobile, version }) {
   };
 
   // Assign each contested one-time TM to a single best recipient
-  const tmWinners = team ? assignOneTimeTMs(team) : {};
+  const tmWinners   = team ? assignOneTimeTMs(team) : {};
+  // Assign each HM to exactly one team member
+  const hmAssignments = team ? assignHMs(team) : {};
 
   return (
     <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
@@ -3725,11 +3760,12 @@ function DreamTeamTab({ isMobile, version }) {
             const finalForm = DT_FINAL_FORM[name] || name;
             const dexEntry  = DEX.find(p => p.name === name);
             const candInfo  = DT_CANDIDATES.find(c => c.name === finalForm);
-            const hms       = getDreamHMs(name);
+            const assignedHMs = Object.entries(hmAssignments)
+              .filter(([,winner]) => winner === name).map(([hm]) => hm);
             const suppressedMoves = new Set(
               Object.entries(tmWinners).filter(([,winner]) => winner !== name).map(([move]) => move)
             );
-            const moves     = getDreamMoves(name, suppressedMoves, hms);
+            const moves     = getDreamMoves(name, suppressedMoves, assignedHMs);
             const acq       = getDreamAcquisition(name);
             const evoNote   = EVO_DELAY[name];
             const isPreEvo  = !!DT_FINAL_FORM[name];
@@ -3753,9 +3789,9 @@ function DreamTeamTab({ isMobile, version }) {
                     </div>
                   </div>
                 </div>
-                {hms.length > 0 && (
+                {assignedHMs.length > 0 && (
                   <div style={{ display:"flex", gap:3, flexWrap:"wrap" }}>
-                    {hms.map(hm => <span key={hm} style={{ fontSize:8, color:"#4a8fc4", background:"rgba(74,143,196,0.10)", border:"1px solid rgba(74,143,196,0.3)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>{hm}</span>)}
+                    {assignedHMs.map(hm => <span key={hm} style={{ fontSize:8, color:"#4a8fc4", background:"rgba(74,143,196,0.10)", border:"1px solid rgba(74,143,196,0.3)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>{hm}</span>)}
                   </div>
                 )}
                 <div>
