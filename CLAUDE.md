@@ -26,7 +26,12 @@ Always audit one Bulbapedia part at a time. After implementing, pause and let th
 
 For each area in a part:
 
-1. **Fetch raw wikitext** for the area page via `curl "https://bulbapedia.bulbagarden.net/w/index.php?title=PAGE_TITLE&action=raw"`. Never rely on the rendered HTML for encounter or item data — use raw wikitext as the authoritative source.
+1. **Fetch raw wikitext** for the area page. Check the local cache first — if `bulbapedia-cache/PAGE_TITLE.txt` exists, read it directly instead of fetching. If not, fetch and save it:
+   ```bash
+   curl -s "https://bulbapedia.bulbagarden.net/w/index.php?title=PAGE_TITLE&action=raw" \
+     -o "bulbapedia-cache/PAGE_TITLE.txt"
+   ```
+   The cache folder is gitignored. Delete a file to force a refresh. Never rely on the rendered HTML for encounter or item data — use raw wikitext as the authoritative source.
 2. **Wild Pokémon** — extract from `{{Catch/entryfl|...}}` lines. The template format is `|dex#|Name|FR(yes/no)|LG(yes/no)|method|levels|rate|`. The `yes`/`no` flags are explicit — no column-guessing needed.
 3. **Encounter rate sanity check** — rates should sum to approximately 100% per version. If they don't, something is wrong.
 4. **Items** — extract from `{{Itemlist|...}}` lines. The raw wikitext lists items with their location description and FR/LG availability flags directly.
