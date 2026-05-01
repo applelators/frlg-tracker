@@ -104,10 +104,6 @@
     }
 
     // ─── Flatten helpers ──────────────────────────────────────────────────────────
-    function flattenWild(area) {
-      if (area.floors) return area.floors.flatMap(f => f.pokemon || []);
-      return area.pokemon || [];
-    }
     function flattenItems(area) {
       if (area.floors) {
         return area.floors.flatMap(f =>
@@ -117,8 +113,12 @@
       return (area.items || []).map((entry, idx) => ({ entry, floorLabel: null, idx }));
     }
     function flattenTrainers(area) {
-      if (area.floors) return area.floors.flatMap(f => f.trainers || []);
-      return area.trainers || [];
+      if (area.floors) {
+        return area.floors.flatMap(f =>
+          (f.trainers || []).map(trainer => ({ trainer, floorLabel: f.label }))
+        );
+      }
+      return (area.trainers || []).map(trainer => ({ trainer, floorLabel: null }));
     }
 
     // ─── Item key — must match main tracker exactly ───────────────────────────────
@@ -229,42 +229,72 @@
 
       // ── Wild Pokémon ───────────────────────────────────────────────────────────
       if (section === "wild") {
-        const entries = flattenWild(area);
-        // Filter other-version exclusives, then sort within each method block by rate
-        const visible = sortByRate(
-          entries.filter(p => !((p.frOnly && version === "lg") || (p.lgOnly && version === "fr"))),
-          version
-        );
-        if (!visible.length) return null;
-
-        // Group by section (land / surf / fishing) and check if all caught
         const getSection = m =>
           m === "Surf" ? "surf" :
           (m === "Old Rod" || m === "Good Rod" || m === "Super Rod") ? "fishing" : "land";
-        const secStats = {};
-        visible.forEach(p => {
-          const s = getSection(p.method);
-          if (!secStats[s]) secStats[s] = { total: 0, done: 0 };
-          secStats[s].total++;
-          if (caught[p.name]) secStats[s].done++;
+
+        // Build flat row list: { type:"floor", label } | { type:"pokemon", p, fi }
+        const floors = area.floors
+          ? area.floors.map(f => ({ label: f.label, pokemon: f.pokemon || [] }))
+          : [{ label: null, pokemon: area.pokemon || [] }];
+
+        const rows = [];
+        floors.forEach(({ label, pokemon }, fi) => {
+          const visible = sortByRate(
+            pokemon.filter(p => !((p.frOnly && version === "lg") || (p.lgOnly && version === "fr"))),
+            version
+          );
+          if (!visible.length) return;
+          if (label) rows.push({ type:"floor", label });
+          visible.forEach(p => rows.push({ type:"pokemon", p, fi }));
         });
-        const secDone = s => secStats[s] && secStats[s].done === secStats[s].total;
+
+        if (!rows.length) return null;
+
+        // Per-floor section-done stats for dimming
+        const floorSecStats = {};
+        rows.forEach(r => {
+          if (r.type !== "pokemon") return;
+          const key = `${r.fi}:${getSection(r.p.method)}`;
+          if (!floorSecStats[key]) floorSecStats[key] = { total:0, done:0 };
+          floorSecStats[key].total++;
+          if (caught[r.p.name]) floorSecStats[key].done++;
+        });
+        const secDone = (fi, m) => {
+          const key = `${fi}:${getSection(m)}`;
+          return floorSecStats[key] && floorSecStats[key].done === floorSecStats[key].total;
+        };
+
+        const floorLabelStyle = (isFirst) => ({
+          fontSize:9, fontWeight:700, letterSpacing:1,
+          color: T.textMuted,
+          borderLeft: `2px solid ${T.border}`,
+          paddingLeft: 5,
+          marginTop: isFirst ? 2 : 8,
+          marginBottom: 3,
+        });
 
         return (
           <div style={panel}>
             <div style={sectionHeader(meta.accent)}>{meta.label}</div>
             <div style={areaLabel}>{area.name}</div>
-            {visible.map((p, i) => {
+            {rows.map((row, i) => {
+              if (row.type === "floor") {
+                return <div key={i} style={floorLabelStyle(i === 0)}>{row.label}</div>;
+              }
+              const p = row.p;
               const isCaught  = caught[p.name];
               const mc        = METHOD_COLOR[p.method] || { bg:"rgba(120,100,80,0.15)", color: T.textMuted };
               const spriteUrl = pokeSprite(p.name);
               const vTag      = p.frOnly ? "FR" : p.lgOnly ? "LG" : null;
-              const dimmed    = secDone(getSection(p.method));
+              const dimmed    = secDone(row.fi, p.method);
+              const nextRow   = rows[i + 1];
+              const border    = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
 
               return (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
                                       opacity: dimmed ? 0.35 : 1,
-                                      borderBottom: rowDivider(i, visible.length) }}>
+                                      borderBottom: border }}>
                   {spriteUrl
                     ? <img src={spriteUrl} alt={p.name} width={24} height={24}
                            style={{ imageRendering:"pixelated", flexShrink:0,
@@ -304,19 +334,44 @@
         const entries = flattenItems(area);
         if (!entries.length) return null;
 
+        const floorLabelStyle = (isFirst) => ({
+          fontSize:9, fontWeight:700, letterSpacing:1,
+          color: T.textMuted,
+          borderLeft: `2px solid ${T.border}`,
+          paddingLeft: 5,
+          marginTop: isFirst ? 2 : 8,
+          marginBottom: 3,
+        });
+
+        const rows = [];
+        let lastFloor = undefined;
+        entries.forEach(({ entry, floorLabel, idx }, i) => {
+          if (floorLabel !== lastFloor) {
+            if (floorLabel) rows.push({ type:"floor", label:floorLabel, isFirst: rows.length === 0 });
+            lastFloor = floorLabel;
+          }
+          rows.push({ type:"item", entry, floorLabel, idx, entryIdx: i });
+        });
+
         return (
           <div style={panel}>
             <div style={sectionHeader(meta.accent)}>{meta.label}</div>
             <div style={areaLabel}>{area.name}</div>
-            {entries.map(({ entry: it, floorLabel, idx }, i) => {
+            {rows.map((row, i) => {
+              if (row.type === "floor") {
+                return <div key={i} style={floorLabelStyle(row.isFirst)}>{row.label}</div>;
+              }
+              const { entry: it, floorLabel, idx } = row;
               const key       = itemKey(areaId, floorLabel, idx);
               const collected = items[key];
               const spriteUrl = itemSprite(it.name);
+              const nextRow   = rows[i + 1];
+              const border    = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
 
               return (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
                                       opacity: collected ? 0.45 : 1,
-                                      borderBottom: rowDivider(i, entries.length) }}>
+                                      borderBottom: border }}>
                   {spriteUrl
                     ? <img src={spriteUrl} alt={it.name} width={24} height={24}
                            style={{ imageRendering:"pixelated", flexShrink:0 }} />
@@ -352,17 +407,42 @@
         const entries = flattenTrainers(area);
         if (!entries.length) return null;
 
+        const floorLabelStyle = (isFirst) => ({
+          fontSize:9, fontWeight:700, letterSpacing:1,
+          color: T.textMuted,
+          borderLeft: `2px solid ${T.border}`,
+          paddingLeft: 5,
+          marginTop: isFirst ? 2 : 8,
+          marginBottom: 3,
+        });
+
+        const rows = [];
+        let lastFloor = undefined;
+        entries.forEach(({ trainer, floorLabel }, i) => {
+          if (floorLabel !== lastFloor) {
+            if (floorLabel) rows.push({ type:"floor", label:floorLabel, isFirst: rows.length === 0 });
+            lastFloor = floorLabel;
+          }
+          rows.push({ type:"trainer", trainer });
+        });
+
         return (
           <div style={panel}>
             <div style={sectionHeader(meta.accent)}>{meta.label}</div>
             <div style={areaLabel}>{area.name}</div>
-            {entries.map((tr, i) => {
+            {rows.map((row, i) => {
+              if (row.type === "floor") {
+                return <div key={i} style={floorLabelStyle(row.isFirst)}>{row.label}</div>;
+              }
+              const tr       = row.trainer;
               const key      = `${areaId}|${tr.class}|${tr.name}`;
               const defeated = trainers[key];
+              const nextRow  = rows[i + 1];
+              const border   = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
 
               return (
                 <div key={i} style={{ padding:"4px 0", opacity: defeated ? 0.45 : 1,
-                                      borderBottom: rowDivider(i, entries.length) }}>
+                                      borderBottom: border }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <div style={{ flex:1, minWidth:0 }}>
                       <span style={{ fontSize:11, color:"#a87acc", marginRight:4 }}>{tr.class}</span>
