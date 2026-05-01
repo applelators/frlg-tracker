@@ -4164,7 +4164,7 @@ function LDexSection({ title, color, items, note }) {
 }
 
 // ─── TMs TAB ──────────────────────────────────────────────────────────────────
-function TMsTab({ tmState, toggleTm }) {
+function TMsTab({ tmState }) {
   const [showTMs, setShowTMs] = useState(true);
   const [showHMs, setShowHMs] = useState(true);
 
@@ -4173,21 +4173,16 @@ function TMsTab({ tmState, toggleTm }) {
   const total   = TM_DATA.length + HM_DATA.length;
   const done    = tmDone + hmDone;
 
-  const markAll  = list => list.forEach(e => { if (!tmState[e.id]) toggleTm(e.id); });
-  const clearAll = list => list.forEach(e => { if (tmState[e.id])  toggleTm(e.id); });
-
   const renderRow = (entry) => {
     const obtained = tmState[entry.id];
     const tc  = TM_TYPE_COLOR[entry.type] || "#8a8a70";
     const isHM = entry.id.startsWith("HM");
     return (
-      <div key={entry.id} onClick={() => toggleTm(entry.id)}
+      <div key={entry.id}
         style={{ display:"flex", alignItems:"center", gap:10, padding:"6px 20px",
-                 cursor:"pointer", borderBottom:`1px solid ${C.border}`,
+                 cursor:"default", borderBottom:`1px solid ${C.border}`,
                  background: obtained ? "rgba(74,175,116,0.06)" : "transparent",
-                 opacity: obtained ? 0.65 : 1, transition:"opacity 0.15s, background 0.15s" }}
-        onMouseEnter={e => { if (!obtained) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = obtained ? "rgba(74,175,116,0.06)" : "transparent"; }}>
+                 opacity: obtained ? 0.65 : 1 }}>
         {/* ID badge */}
         <span style={{ fontSize:10, fontWeight:"700", fontFamily:"'Courier New',monospace",
                        background: isHM ? "rgba(90,176,216,0.18)" : "rgba(255,255,255,0.08)",
@@ -4218,7 +4213,7 @@ function TMsTab({ tmState, toggleTm }) {
     );
   };
 
-  const SectionHeader = ({ label, count, total: tot, open, toggle, list }) => (
+  const SectionHeader = ({ label, count, total: tot, open, toggle }) => (
     <div style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 20px",
                   background:"rgba(0,0,0,0.25)", borderBottom:`1px solid ${C.border}`,
                   borderTop:`1px solid ${C.border}`, position:"sticky", top:52, zIndex:5 }}>
@@ -4231,12 +4226,6 @@ function TMsTab({ tmState, toggleTm }) {
         <span style={{ color: count===tot ? C.green : "var(--frlg-accent)", fontWeight:"700" }}>{count}</span>
         <span> / {tot}</span>
       </span>
-      <button onClick={() => count===tot ? clearAll(list) : markAll(list)}
-        style={{ fontSize:10, padding:"2px 10px", border:`1px solid ${C.border}`, borderRadius:4,
-                 background:"transparent", color:C.muted, cursor:"pointer",
-                 fontFamily:"'DM Sans',system-ui,sans-serif" }}>
-        {count===tot ? "Clear" : "Mark all"}
-      </button>
     </div>
   );
 
@@ -4259,13 +4248,13 @@ function TMsTab({ tmState, toggleTm }) {
       {/* TMs section */}
       <SectionHeader label="Technical Machines (TM01–TM50)"
         count={tmDone} total={TM_DATA.length}
-        open={showTMs} toggle={() => setShowTMs(v => !v)} list={TM_DATA} />
+        open={showTMs} toggle={() => setShowTMs(v => !v)} />
       {showTMs && TM_DATA.map(renderRow)}
 
       {/* HMs section */}
       <SectionHeader label="Hidden Machines (HM01–HM07)"
         count={hmDone} total={HM_DATA.length}
-        open={showHMs} toggle={() => setShowHMs(v => !v)} list={HM_DATA} />
+        open={showHMs} toggle={() => setShowHMs(v => !v)} />
       {showHMs && HM_DATA.map(renderRow)}
     </div>
   );
@@ -4428,10 +4417,10 @@ function FireRedTracker() {
         return next;
       });
     }
-    if (!wasChecked && meta?.tmId) {
+    if (meta?.tmId) {
       setTmState(prev => {
-        if (prev[meta.tmId]) return prev;
-        const next = { ...prev, [meta.tmId]: true };
+        const next = { ...prev };
+        if (wasChecked) { delete next[meta.tmId]; } else { next[meta.tmId] = true; }
         try { localStorage.setItem("frlg-tms", JSON.stringify(next)); } catch {}
         return next;
       });
@@ -4568,7 +4557,7 @@ function FireRedTracker() {
       {tab === "hunt" && <HuntTab version={version} isMobile={isMobile} />}
 
       {/* ── Tab: TMs & HMs ── */}
-      {tab === "tms" && <TMsTab tmState={tmState} toggleTm={toggleTm} />}
+      {tab === "tms" && <TMsTab tmState={tmState} />}
 
       {/* ── Tab: 100% Completion ── */}
       {tab === "completion" && <CompletionTab caught={caught} checklist={checklist} toggleChecklist={toggleChecklist} isMobile={isMobile} />}
@@ -5715,7 +5704,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const markAllPokemon  = (poks) => { const seen = new Set(); poks.forEach(p => { if (seen.has(p.name)) return; seen.add(p.name); if (!caught[p.name] && !isPassedPokemon(p)) toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined); }); };
   const clearAllPokemon = (poks) => { const seen = new Set(); poks.forEach(p => { if (seen.has(p.name)) return; seen.add(p.name); if (caught[p.name]  && !isPassedPokemon(p)) toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined); }); };
   const markAllItems    = (its, keyFn) => its.forEach((it, i) => { if (isPassedItem(it)) return; const k = keyFn(it, i); const tmM = it.name.match(/^(TM\d{2}|HM\d{2})\b/); const tmId = tmM ? tmM[1] : undefined; if (!items[k]) toggleItem(k, { ...(it.choiceGroup ? {choiceGroup:it.choiceGroup, choiceId:it.choiceId} : {}), ...(tmId ? {tmId} : {}) }); });
-  const clearAllItems   = (its, keyFn) => its.forEach((it, i) => { if (isPassedItem(it)) return; const k = keyFn(it, i); if (items[k])  toggleItem(k, it.choiceGroup ? {choiceGroup:it.choiceGroup, choiceId:it.choiceId} : undefined); });
+  const clearAllItems   = (its, keyFn) => its.forEach((it, i) => { if (isPassedItem(it)) return; const k = keyFn(it, i); const tmM = it.name.match(/^(TM\d{2}|HM\d{2})\b/); const tmId = tmM ? tmM[1] : undefined; if (items[k])  toggleItem(k, { ...(it.choiceGroup ? {choiceGroup:it.choiceGroup, choiceId:it.choiceId} : {}), ...(tmId ? {tmId} : {}) }); });
   const markAllTrainers = (trns) => trns.forEach(t => { const k = `${areaId}|${t.class}|${t.name}`; if (!trainers[k]) toggleTrainer(k); });
   const clearAllTrainers = (trns) => trns.forEach(t => { const k = `${areaId}|${t.class}|${t.name}`; if (trainers[k]) toggleTrainer(k); });
 
