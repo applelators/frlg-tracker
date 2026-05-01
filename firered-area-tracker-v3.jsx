@@ -1539,9 +1539,7 @@ const AREAS = [
       {name:"Psyduck",   method:"Super Rod",levels:"25–35",rate:"1%",  frOnly:true},
       {name:"Slowpoke",  method:"Super Rod",levels:"25–35",rate:"1%",  lgOnly:true},
     ],
-    items:[
-      {name:"Stardust",hidden:true,note:"On the small rocky islet south of the main path (★ Itemfinder)"},
-    ],
+    items:[],
     trainers:[
       {class:"Swimmer♂",name:"Barry",  team:[{name:"Shellder",level:31},{name:"Cloyster",level:31}]},
       {class:"Swimmer♂",name:"Darrin", team:[{name:"Horsea",level:28},{name:"Horsea",level:28},{name:"Horsea",level:28},{name:"Seadra",level:28}]},
@@ -1675,7 +1673,9 @@ const AREAS = [
       {name:"Psyduck",   method:"Super Rod",levels:"25–35",rate:"1%",  frOnly:true},
       {name:"Slowpoke",  method:"Super Rod",levels:"25–35",rate:"1%",  lgOnly:true},
     ],
-    items:[],
+    items:[
+      {name:"Stardust", hidden:true, recurring:true, note:"Large unoccupied island near Cinnabar Island"},
+    ],
     trainers:[
       {class:"Picnicker",  name:"Irene",  team:[{name:"Tentacool",level:30},{name:"Horsea",level:30},{name:"Seel",level:30}]},
       {class:"Bird Keeper",name:"Roger",  team:[{name:"Fearow",level:30},{name:"Fearow",level:30},{name:"Pidgeotto",level:30}]},
@@ -2456,7 +2456,7 @@ const AREAS = [
       {name:"Kingler",    method:"Super Rod", levels:"25–35", rate:"4%",  lgOnly:true},
     ],
     items:[
-      {name:"Ultra Ball", hidden:true, note:"One step south and east of Psychic Jaclyn"},
+      {name:"Ultra Ball", hidden:true, recurring:true, note:"One step south and east of Psychic Jaclyn"},
     ],
     trainers:[
       {class:"Psychic",name:"Jaclyn",team:[{name:"Natu",level:48},{name:"Slowbro",level:48},{name:"Kadabra",level:49}]},
@@ -2632,7 +2632,7 @@ const AREAS = [
       {name:"Bluk Berry",  hidden:true,  note:"Northern island, south of Bird Keeper Chaz"},
       {name:"TM42 Facade", hidden:false, note:"Southern island — given by NPC after sharing Lemonade"},
       {name:"Metal Coat",  hidden:false, note:"Southern island, grassy area southwest of the memorial"},
-      {name:"Big Pearl",   hidden:true,  note:"Southern island, southwest beach"},
+      {name:"Big Pearl",   hidden:true, recurring:true, note:"Southern island, southwest beach"},
     ],
     trainers:[
       {class:"Bird Keeper",name:"Milo",  team:[{name:"Pidgey",level:47},{name:"Pidgeotto",level:49}]},
@@ -2669,9 +2669,9 @@ const AREAS = [
       {name:"Magikarp",   method:"Good Rod", levels:"5–15",  rate:"20%"},
     ],
     items:[
-      {name:"Nest Ball",  hidden:true,  note:"Western island, west of a rock (recurring)"},
-      {name:"Stardust",   hidden:true,  note:"Center island, northwest area — two patches (recurring)"},
-      {name:"Star Piece", hidden:true,  note:"South of Selphy's house (recurring)"},
+      {name:"Nest Ball",  hidden:true, recurring:true, note:"Western island, west of a rock"},
+      {name:"Stardust",   hidden:true, recurring:true, note:"Center island, northwest area — two patches"},
+      {name:"Star Piece", hidden:true, recurring:true, note:"South of Selphy's house"},
     ],
     trainers:[
       {class:"Painter",   name:"Rayna",   team:[{name:"Smeargle",level:50}]},
@@ -2797,8 +2797,8 @@ const AREAS = [
       {name:"Metal Coat",   hidden:false, note:"Knockout mode completion reward"},
       {name:"King's Rock",  hidden:false, note:"Mixed mode completion reward"},
       {name:"Nanab Berry",  hidden:true,  note:"Exterior, near the entrance"},
-      {name:"Pearl",        hidden:true,  note:"Exterior (recurring)"},
-      {name:"Big Pearl",    hidden:true,  note:"Exterior (recurring)"},
+      {name:"Pearl",        hidden:true, recurring:true, note:"Beach, three steps west of the sign"},
+      {name:"Big Pearl",    hidden:true, recurring:true, note:"Beach, north of the sign"},
     ],
     trainers:[] },
 
