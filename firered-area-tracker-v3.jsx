@@ -6434,9 +6434,11 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, ch
     else countFloor(area.items || [], i => flatItemKey(area.id, i));
     return { id_: done, itTotal: total };
   })();
-  const td  = allTrns.filter(t => trainers[`${area.id}|${t.class}|${t.name}`]).length;
+  const td   = allTrns.filter(t => trainers[`${area.id}|${t.class}|${t.name}`]).length;
+  const done = pd + id_ + td;
   const total = allPoks.length + itTotal + allTrns.length;
-  const allDone = total > 0 && (pd + id_ + td) === total;
+  const allDone = total > 0 && done === total;
+  const pct  = total > 0 ? Math.round((done / total) * 100) : 0;
   const tint = AREA_TINT[getAreaType(area)];
   return (
     <div onClick={() => setAreaId(area.id)} style={{
@@ -6457,6 +6459,11 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, ch
           <span style={{ color: pd===allPoks.length && allPoks.length>0 ? C.green : C.muted }}>{pd}/{allPoks.length} pkm</span>
           <span style={{ color: id_===itTotal && itTotal>0 ? C.gold : C.muted }}>{id_}/{itTotal} itm</span>
           {allTrns.length > 0 && <span style={{ color: td===allTrns.length ? "#a87acc" : C.muted }}>{td}/{allTrns.length} tr</span>}
+        </div>
+      )}
+      {total > 0 && !allDone && (
+        <div style={{ marginTop:4, height:2, background:"rgba(255,255,255,0.06)", borderRadius:1, overflow:"hidden" }}>
+          <div style={{ height:"100%", width:`${pct}%`, background:"var(--frlg-accent)", borderRadius:1, transition:"width 0.3s" }} />
         </div>
       )}
     </div>
