@@ -6444,11 +6444,11 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, ch
     <div onClick={() => setAreaId(area.id)} style={{
         padding:"8px 12px", cursor:"pointer",
         borderBottom:`1px solid rgba(58,42,28,0.5)`,
-        borderLeft: isSel ? `3px solid var(--frlg-accent)` : `3px solid ${tint.bar}`,
-        background: isSel ? "rgba(var(--frlg-accent-rgb,212,98,26),0.18)" : tint.bg,
+        borderLeft: isSel ? `3px solid var(--frlg-accent)` : allDone ? `3px solid #4aaf74` : `3px solid ${tint.bar}`,
+        background: isSel ? "rgba(var(--frlg-accent-rgb,212,98,26),0.18)" : allDone ? "rgba(74,175,116,0.08)" : tint.bg,
         transition:"background 0.1s" }}
-      onMouseEnter={e => { if (!isSel) e.currentTarget.style.background="rgba(255,255,255,0.04)"; }}
-      onMouseLeave={e => { if (!isSel) e.currentTarget.style.background=tint.bg; }}>
+      onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = allDone ? "rgba(74,175,116,0.14)" : "rgba(255,255,255,0.04)"; }}
+      onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = allDone ? "rgba(74,175,116,0.08)" : tint.bg; }}>
       <div style={{ display:"flex", alignItems:"center", gap:5 }}>
         <span style={{ fontSize:12, fontWeight: isSel ? "700" : "400", color: allDone ? C.green : isSel ? "var(--frlg-accent)" : "#c4a888", lineHeight:1.4, flex:1 }}>{allDone ? "✓ " : ""}{area.name}</span>
         {hasPendingTrades && <span style={{ fontSize:9, color:"#c8960a", background:"rgba(200,150,10,0.12)", border:"1px solid rgba(200,150,10,0.35)", padding:"1px 5px", borderRadius:99, fontWeight:"700", flexShrink:0 }}>⇄</span>}
