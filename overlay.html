@@ -232,10 +232,10 @@
       };
 
       const sectionHeader = (accent) => ({
-        fontSize: 9, fontWeight: 700, letterSpacing: 2, color: accent,
+        fontSize: 11, fontWeight: 700, letterSpacing: 2, color: accent,
         borderLeft: `3px solid ${accent}`, paddingLeft: 7, marginBottom: 8,
       });
-      const areaLabel = { fontSize: 9, color: T.textMuted, marginBottom: 6 };
+      const areaLabel = { fontSize: 11, color: T.textMuted, marginBottom: 6 };
       const rowDivider = (i, total) => i < total - 1 ? `1px solid ${T.divider}` : "none";
 
       // ── Loading / placeholder states ───────────────────────────────────────────
@@ -308,7 +308,7 @@
         };
 
         const floorLabelStyle = (isFirst) => ({
-          fontSize:9, fontWeight:700, letterSpacing:1,
+          fontSize:11, fontWeight:700, letterSpacing:1,
           color: T.textMuted,
           borderLeft: `2px solid ${T.border}`,
           paddingLeft: 5,
@@ -330,7 +330,7 @@
                 const hasFloorAbove  = prevRow && prevRow.type === "floor";
                 return (
                   <div key={i} style={{
-                    fontSize:8, fontWeight:700, letterSpacing:1.5,
+                    fontSize:10, fontWeight:700, letterSpacing:1.5,
                     color: row.color,
                     marginTop: hasFloorAbove ? 0 : (i === 0 ? 2 : 7),
                     marginBottom: 2,
@@ -349,34 +349,34 @@
               const border    = (!nextRow || nextRow.type === "floor" || nextRow.type === "method") ? "none" : `1px solid ${T.divider}`;
 
               return (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 0",
                                       opacity: dimmed ? 0.35 : 1,
                                       borderBottom: border }}>
                   {spriteUrl
-                    ? <img src={spriteUrl} alt={p.name} width={24} height={24}
+                    ? <img src={spriteUrl} alt={p.name} width={32} height={32}
                            style={{ imageRendering:"pixelated", flexShrink:0,
                                     opacity: isCaught ? 1 : 0.65,
                                     filter:  isCaught ? "none" : "brightness(0)" }} />
-                    : <div style={{ width:24, height:24, flexShrink:0 }} />
+                    : <div style={{ width:32, height:32, flexShrink:0 }} />
                   }
-                  <span style={{ fontSize:11, flex:1, minWidth:0,
+                  <span style={{ fontSize:14, flex:1, minWidth:0,
                                  color: isCaught ? "#4aaf74" : T.textPrimary,
                                  whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                     {p.name}
                   </span>
                   {vTag && (
-                    <span style={{ fontSize:9, fontWeight:700,
+                    <span style={{ fontSize:11, fontWeight:700,
                                    color: vTag === "FR" ? "#d4621a" : "#3fa84a",
                                    background: vTag === "FR" ? "rgba(212,98,26,0.15)" : "rgba(63,168,74,0.15)",
-                                   borderRadius:4, padding:"1px 5px", flexShrink:0 }}>
+                                   borderRadius:4, padding:"1px 6px", flexShrink:0 }}>
                       {vTag}
                     </span>
                   )}
-                  <span style={{ fontSize:9, background:mc.bg, color:mc.color,
-                                 borderRadius:4, padding:"1px 5px", flexShrink:0 }}>
+                  <span style={{ fontSize:11, background:mc.bg, color:mc.color,
+                                 borderRadius:4, padding:"1px 6px", flexShrink:0 }}>
                     {{"Old Rod":"Old","Good Rod":"Good","Super Rod":"Super"}[p.method] ?? p.method}
                   </span>
-                  <span style={{ fontSize:9, color: T.textMuted, flexShrink:0, whiteSpace:"nowrap" }}>
+                  <span style={{ fontSize:11, color: T.textMuted, flexShrink:0, whiteSpace:"nowrap" }}>
                     {versionRate(p, version)}
                   </span>
                 </div>
@@ -392,7 +392,7 @@
         if (!entries.length) return null;
 
         const floorLabelStyle = (isFirst) => ({
-          fontSize:9, fontWeight:700, letterSpacing:1,
+          fontSize:11, fontWeight:700, letterSpacing:1,
           color: T.textMuted,
           borderLeft: `2px solid ${T.border}`,
           paddingLeft: 5,
@@ -427,31 +427,31 @@
               const border    = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
 
               return (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 0",
                                       opacity: collected ? 0.45 : 1,
                                       borderBottom: border }}>
                   {spriteUrl
-                    ? <img src={spriteUrl} alt={it.name} width={24} height={24}
+                    ? <img src={spriteUrl} alt={it.name} width={32} height={32}
                            style={{ imageRendering:"pixelated", flexShrink:0 }} />
-                    : <div style={{ width:24, height:24, background: T.placeholderBg,
+                    : <div style={{ width:32, height:32, background: T.placeholderBg,
                                     borderRadius:4, flexShrink:0 }} />
                   }
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:11, color: collected ? T.textMuted : T.textPrimary,
+                    <div style={{ fontSize:14, color: collected ? T.textMuted : T.textPrimary,
                                   textDecoration: collected ? "line-through" : "none",
                                   whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                       {it.hidden && <span style={{ color:"#c8960a", marginRight:3 }}>★</span>}
                       {it.name}
                     </div>
                     {it.note && (
-                      <div style={{ fontSize:9, color: T.textMuted, marginTop:1,
+                      <div style={{ fontSize:11, color: T.textMuted, marginTop:1,
                                     whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                         {it.note}
                       </div>
                     )}
                   </div>
                   {collected && (
-                    <span style={{ fontSize:13, color:"#4aaf74", flexShrink:0 }}>✓</span>
+                    <span style={{ fontSize:16, color:"#4aaf74", flexShrink:0 }}>✓</span>
                   )}
                 </div>
               );
@@ -466,7 +466,7 @@
         if (!entries.length) return null;
 
         const floorLabelStyle = (isFirst) => ({
-          fontSize:9, fontWeight:700, letterSpacing:1,
+          fontSize:11, fontWeight:700, letterSpacing:1,
           color: T.textMuted,
           borderLeft: `2px solid ${T.border}`,
           paddingLeft: 5,
