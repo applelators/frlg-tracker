@@ -985,7 +985,7 @@ const AREAS = [
       {name:"TM48 Skill Swap",hidden:false,surf:true,note:"Southeast of the Lavender Town gate (requires Surf)"},
       {name:"Hyper Potion",   hidden:true, note:"Five steps east, two steps north of Fisherman Elliot",img:"screenshots/hidden/route12-3.png"},
       {name:"Super Rod",      hidden:false,note:"From the Fishing Guru's younger brother"},
-      {name:"Net Ball",       hidden:false,note:"From the Fishing Guru's younger brother, for showing him a record-breaking Magikarp (repeatable)"},
+      {name:"Net Ball",       hidden:false,optional:true,note:"From the Fishing Guru's younger brother, for showing him a record-breaking Magikarp (repeatable)"},
       {name:"Iron",           hidden:false,note:"Southwest of the Fishing Guru's house (requires Cut)"},
       {name:"Rare Candy",     hidden:true, note:"In the tall grass patch (requires Cut)",img:"screenshots/hidden/route12-5.png"},
     ],
