@@ -851,7 +851,7 @@ const AREAS = [
     ] },
 
   { part:"Part 9", id:"pokemon-tower", name:"Pokémon Tower",
-    note:"Requires Silph Scope (from Rocket Hideout) to reveal and catch Ghost-types on floors 3–7. Rescue Mr. Fuji on 7F to receive the Poké Flute. Cleanse Tag is a field item on 5F.",
+    note:"Requires Silph Scope (from Rocket Hideout) to reveal and catch Ghost-types on floors 3–7. Rescue Mr. Fuji on 7F to receive the Poké Flute.",
     floors:[
       { label:"2F",
         pokemon:[],
@@ -867,37 +867,43 @@ const AREAS = [
           {name:"Haunter",method:"Cave",levels:"17",   rate:"1%"},
         ],
         items:[
-          {name:"Escape Rope", hidden:false,note:""},
-          {name:"Awakening",   hidden:false,note:""},
-          {name:"Super Potion",hidden:false,note:""},
-          {name:"Star Piece",  hidden:true, note:"★ Itemfinder"},
+          {name:"Escape Rope",hidden:false,note:"Near the north wall"},
         ],
         trainers:[
           {class:"Channeler",name:"Hope",    team:[{name:"Gastly",level:23}]},
           {class:"Channeler",name:"Patricia",team:[{name:"Gastly",level:22}]},
           {class:"Channeler",name:"Carly",   team:[{name:"Gastly",level:24}]},
         ]},
-      { label:"4F–5F",
+      { label:"4F",
         pokemon:[
           {name:"Gastly", method:"Cave",levels:"20–22",rate:"86%"},
           {name:"Cubone", method:"Cave",levels:"19–21",rate:"9%"},
           {name:"Haunter",method:"Cave",levels:"20–22",rate:"5%"},
         ],
         items:[
-          {name:"Elixir",    hidden:false,note:"4F"},
-          {name:"Escape Rope",hidden:false,note:"4F"},
-          {name:"Full Heal", hidden:false,note:"4F"},
-          {name:"Great Ball",hidden:false,note:"4F"},
-          {name:"Cleanse Tag",hidden:false,note:"5F"},
-          {name:"Nugget",    hidden:false,note:"5F"},
-          {name:"Big Mushroom",hidden:true,note:"5F (★ Itemfinder)",img:"screenshots/hidden/pokemon-tower-4f-5f-6.png"},
+          {name:"Elixir",    hidden:false,note:"West of the stairway from 3F"},
+          {name:"Awakening", hidden:false,note:"In the center of the room"},
+          {name:"Great Ball",hidden:false,note:"Near the south wall"},
         ],
         trainers:[
           {class:"Channeler",name:"Laurel",team:[{name:"Gastly",level:23},{name:"Gastly",level:23}]},
           {class:"Channeler",name:"Jody",  team:[{name:"Gastly",level:22}]},
           {class:"Channeler",name:"Paula", team:[{name:"Gastly",level:24}]},
-          {class:"Channeler",name:"Ruth",  team:[{name:"Gastly",level:22}]},
-          {class:"Channeler",name:"Tammy", team:[{name:"Haunter",level:23}]},
+        ]},
+      { label:"5F",
+        pokemon:[
+          {name:"Gastly", method:"Cave",levels:"20–22",rate:"86%"},
+          {name:"Cubone", method:"Cave",levels:"19–21",rate:"9%"},
+          {name:"Haunter",method:"Cave",levels:"20–22",rate:"5%"},
+        ],
+        items:[
+          {name:"Big Mushroom",hidden:true, note:"One step north, four steps west of Channeler Ruth",img:"screenshots/hidden/pokemon-tower-4f-5f-6.png"},
+          {name:"Cleanse Tag", hidden:false,note:"Middle of the healing area"},
+          {name:"Nugget",      hidden:false,note:"Near the south wall"},
+        ],
+        trainers:[
+          {class:"Channeler",name:"Ruth", team:[{name:"Gastly",level:22}]},
+          {class:"Channeler",name:"Tammy",team:[{name:"Haunter",level:23}]},
         ]},
       { label:"6F",
         pokemon:[
@@ -906,8 +912,8 @@ const AREAS = [
           {name:"Haunter",method:"Cave",levels:"22–23",rate:"6%"},
         ],
         items:[
-          {name:"X Accuracy",hidden:false,note:""},
-          {name:"Rare Candy", hidden:false,note:""},
+          {name:"X Accuracy",hidden:false,note:"Southwest of the stairway from 5F"},
+          {name:"Rare Candy", hidden:false,note:"West-central part of the room"},
         ],
         trainers:[
           {class:"Channeler",name:"Karina",   team:[{name:"Gastly",level:24}]},
@@ -923,7 +929,8 @@ const AREAS = [
           {name:"Cubone", method:"Cave",levels:"22–23",rate:"10%"},
         ],
         items:[
-          {name:"Poké Flute",hidden:false,note:"From Mr. Fuji after rescuing him — wakes both Snorlax"},
+          {name:"Soothe Bell",hidden:true, note:"On the spot where Mr. Fuji was standing (★ Itemfinder)"},
+          {name:"Poké Flute", hidden:false,note:"From Mr. Fuji after rescuing him — wakes both Snorlax"},
         ],
         trainers:[
           {class:"Team Rocket Grunt",name:"Grunt 1",team:[{name:"Zubat",  level:25},{name:"Zubat",  level:25},{name:"Golbat",level:25}]},
