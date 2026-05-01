@@ -4685,7 +4685,7 @@ function FireRedTracker() {
 
         {/* Tabs */}
         <div style={{ display:"flex", gap:2, marginTop:10 }}>
-          {[["areas","Areas"],["dex","Pokédex"],["team","Dream Team"],["types","Types"],["calc","Catch Calc"],["hunt","Hunt"],["tms","TMs"],["completion","100%"]].map(([t,label]) => (
+          {[["areas","Areas"],["dex","Pokédex"],["team","Team"],["types","Types"],["calc","Catch"],["hunt","Hunt"],["tms","TMs"],["completion","100%"]].map(([t,label]) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding:"8px 20px", border:"none", borderRadius:"6px 6px 0 0", cursor:"pointer",
               fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"600",
