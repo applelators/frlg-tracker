@@ -3617,6 +3617,76 @@ function getAreaType(area) {
   if (n.includes("game corner") || n.includes("underground path")) return "special";
   return "city";
 }
+// ─── TM / HM DATA ─────────────────────────────────────────────────────────────
+const TM_TYPE_COLOR = {
+  Normal:"#8a8a70",Fire:"#d06828",Water:"#4870d8",Electric:"#c0a018",
+  Grass:"#58a030",Ice:"#70b8b8",Fighting:"#a01818",Poison:"#8028a0",
+  Ground:"#b09040",Flying:"#8070c0",Psychic:"#d03870",Bug:"#789018",
+  Rock:"#908028",Ghost:"#504070",Dragon:"#5020c0",Dark:"#4c3830",
+  Steel:"#8888a8",
+};
+const TM_DATA = [
+  {id:"TM01",move:"Focus Punch", type:"Fighting",note:"Silph Co."},
+  {id:"TM02",move:"Dragon Claw", type:"Dragon",  note:"Victory Road — north area (requires Strength)"},
+  {id:"TM03",move:"Water Pulse", type:"Water",   note:"Cerulean City Gym — defeat Misty"},
+  {id:"TM04",move:"Calm Mind",   type:"Psychic", note:"Saffron City Gym — defeat Sabrina"},
+  {id:"TM05",move:"Roar",        type:"Normal",  note:"Route 22 — from the man by the hill"},
+  {id:"TM06",move:"Toxic",       type:"Poison",  note:"Fuchsia City Gym — defeat Koga"},
+  {id:"TM07",move:"Hail",        type:"Ice",     note:"Victory Road — northeast area"},
+  {id:"TM08",move:"Bulk Up",     type:"Fighting",note:"Silph Co. — requires Card Key"},
+  {id:"TM09",move:"Bullet Seed", type:"Grass",   note:"Mt. Moon — west chamber"},
+  {id:"TM10",move:"Hidden Power",type:"Normal",  note:"Celadon Dept. Store — ₽3,000"},
+  {id:"TM11",move:"Sunny Day",   type:"Fire",    note:"Safari Zone — in the tall grass"},
+  {id:"TM12",move:"Taunt",       type:"Dark",    note:"Rocket Hideout"},
+  {id:"TM13",move:"Ice Beam",    type:"Ice",     note:"Celadon Game Corner — 4,000 coins"},
+  {id:"TM14",move:"Blizzard",    type:"Ice",     note:"Pokémon Mansion — B1F, north-central room"},
+  {id:"TM15",move:"Hyper Beam",  type:"Normal",  note:"Celadon Dept. Store — ₽7,500"},
+  {id:"TM16",move:"Light Screen",type:"Psychic", note:"Celadon City Rooftop — give Fresh Water"},
+  {id:"TM17",move:"Protect",     type:"Normal",  note:"Power Plant — central corridor"},
+  {id:"TM18",move:"Rain Dance",  type:"Water",   note:"Route 15 — western hill (requires Cut)"},
+  {id:"TM19",move:"Giga Drain",  type:"Grass",   note:"Celadon City Gym — defeat Erika"},
+  {id:"TM20",move:"Safeguard",   type:"Normal",  note:"Celadon City Rooftop — give Soda Pop"},
+  {id:"TM21",move:"Frustration", type:"Normal",  note:"Rocket Hideout"},
+  {id:"TM22",move:"SolarBeam",   type:"Grass",   note:"Pokémon Mansion — B1F, west-central room"},
+  {id:"TM23",move:"Iron Tail",   type:"Steel",   note:"Silph Co."},
+  {id:"TM24",move:"Thunderbolt", type:"Electric",note:"Celadon Game Corner — 4,000 coins"},
+  {id:"TM25",move:"Thunder",     type:"Electric",note:"Power Plant — southeast room"},
+  {id:"TM26",move:"Earthquake",  type:"Ground",  note:"Viridian City Gym — defeat Giovanni"},
+  {id:"TM27",move:"Return",      type:"Normal",  note:"Route 12 gate — 2F"},
+  {id:"TM28",move:"Dig",         type:"Ground",  note:"Cerulean City — defeat Team Rocket Grunt"},
+  {id:"TM29",move:"Psychic",     type:"Psychic", note:"Saffron City — Mr. Psychic (SE house)"},
+  {id:"TM30",move:"Shadow Ball",  type:"Ghost",   note:"Celadon Dept. Store — ₽3,000"},
+  {id:"TM31",move:"Brick Break",  type:"Fighting",note:"S.S. Anne — second cabin from left"},
+  {id:"TM32",move:"Double Team",  type:"Normal",  note:"Safari Zone — southeast of Secret House"},
+  {id:"TM33",move:"Reflect",      type:"Psychic", note:"Celadon City Rooftop — give Lemonade"},
+  {id:"TM34",move:"Shock Wave",   type:"Electric",note:"Vermilion City Gym — defeat Lt. Surge"},
+  {id:"TM35",move:"Flamethrower", type:"Fire",    note:"Celadon Game Corner — 4,000 coins"},
+  {id:"TM36",move:"Sludge Bomb",  type:"Poison",  note:"Rocket Warehouse — north-central room"},
+  {id:"TM37",move:"Sandstorm",    type:"Rock",    note:"Victory Road — southwest"},
+  {id:"TM38",move:"Fire Blast",   type:"Fire",    note:"Cinnabar Island Gym — defeat Blaine"},
+  {id:"TM39",move:"Rock Tomb",    type:"Rock",    note:"Pewter City Gym — defeat Brock"},
+  {id:"TM40",move:"Aerial Ace",   type:"Flying",  note:"Route 9 — southwest corner"},
+  {id:"TM41",move:"Torment",      type:"Dark",    note:"Silph Co."},
+  {id:"TM42",move:"Facade",       type:"Normal",  note:"Memorial Pillar — from NPC after sharing Lemonade"},
+  {id:"TM43",move:"Secret Power", type:"Normal",  note:"Route 25 — northeast maze"},
+  {id:"TM44",move:"Rest",         type:"Psychic", note:"S.S. Anne — second cabin from left"},
+  {id:"TM45",move:"Attract",      type:"Normal",  note:"Route 24 — northwest hill"},
+  {id:"TM46",move:"Thief",        type:"Dark",    note:"Mt. Moon — northeast platform"},
+  {id:"TM47",move:"Steel Wing",   type:"Steel",   note:"Safari Zone — southwest of rest house"},
+  {id:"TM48",move:"Skill Swap",   type:"Psychic", note:"Route 12 — requires Surf"},
+  {id:"TM49",move:"Snatch",       type:"Dark",    note:"Rocket Hideout"},
+  {id:"TM50",move:"Overheat",     type:"Fire",    note:"Victory Road — northwest area"},
+];
+const HM_DATA = [
+  {id:"HM01",move:"Cut",       type:"Normal",  note:"S.S. Anne — from the Captain"},
+  {id:"HM02",move:"Fly",       type:"Flying",  note:"Route 16 — woman in house behind Cut tree"},
+  {id:"HM03",move:"Surf",      type:"Water",   note:"Safari Zone — Warden reward"},
+  {id:"HM04",move:"Strength",  type:"Normal",  note:"Fuchsia City — Warden reward (return Gold Teeth)"},
+  {id:"HM05",move:"Flash",     type:"Normal",  note:"Route 2 — Prof. Oak's aide (requires 10 Pokémon caught)"},
+  {id:"HM06",move:"Rock Smash",type:"Fighting",note:"One Island — Ember Spa"},
+  {id:"HM07",move:"Waterfall", type:"Water",   note:"One Island — Icefall Cave (back area)"},
+];
+
 const AREA_TINT = {
   route:   { bar:"#4a8a38", bg:"rgba(40,90,28,0.13)" },
   cave:    { bar:"#7a6a52", bg:"rgba(80,65,45,0.14)" },
@@ -4074,6 +4144,114 @@ function LDexSection({ title, color, items, note }) {
   );
 }
 
+// ─── TMs TAB ──────────────────────────────────────────────────────────────────
+function TMsTab({ tmState, toggleTm }) {
+  const [showTMs, setShowTMs] = useState(true);
+  const [showHMs, setShowHMs] = useState(true);
+
+  const tmDone  = TM_DATA.filter(t => tmState[t.id]).length;
+  const hmDone  = HM_DATA.filter(h => tmState[h.id]).length;
+  const total   = TM_DATA.length + HM_DATA.length;
+  const done    = tmDone + hmDone;
+
+  const markAll  = list => list.forEach(e => { if (!tmState[e.id]) toggleTm(e.id); });
+  const clearAll = list => list.forEach(e => { if (tmState[e.id])  toggleTm(e.id); });
+
+  const renderRow = (entry) => {
+    const obtained = tmState[entry.id];
+    const tc  = TM_TYPE_COLOR[entry.type] || "#8a8a70";
+    const isHM = entry.id.startsWith("HM");
+    return (
+      <div key={entry.id} onClick={() => toggleTm(entry.id)}
+        style={{ display:"flex", alignItems:"center", gap:10, padding:"6px 20px",
+                 cursor:"pointer", borderBottom:`1px solid ${C.border}`,
+                 background: obtained ? "rgba(74,175,116,0.06)" : "transparent",
+                 opacity: obtained ? 0.65 : 1, transition:"opacity 0.15s, background 0.15s" }}
+        onMouseEnter={e => { if (!obtained) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = obtained ? "rgba(74,175,116,0.06)" : "transparent"; }}>
+        {/* ID badge */}
+        <span style={{ fontSize:10, fontWeight:"700", fontFamily:"'Courier New',monospace",
+                       background: isHM ? "rgba(90,176,216,0.18)" : "rgba(255,255,255,0.08)",
+                       color: isHM ? "#5ab0d8" : C.muted,
+                       borderRadius:4, padding:"2px 6px", flexShrink:0, minWidth:38, textAlign:"center" }}>
+          {entry.id}
+        </span>
+        {/* Move name */}
+        <span style={{ fontSize:13, fontWeight:"600", flex:"0 0 130px",
+                       color: obtained ? C.green : C.text }}>
+          {entry.move}
+        </span>
+        {/* Type badge */}
+        <span style={{ fontSize:10, fontWeight:"700", borderRadius:4, padding:"2px 8px",
+                       background:`${tc}28`, color:tc, flexShrink:0, minWidth:68, textAlign:"center" }}>
+          {entry.type}
+        </span>
+        {/* Location note */}
+        <span style={{ fontSize:11, color:C.muted, flex:1, minWidth:0,
+                       overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+          {entry.note}
+        </span>
+        {/* Checkmark */}
+        <span style={{ fontSize:14, color:C.green, flexShrink:0, width:18, textAlign:"center" }}>
+          {obtained ? "✓" : ""}
+        </span>
+      </div>
+    );
+  };
+
+  const SectionHeader = ({ label, count, total: tot, open, toggle, list }) => (
+    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 20px",
+                  background:"rgba(0,0,0,0.25)", borderBottom:`1px solid ${C.border}`,
+                  borderTop:`1px solid ${C.border}`, position:"sticky", top:52, zIndex:5 }}>
+      <button onClick={toggle} style={{ background:"none", border:"none", color:C.muted,
+                                        cursor:"pointer", fontSize:11, padding:0, flexShrink:0 }}>
+        {open ? "▾" : "▸"}
+      </button>
+      <span style={{ fontWeight:"700", fontSize:12, color:C.text, flex:1 }}>{label}</span>
+      <span style={{ fontSize:11, color: count===tot ? C.green : C.muted }}>
+        <span style={{ color: count===tot ? C.green : "var(--frlg-accent)", fontWeight:"700" }}>{count}</span>
+        <span> / {tot}</span>
+      </span>
+      <button onClick={() => count===tot ? clearAll(list) : markAll(list)}
+        style={{ fontSize:10, padding:"2px 10px", border:`1px solid ${C.border}`, borderRadius:4,
+                 background:"transparent", color:C.muted, cursor:"pointer",
+                 fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+        {count===tot ? "Clear" : "Mark all"}
+      </button>
+    </div>
+  );
+
+  return (
+    <div style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column" }}>
+      {/* Tab header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+                    padding:"12px 20px", borderBottom:`1px solid ${C.border}`,
+                    background:C.card, position:"sticky", top:0, zIndex:10, flexShrink:0 }}>
+        <div>
+          <div style={{ fontSize:16, fontWeight:"700", color:C.text }}>TMs &amp; HMs</div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:2 }}>50 TMs · 7 HMs</div>
+        </div>
+        <div style={{ textAlign:"right" }}>
+          <span style={{ color:"var(--frlg-accent)", fontWeight:"700", fontSize:18 }}>{done}</span>
+          <span style={{ color:C.muted, fontSize:13 }}> / {total} obtained</span>
+        </div>
+      </div>
+
+      {/* TMs section */}
+      <SectionHeader label="Technical Machines (TM01–TM50)"
+        count={tmDone} total={TM_DATA.length}
+        open={showTMs} toggle={() => setShowTMs(v => !v)} list={TM_DATA} />
+      {showTMs && TM_DATA.map(renderRow)}
+
+      {/* HMs section */}
+      <SectionHeader label="Hidden Machines (HM01–HM07)"
+        count={hmDone} total={HM_DATA.length}
+        open={showHMs} toggle={() => setShowHMs(v => !v)} list={HM_DATA} />
+      {showHMs && HM_DATA.map(renderRow)}
+    </div>
+  );
+}
+
 // ─── ROOT COMPONENT ───────────────────────────────────────────────────────────
 function FireRedTracker() {
   const isMobile = useIsMobile();
@@ -4090,6 +4268,7 @@ function FireRedTracker() {
   const [badges, setBadges]     = useState({});      // {badgeId: true}
   const [checklist, setChecklist] = useState({});   // {itemId: true}
   const [choiceGroups, setChoiceGroups] = useState({});  // {groupId: choiceId}
+  const [tmState, setTmState]     = useState({});   // {TM01: true, HM03: true, ...}
 
 
   useEffect(() => {
@@ -4101,6 +4280,7 @@ function FireRedTracker() {
       try { const r = localStorage.getItem("frlg-badges");     if (r) setBadges(JSON.parse(r));       } catch {}
       try { const r = localStorage.getItem("frlg-checklist"); if (r) setChecklist(JSON.parse(r));    } catch {}
       try { const r = localStorage.getItem("frlg-choices");   if (r) setChoiceGroups(JSON.parse(r)); } catch {}
+      try { const r = localStorage.getItem("frlg-tms");       if (r) setTmState(JSON.parse(r));      } catch {}
 
       setBooted(true);
     })();
@@ -4126,6 +4306,7 @@ function FireRedTracker() {
       badges:    localStorage.getItem("frlg-badges"),
       checklist: localStorage.getItem("frlg-checklist"),
       choices:   localStorage.getItem("frlg-choices"),
+      tms:       localStorage.getItem("frlg-tms"),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
     const url = URL.createObjectURL(blob);
@@ -4154,6 +4335,7 @@ function FireRedTracker() {
           if (data.badges)     localStorage.setItem("frlg-badges",    data.badges);
           if (data.checklist)  localStorage.setItem("frlg-checklist", data.checklist);
           if (data.choices)    localStorage.setItem("frlg-choices",   data.choices);
+          if (data.tms)        localStorage.setItem("frlg-tms",       data.tms);
           window.location.reload();
         } catch { alert("Invalid save file — could not restore data."); }
       };
@@ -4176,6 +4358,15 @@ function FireRedTracker() {
       const next = { ...prev };
       if (next[id]) delete next[id]; else next[id] = true;
       try { localStorage.setItem("frlg-checklist", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  const toggleTm = useCallback((id) => {
+    setTmState(prev => {
+      const next = { ...prev };
+      if (next[id]) delete next[id]; else next[id] = true;
+      try { localStorage.setItem("frlg-tms", JSON.stringify(next)); } catch {}
       return next;
     });
   }, []);
@@ -4321,7 +4512,7 @@ function FireRedTracker() {
 
         {/* Tabs */}
         <div style={{ display:"flex", gap:2, marginTop:10 }}>
-          {[["areas","Areas"],["dex","Pokédex"],["team","Dream Team"],["calc","Catch Calc"],["hunt","Hunt"],["completion","100%"]].map(([t,label]) => (
+          {[["areas","Areas"],["dex","Pokédex"],["team","Dream Team"],["calc","Catch Calc"],["hunt","Hunt"],["tms","TMs"],["completion","100%"]].map(([t,label]) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding:"8px 20px", border:"none", borderRadius:"6px 6px 0 0", cursor:"pointer",
               fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"600",
@@ -4348,6 +4539,9 @@ function FireRedTracker() {
 
       {/* ── Tab: Hunt ── */}
       {tab === "hunt" && <HuntTab version={version} isMobile={isMobile} />}
+
+      {/* ── Tab: TMs & HMs ── */}
+      {tab === "tms" && <TMsTab tmState={tmState} toggleTm={toggleTm} />}
 
       {/* ── Tab: 100% Completion ── */}
       {tab === "completion" && <CompletionTab caught={caught} checklist={checklist} toggleChecklist={toggleChecklist} isMobile={isMobile} />}
