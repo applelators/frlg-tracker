@@ -237,6 +237,19 @@
         );
         if (!visible.length) return null;
 
+        // Group by section (land / surf / fishing) and check if all caught
+        const getSection = m =>
+          m === "Surf" ? "surf" :
+          (m === "Old Rod" || m === "Good Rod" || m === "Super Rod") ? "fishing" : "land";
+        const secStats = {};
+        visible.forEach(p => {
+          const s = getSection(p.method);
+          if (!secStats[s]) secStats[s] = { total: 0, done: 0 };
+          secStats[s].total++;
+          if (caught[p.name]) secStats[s].done++;
+        });
+        const secDone = s => secStats[s] && secStats[s].done === secStats[s].total;
+
         return (
           <div style={panel}>
             <div style={sectionHeader(meta.accent)}>{meta.label}</div>
@@ -246,9 +259,11 @@
               const mc        = METHOD_COLOR[p.method] || { bg:"rgba(120,100,80,0.15)", color: T.textMuted };
               const spriteUrl = pokeSprite(p.name);
               const vTag      = p.frOnly ? "FR" : p.lgOnly ? "LG" : null;
+              const dimmed    = secDone(getSection(p.method));
 
               return (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
+                                      opacity: dimmed ? 0.35 : 1,
                                       borderBottom: rowDivider(i, visible.length) }}>
                   {spriteUrl
                     ? <img src={spriteUrl} alt={p.name} width={24} height={24}
