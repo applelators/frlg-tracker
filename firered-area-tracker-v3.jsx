@@ -4899,28 +4899,37 @@ function DreamTeamTab({ isMobile, version }) {
                     <span style={{ fontSize:8, color:"#fff", background: bg || TYPE_COLORS[type] || "#888", padding:"1px 5px", borderRadius:3, fontWeight:"700", letterSpacing:0.3 }}>{type}</span>
                   );
                   return (
-                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-                      <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase" }}>Weak against</div>
-                      {weak4.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                        <span style={{ fontSize:9, color:"#e83030", fontWeight:"700", minWidth:22 }}>4×</span>
-                        {weak4.map(t => <TypePill key={t} type={t} bg="#c02020" />)}
-                      </div>}
-                      {weak.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                        <span style={{ fontSize:9, color:"#e07b3a", fontWeight:"700", minWidth:22 }}>2×</span>
-                        {weak.map(t => <TypePill key={t} type={t} />)}
-                      </div>}
-                      {res.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                        <span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>½×</span>
-                        {res.map(t => <TypePill key={t} type={t} />)}
-                      </div>}
-                      {res2.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                        <span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>¼×</span>
-                        {res2.map(t => <TypePill key={t} type={t} />)}
-                      </div>}
-                      {imm.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                        <span style={{ fontSize:9, color:"#7a5ab0", fontWeight:"700", minWidth:22 }}>0×</span>
-                        {imm.map(t => <TypePill key={t} type={t} bg="#5a3a8a" />)}
-                      </div>}
+                    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                      {(weak4.length > 0 || weak.length > 0) && (
+                        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                          <div style={{ fontSize:9, color:"#e07b3a", letterSpacing:1.5, textTransform:"uppercase", fontWeight:"700" }}>Weak against</div>
+                          {weak4.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
+                            <span style={{ fontSize:9, color:"#e83030", fontWeight:"700", minWidth:22 }}>4×</span>
+                            {weak4.map(t => <TypePill key={t} type={t} bg="#c02020" />)}
+                          </div>}
+                          {weak.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
+                            <span style={{ fontSize:9, color:"#e07b3a", fontWeight:"700", minWidth:22 }}>2×</span>
+                            {weak.map(t => <TypePill key={t} type={t} />)}
+                          </div>}
+                        </div>
+                      )}
+                      {(res.length > 0 || res2.length > 0 || imm.length > 0) && (
+                        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                          <div style={{ fontSize:9, color:"#4a8fc4", letterSpacing:1.5, textTransform:"uppercase", fontWeight:"700" }}>Strong against</div>
+                          {res.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
+                            <span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>½×</span>
+                            {res.map(t => <TypePill key={t} type={t} />)}
+                          </div>}
+                          {res2.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
+                            <span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>¼×</span>
+                            {res2.map(t => <TypePill key={t} type={t} />)}
+                          </div>}
+                          {imm.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
+                            <span style={{ fontSize:9, color:"#7a5ab0", fontWeight:"700", minWidth:22 }}>0×</span>
+                            {imm.map(t => <TypePill key={t} type={t} bg="#5a3a8a" />)}
+                          </div>}
+                        </div>
+                      )}
                     </div>
                   );
                 })()}
