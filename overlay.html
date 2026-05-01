@@ -272,7 +272,7 @@
                   )}
                   <span style={{ fontSize:9, background:mc.bg, color:mc.color,
                                  borderRadius:4, padding:"1px 5px", flexShrink:0 }}>
-                    {p.method}
+                    {{"Old Rod":"Old","Good Rod":"Good","Super Rod":"Super"}[p.method] ?? p.method}
                   </span>
                   <span style={{ fontSize:9, color: T.textMuted, flexShrink:0, whiteSpace:"nowrap" }}>
                     {versionRate(p, version)}
