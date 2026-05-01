@@ -77,6 +77,28 @@
       trainers: { label: "TRAINERS",     accent: "#a87acc" },
     };
 
+    // ─── Rate sorting (mirrors renderPokemonList in main tracker) ────────────────
+    // Within each consecutive same-method block, sort by effective rate descending
+    // for the active version. Handles split-rate strings like "1% FR / 4% LG".
+    function effectivePct(p, ver) {
+      const split = p.rate && p.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
+      const raw   = split ? (ver === "fr" ? split[1] : split[2]) : p.rate;
+      const m     = raw && raw.match(/^(\d+(?:\.\d+)?)%/);
+      return m ? parseFloat(m[1]) : 0;
+    }
+    function sortByRate(pokemon, ver) {
+      const out = [];
+      let i = 0;
+      while (i < pokemon.length) {
+        const method = pokemon[i].method;
+        let j = i;
+        while (j < pokemon.length && pokemon[j].method === method) j++;
+        out.push(...pokemon.slice(i, j).slice().sort((a, b) => effectivePct(b, ver) - effectivePct(a, ver)));
+        i = j;
+      }
+      return out;
+    }
+
     // ─── Flatten helpers ──────────────────────────────────────────────────────────
     function flattenWild(area) {
       if (area.floors) return area.floors.flatMap(f => f.pokemon || []);
@@ -204,9 +226,10 @@
       // ── Wild Pokémon ───────────────────────────────────────────────────────────
       if (section === "wild") {
         const entries = flattenWild(area);
-        // Filter out the other version's exclusives entirely (matching main tracker behaviour)
-        const visible = entries.filter(p =>
-          !((p.frOnly && version === "lg") || (p.lgOnly && version === "fr"))
+        // Filter other-version exclusives, then sort within each method block by rate
+        const visible = sortByRate(
+          entries.filter(p => !((p.frOnly && version === "lg") || (p.lgOnly && version === "fr"))),
+          version
         );
         if (!visible.length) return null;
 
