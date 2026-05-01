@@ -1,0 +1,12 @@
+name = "firered-progress-tracker"
+main = "_worker.js"
+compatibility_date = "2026-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "."
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "TRACKER_KV"
+id = "944713fa40d842c59764425cbd4d2546"
