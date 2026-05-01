@@ -9,7 +9,18 @@
     Items        : http://localhost:8080/overlay.html?section=items
     Trainers     : http://localhost:8080/overlay.html?section=trainers
 
-  Suggested size: 340 × 600 (OBS will crop transparent rows automatically).
+  URL params (all optional):
+    section  wild | items | trainers        Which section to display
+    width    any number (default: 340)      Panel width in pixels
+    opacity  0.0–1.0 (default: 0.92)        Panel background opacity
+    theme    warm | cool (default: warm)    warm = tracker brown-black; cool = navy for sidebar use
+
+  Examples:
+    ?section=wild&width=300&opacity=0.80
+    ?section=items&width=200&theme=cool&opacity=0.85
+
+  Suggested OBS source size: set width to match your ?width= value; height 600+
+  (OBS auto-crops transparent rows at the bottom).
   The panel updates within ~1.5 seconds when you switch areas in the main tracker.
 -->
 <html lang="en">
@@ -46,17 +57,17 @@
 
     // ─── Method badge colors (matching main tracker) ──────────────────────────────
     const METHOD_COLOR = {
-      "Grass":     { bg:"rgba(74,175,116,0.15)", color:"#4aaf74" },
-      "Cave":      { bg:"rgba(180,150,100,0.15)", color:"#b49664" },
-      "Surf":      { bg:"rgba(90,176,216,0.15)",  color:"#5ab0d8" },
-      "Old Rod":   { bg:"rgba(90,176,216,0.12)",  color:"#5ab0d8" },
-      "Good Rod":  { bg:"rgba(90,176,216,0.12)",  color:"#5ab0d8" },
-      "Super Rod": { bg:"rgba(90,176,216,0.12)",  color:"#5ab0d8" },
-      "Gift":      { bg:"rgba(200,150,10,0.15)",  color:"#c8960a" },
-      "Trade":     { bg:"rgba(200,150,10,0.15)",  color:"#c8960a" },
-      "Fossil":    { bg:"rgba(180,150,100,0.15)", color:"#b49664" },
-      "Event":     { bg:"rgba(168,122,204,0.15)", color:"#a87acc" },
-      "Game Corner":{ bg:"rgba(200,150,10,0.15)", color:"#c8960a" },
+      "Grass":      { bg:"rgba(74,175,116,0.15)",  color:"#4aaf74" },
+      "Cave":       { bg:"rgba(180,150,100,0.15)", color:"#b49664" },
+      "Surf":       { bg:"rgba(90,176,216,0.15)",  color:"#5ab0d8" },
+      "Old Rod":    { bg:"rgba(90,176,216,0.12)",  color:"#5ab0d8" },
+      "Good Rod":   { bg:"rgba(90,176,216,0.12)",  color:"#5ab0d8" },
+      "Super Rod":  { bg:"rgba(90,176,216,0.12)",  color:"#5ab0d8" },
+      "Gift":       { bg:"rgba(200,150,10,0.15)",  color:"#c8960a" },
+      "Trade":      { bg:"rgba(200,150,10,0.15)",  color:"#c8960a" },
+      "Fossil":     { bg:"rgba(180,150,100,0.15)", color:"#b49664" },
+      "Event":      { bg:"rgba(168,122,204,0.15)", color:"#a87acc" },
+      "Game Corner":{ bg:"rgba(200,150,10,0.15)",  color:"#c8960a" },
     };
 
     // ─── Section config ───────────────────────────────────────────────────────────
@@ -72,7 +83,6 @@
       return area.pokemon || [];
     }
     function flattenItems(area) {
-      // Returns [{entry, floorLabel, idx}] — floor label needed for correct item key
       if (area.floors) {
         return area.floors.flatMap(f =>
           (f.items || []).map((entry, idx) => ({ entry, floorLabel: f.label, idx }))
@@ -93,8 +103,32 @@
     // ─── OverlayApp ───────────────────────────────────────────────────────────────
     function OverlayApp() {
       const params  = new URLSearchParams(window.location.search);
-      const section = params.get("section") || "wild"; // wild | items | trainers
+      const section = params.get("section") || "wild";
       const meta    = SECTION_META[section] || SECTION_META.wild;
+
+      // ── URL-configurable display params ────────────────────────────────────────
+      const panelWidth   = parseInt(params.get("width"),   10) || 340;
+      const panelOpacity = Math.min(1, Math.max(0, parseFloat(params.get("opacity")) || 0.92));
+      const isCool       = params.get("theme") === "cool";
+
+      // ── Theme palette ──────────────────────────────────────────────────────────
+      const T = isCool ? {
+        bg:          `rgba(16,20,28,${panelOpacity})`,
+        border:      "#2a3040",
+        textPrimary: "#dde4f0",
+        textMuted:   "#7a8a9a",
+        divider:     "rgba(42,48,64,0.5)",
+        teamBg:      "rgba(42,48,64,0.5)",
+        placeholderBg:"rgba(42,48,64,0.4)",
+      } : {
+        bg:          `rgba(28,21,16,${panelOpacity})`,
+        border:      "#3a2a1c",
+        textPrimary: "#ede0d4",
+        textMuted:   "#8a7a6a",
+        divider:     "rgba(58,42,28,0.5)",
+        teamBg:      "rgba(58,42,28,0.5)",
+        placeholderBg:"rgba(58,42,28,0.4)",
+      };
 
       const [ready,    setReady]    = React.useState(false);
       const [areaId,   setAreaId]   = React.useState(null);
@@ -134,26 +168,31 @@
         return () => clearInterval(id);
       }, []);
 
-      // ── Styles ─────────────────────────────────────────────────────────────────
+      // ── Base panel style ───────────────────────────────────────────────────────
       const panel = {
-        width: 340,
-        background: "rgba(28,21,16,0.92)",
-        border: "1px solid #3a2a1c",
+        width: panelWidth,
+        background: T.bg,
+        border: `1px solid ${T.border}`,
         borderRadius: 10,
         padding: "10px 14px",
         fontFamily: "'DM Sans', sans-serif",
-        color: "#ede0d4",
+        color: T.textPrimary,
       };
+
+      const sectionHeader = (accent) => ({
+        fontSize: 9, fontWeight: 700, letterSpacing: 2, color: accent,
+        borderLeft: `3px solid ${accent}`, paddingLeft: 7, marginBottom: 8,
+      });
+      const areaLabel = { fontSize: 9, color: T.textMuted, marginBottom: 6 };
+      const rowDivider = (i, total) => i < total - 1 ? `1px solid ${T.divider}` : "none";
 
       // ── Loading / placeholder states ───────────────────────────────────────────
       if (!ready) {
-        return (
-          <div style={{ ...panel, color: "#8a7a6a", fontSize: 11 }}>Loading…</div>
-        );
+        return <div style={{ ...panel, color: T.textMuted, fontSize: 11 }}>Loading…</div>;
       }
       if (!areaId) {
         return (
-          <div style={{ ...panel, color: "#8a7a6a", fontSize: 11 }}>
+          <div style={{ ...panel, color: T.textMuted, fontSize: 11 }}>
             Select an area in the tracker
           </div>
         );
@@ -162,38 +201,35 @@
       const area = (window.__FRLG_AREAS || []).find(a => a.id === areaId);
       if (!area) return null;
 
-      // ── Render section ─────────────────────────────────────────────────────────
+      // ── Wild Pokémon ───────────────────────────────────────────────────────────
       if (section === "wild") {
         const entries = flattenWild(area);
         if (!entries.length) return null;
 
-        const otherVer = version === "fr" ? "lg" : "fr";
-
         return (
           <div style={panel}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, color: meta.accent,
-                          borderLeft: `3px solid ${meta.accent}`, paddingLeft: 7, marginBottom: 8 }}>
-              {meta.label}
-            </div>
-            <div style={{ fontSize: 9, color: "#8a7a6a", marginBottom: 6 }}>{area.name}</div>
+            <div style={sectionHeader(meta.accent)}>{meta.label}</div>
+            <div style={areaLabel}>{area.name}</div>
             {entries.map((p, i) => {
-              const isOtherVer = p.frOnly && version === "lg" || p.lgOnly && version === "fr";
+              const isOtherVer = (p.frOnly && version === "lg") || (p.lgOnly && version === "fr");
               const isCaught   = caught[p.name];
-              const mc         = METHOD_COLOR[p.method] || { bg:"rgba(120,100,80,0.15)", color:"#8a7a6a" };
+              const mc         = METHOD_COLOR[p.method] || { bg:"rgba(120,100,80,0.15)", color: T.textMuted };
               const spriteUrl  = pokeSprite(p.name);
               const vTag       = p.frOnly ? "FR" : p.lgOnly ? "LG" : null;
 
               return (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
                                       opacity: isOtherVer ? 0.35 : 1,
-                                      borderBottom: i < entries.length - 1 ? "1px solid rgba(58,42,28,0.5)" : "none" }}>
+                                      borderBottom: rowDivider(i, entries.length) }}>
                   {spriteUrl
                     ? <img src={spriteUrl} alt={p.name} width={24} height={24}
-                           style={{ imageRendering:"pixelated", filter: isCaught ? "brightness(0) opacity(0.3)" : "none", flexShrink:0 }} />
+                           style={{ imageRendering:"pixelated",
+                                    filter: isCaught ? "brightness(0) opacity(0.3)" : "none",
+                                    flexShrink:0 }} />
                     : <div style={{ width:24, height:24, flexShrink:0 }} />
                   }
                   <span style={{ fontSize:11, flex:1, minWidth:0,
-                                 color: isCaught ? "#8a7a6a" : "#ede0d4",
+                                 color: isCaught ? T.textMuted : T.textPrimary,
                                  textDecoration: isCaught ? "line-through" : "none",
                                  whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                     {p.name}
@@ -210,7 +246,7 @@
                                  borderRadius:4, padding:"1px 5px", flexShrink:0 }}>
                     {p.method}
                   </span>
-                  <span style={{ fontSize:9, color:"#8a7a6a", flexShrink:0, whiteSpace:"nowrap" }}>
+                  <span style={{ fontSize:9, color: T.textMuted, flexShrink:0, whiteSpace:"nowrap" }}>
                     {p.levels && `Lv.${p.levels}`}{p.rate && ` · ${p.rate}`}
                   </span>
                 </div>
@@ -220,17 +256,15 @@
         );
       }
 
+      // ── Items ──────────────────────────────────────────────────────────────────
       if (section === "items") {
         const entries = flattenItems(area);
         if (!entries.length) return null;
 
         return (
           <div style={panel}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, color: meta.accent,
-                          borderLeft: `3px solid ${meta.accent}`, paddingLeft: 7, marginBottom: 8 }}>
-              {meta.label}
-            </div>
-            <div style={{ fontSize: 9, color: "#8a7a6a", marginBottom: 6 }}>{area.name}</div>
+            <div style={sectionHeader(meta.accent)}>{meta.label}</div>
+            <div style={areaLabel}>{area.name}</div>
             {entries.map(({ entry: it, floorLabel, idx }, i) => {
               const key       = itemKey(areaId, floorLabel, idx);
               const collected = items[key];
@@ -239,21 +273,22 @@
               return (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 0",
                                       opacity: collected ? 0.45 : 1,
-                                      borderBottom: i < entries.length - 1 ? "1px solid rgba(58,42,28,0.5)" : "none" }}>
+                                      borderBottom: rowDivider(i, entries.length) }}>
                   {spriteUrl
                     ? <img src={spriteUrl} alt={it.name} width={24} height={24}
                            style={{ imageRendering:"pixelated", flexShrink:0 }} />
-                    : <div style={{ width:24, height:24, background:"rgba(58,42,28,0.4)", borderRadius:4, flexShrink:0 }} />
+                    : <div style={{ width:24, height:24, background: T.placeholderBg,
+                                    borderRadius:4, flexShrink:0 }} />
                   }
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:11, color: collected ? "#8a7a6a" : "#ede0d4",
+                    <div style={{ fontSize:11, color: collected ? T.textMuted : T.textPrimary,
                                   textDecoration: collected ? "line-through" : "none",
                                   whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                       {it.hidden && <span style={{ color:"#c8960a", marginRight:3 }}>★</span>}
                       {it.name}
                     </div>
                     {it.note && (
-                      <div style={{ fontSize:9, color:"#8a7a6a", marginTop:1,
+                      <div style={{ fontSize:9, color: T.textMuted, marginTop:1,
                                     whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
                         {it.note}
                       </div>
@@ -269,28 +304,27 @@
         );
       }
 
+      // ── Trainers ───────────────────────────────────────────────────────────────
       if (section === "trainers") {
         const entries = flattenTrainers(area);
         if (!entries.length) return null;
 
         return (
           <div style={panel}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, color: meta.accent,
-                          borderLeft: `3px solid ${meta.accent}`, paddingLeft: 7, marginBottom: 8 }}>
-              {meta.label}
-            </div>
-            <div style={{ fontSize: 9, color: "#8a7a6a", marginBottom: 6 }}>{area.name}</div>
+            <div style={sectionHeader(meta.accent)}>{meta.label}</div>
+            <div style={areaLabel}>{area.name}</div>
             {entries.map((tr, i) => {
               const key      = `${areaId}|${tr.class}|${tr.name}`;
               const defeated = trainers[key];
 
               return (
                 <div key={i} style={{ padding:"4px 0", opacity: defeated ? 0.45 : 1,
-                                      borderBottom: i < entries.length - 1 ? "1px solid rgba(58,42,28,0.5)" : "none" }}>
+                                      borderBottom: rowDivider(i, entries.length) }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <div style={{ flex:1, minWidth:0 }}>
                       <span style={{ fontSize:11, color:"#a87acc", marginRight:4 }}>{tr.class}</span>
-                      <span style={{ fontSize:11, color: defeated ? "#8a7a6a" : "#ede0d4",
+                      <span style={{ fontSize:11,
+                                     color: defeated ? T.textMuted : T.textPrimary,
                                      textDecoration: defeated ? "line-through" : "none" }}>
                         {tr.name}
                       </span>
@@ -305,13 +339,13 @@
                         const url = pokeSprite(mon.name);
                         return (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:2,
-                                                background:"rgba(58,42,28,0.5)", borderRadius:5,
-                                                padding:"1px 5px 1px 2px" }}>
+                                                background: T.teamBg,
+                                                borderRadius:5, padding:"1px 5px 1px 2px" }}>
                             {url && (
                               <img src={url} alt={mon.name} width={20} height={20}
                                    style={{ imageRendering:"pixelated" }} />
                             )}
-                            <span style={{ fontSize:9, color:"#8a7a6a" }}>
+                            <span style={{ fontSize:9, color: T.textMuted }}>
                               {mon.name} <span style={{ color:"#c8960a" }}>{mon.level}</span>
                             </span>
                           </div>
