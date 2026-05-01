@@ -14,14 +14,20 @@
     width    any number (default: 340)      Panel width in pixels
     opacity  0.0–1.0 (default: 0.92)        Panel background opacity
     theme    warm | cool (default: warm)    warm = tracker brown-black; cool = navy for sidebar use
+    worker   URL                            Cloudflare /state endpoint for cross-browser sync
 
   Examples:
     ?section=wild&width=300&opacity=0.80
     ?section=items&width=200&theme=cool&opacity=0.85
+    ?section=wild&theme=cool&width=200&opacity=0.85&worker=https://frlg.nabunan.com/state
 
   Suggested OBS source size: set width to match your ?width= value; height 600+
   (OBS auto-crops transparent rows at the bottom).
   The panel updates within ~1.5 seconds when you switch areas in the main tracker.
+
+  Cross-browser OBS setup (tracker in Chrome, overlay in OBS):
+    Add worker= param pointing to the /state Pages Function.
+    The tracker posts state there on every change; the overlay polls it.
 -->
 <html lang="en">
 <head>
@@ -156,6 +162,8 @@
         placeholderBg:"rgba(58,42,28,0.4)",
       };
 
+      const workerUrl = params.get("worker") || null;
+
       const [ready,           setReady]           = React.useState(false);
       const [areaId,          setAreaId]          = React.useState(null);
       const [version,         setVersion]         = React.useState("fr");
@@ -164,23 +172,38 @@
       const [trainers,        setTrainers]        = React.useState({});
       const [collapsedFloors, setCollapsedFloors] = React.useState({});
 
-      // Poll localStorage for live state
+      // Poll worker URL (cross-browser) or localStorage (same-browser fallback)
       React.useEffect(() => {
+        function applyState(s) {
+          if (!s) return;
+          if (s.areaId)          setAreaId(s.areaId);
+          if (s.version)         setVersion(s.version);
+          if (s.caught)          setCaught(s.caught);
+          if (s.items)           setItems(s.items);
+          if (s.trainers)        setTrainers(s.trainers);
+          setCollapsedFloors(s.collapsedFloors || {});
+        }
         function poll() {
-          try {
-            const aid = localStorage.getItem("frlg-active-area");
-            const ver = localStorage.getItem("frlg-version");
-            const c   = localStorage.getItem("fr-caught5");
-            const it  = localStorage.getItem("fr-items5");
-            const tr  = localStorage.getItem("fr-trainers1");
-            const cf  = localStorage.getItem("frlg-collapsed-floors");
-            if (aid) setAreaId(aid);
-            if (ver) setVersion(ver);
-            if (c)   setCaught(JSON.parse(c));
-            if (it)  setItems(JSON.parse(it));
-            if (tr)  setTrainers(JSON.parse(tr));
-            if (cf)  setCollapsedFloors(JSON.parse(cf)); else setCollapsedFloors({});
-          } catch {}
+          if (workerUrl) {
+            fetch(workerUrl).then(r => r.json()).then(applyState).catch(() => {});
+          } else {
+            try {
+              const aid = localStorage.getItem("frlg-active-area");
+              const ver = localStorage.getItem("frlg-version");
+              const c   = localStorage.getItem("fr-caught5");
+              const it  = localStorage.getItem("fr-items5");
+              const tr  = localStorage.getItem("fr-trainers1");
+              const cf  = localStorage.getItem("frlg-collapsed-floors");
+              applyState({
+                areaId:          aid,
+                version:         ver,
+                caught:          c  ? JSON.parse(c)  : null,
+                items:           it ? JSON.parse(it) : null,
+                trainers:        tr ? JSON.parse(tr) : null,
+                collapsedFloors: cf ? JSON.parse(cf) : {},
+              });
+            } catch {}
+          }
         }
         poll();
         const id = setInterval(poll, 1500);

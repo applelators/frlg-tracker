@@ -4487,6 +4487,31 @@ function FireRedTracker() {
     }
   }, [areaId]);
 
+  // Sync state to /state Pages Function so the OBS overlay can poll it
+  // cross-browser (OBS Chromium has isolated localStorage from Chrome).
+  const OVERLAY_SYNC_URL = "https://frlg.nabunan.com/state";
+  useEffect(() => {
+    if (!booted) return;
+    const timer = setTimeout(() => {
+      try {
+        const collapsedRaw = localStorage.getItem("frlg-collapsed-floors");
+        fetch(OVERLAY_SYNC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            areaId,
+            version,
+            caught,
+            items,
+            trainers,
+            collapsedFloors: collapsedRaw ? JSON.parse(collapsedRaw) : {},
+          }),
+        }).catch(() => {});
+      } catch {}
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [booted, areaId, version, caught, items, trainers]);
+
   const handleSetVersion = (v) => {
     setVersion(v);
     try { localStorage.setItem("frlg-version", v); } catch {}
