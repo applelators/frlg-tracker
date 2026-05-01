@@ -83,7 +83,7 @@ Area data is being audited part by part against the [Bulbapedia FireRed & LeafGr
 | Part 18 | Four Island · Icefall Cave · Water Path · Green Path · Pattern Bush · Altering Cave · Ruin Valley · Dotted Hole | Audited |
 | Part 19 | Five Isle Meadow · Rocket Warehouse · Memorial Pillar · Water Labyrinth · Resort Gorgeous · Lost Cave · Seven Island · Canyon Entrance · Sevault Canyon · Tanoby Key · Tanoby Ruins · Trainer Tower | Audited |
 | Part 20 | Cerulean Cave · Indigo Plateau Round 2 | Audited |
-| Part 21 | Birth Island · Navel Rock (event-only islands) | N/A |
+| Part 21 | Birth Island · Navel Rock (event-only islands) | Audited |
 
 ---
 

@@ -132,6 +132,9 @@ const NATIONAL_DEX = [
   {id:247,name:"Pupitar"},
   {id:248,name:"Tyranitar"},
   {id:298,name:"Azurill",   lgOnly:true},
+  {id:249,name:"Lugia"},
+  {id:250,name:"Ho-Oh"},
+  {id:386,name:"Deoxys"},
 ];
 
 // ─── AREA DATA ────────────────────────────────────────────────────────────────
@@ -2911,6 +2914,33 @@ const AREAS = [
         team:[{name:"Heracross",level:72},{name:"Alakazam",level:73},{name:"Tyranitar",level:72},{name:"Gyarados",level:73},{name:"Arcanine",level:73},{name:"Venusaur",level:75}]},
     ] },
 
+  { part:"Part 21", id:"birth-island", name:"Birth Island",
+    note:"Event-only island — requires the AuroraTicket obtained via Mystery Gift. After solving the triangular rock puzzle, Deoxys appears at Lv 30. Once caught, it transforms into Attack Forme (FR) or Defense Forme (LG). Respawns after entering the Hall of Fame if defeated.",
+    pokemon:[
+      {name:"Deoxys", method:"Event", levels:"30", warn:true, note:"Solve the rock puzzle to trigger the encounter. Attack Forme in FR · Defense Forme in LG."},
+    ],
+    items:[],
+    trainers:[] },
+
+  { part:"Part 21", id:"navel-rock", name:"Navel Rock",
+    note:"Event-only island — requires the MysticTicket obtained via Mystery Gift. The cave forks at B1F: ascend to the summit for Ho-Oh, descend to the depths for Lugia. Both respawn after entering the Hall of Fame if defeated.",
+    floors:[
+      { label:"Summit (4F)",
+        pokemon:[
+          {name:"Ho-Oh", method:"Cave", levels:"70", warn:true, note:"At the top of Navel Rock."},
+        ],
+        items:[
+          {name:"Sacred Ash", hidden:true, note:"On the spot where Ho-Oh stood (requires Itemfinder)"},
+        ],
+        trainers:[] },
+      { label:"Depths (B14F)",
+        pokemon:[
+          {name:"Lugia", method:"Cave", levels:"70", warn:true, note:"At the deepest point of Navel Rock."},
+        ],
+        items:[],
+        trainers:[] },
+    ] },
+
 ];
 
 // ─── BUILD LOCATION MAP ── (which areas each Pokémon appears in)
@@ -3935,7 +3965,7 @@ function getMoveSuper(moveName) {
 }
 
 // Parts that have been fully audited against the Bulbapedia walkthrough — extend as each part is verified.
-const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11", "Part 12", "Part 13", "Part 14", "Part 15", "Part 16", "Part 17", "Part 18", "Part 19", "Part 20"]);
+const AUDITED_PARTS = new Set(["Part 1", "Part 2", "Part 3", "Part 4", "Part 5", "Part 6", "Part 7", "Part 8", "Part 9", "Part 10", "Part 11", "Part 12", "Part 13", "Part 14", "Part 15", "Part 16", "Part 17", "Part 18", "Part 19", "Part 20", "Part 21"]);
 
 // ─── CATCH RATE DATA ──────────────────────────────────────────────────────────
 // Gen III base catch rates for all 151 Kanto Pokémon (FRLG)
