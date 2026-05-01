@@ -5703,8 +5703,8 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const nextArea = currentIdx >= 0 && currentIdx < visibleAreas.length - 1 ? visibleAreas[currentIdx + 1] : null;
 
   // Mark-all helpers (skip passed choice-group entries)
-  const markAllPokemon  = (poks) => poks.forEach(p  => { if (!caught[p.name] && !isPassedPokemon(p)) toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined); });
-  const clearAllPokemon = (poks) => poks.forEach(p  => { if (caught[p.name]  && !isPassedPokemon(p)) toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined); });
+  const markAllPokemon  = (poks) => { const seen = new Set(); poks.forEach(p => { if (seen.has(p.name)) return; seen.add(p.name); if (!caught[p.name] && !isPassedPokemon(p)) toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined); }); };
+  const clearAllPokemon = (poks) => { const seen = new Set(); poks.forEach(p => { if (seen.has(p.name)) return; seen.add(p.name); if (caught[p.name]  && !isPassedPokemon(p)) toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined); }); };
   const markAllItems    = (its, keyFn) => its.forEach((it, i) => { if (isPassedItem(it)) return; const k = keyFn(it, i); if (!items[k]) toggleItem(k, it.choiceGroup ? {choiceGroup:it.choiceGroup, choiceId:it.choiceId} : undefined); });
   const clearAllItems   = (its, keyFn) => its.forEach((it, i) => { if (isPassedItem(it)) return; const k = keyFn(it, i); if (items[k])  toggleItem(k, it.choiceGroup ? {choiceGroup:it.choiceGroup, choiceId:it.choiceId} : undefined); });
   const markAllTrainers = (trns) => trns.forEach(t => { const k = `${areaId}|${t.class}|${t.name}`; if (!trainers[k]) toggleTrainer(k); });
