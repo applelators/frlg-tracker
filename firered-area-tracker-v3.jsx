@@ -6522,7 +6522,8 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                             <Section title="Wild Pokémon" count={`${pokDone}/${relevFloorPoks.length}`} color={C.green}
                               allDone={pokDone===relevFloorPoks.length && relevFloorPoks.length>0}
-                              onMarkAll={() => pokDone===relevFloorPoks.length ? clearAllPokemon(floorVerPoks) : markAllPokemon(floorVerPoks)}>
+                              onMarkAll={() => pokDone===relevFloorPoks.length ? clearAllPokemon(floorVerPoks) : markAllPokemon(floorVerPoks)}
+                              collapsible>
                               {!hasPoks ? <Empty text="No wild Pokémon here" /> : renderPokemonList(floor.pokemon, caught, toggleCaught, version, isMobile, choiceGroups, areaId, trades, toggleTrade)}
                             </Section>
                             <Section title="Items" count={`${itmDone}/${relevFloorItems.length}`} color={C.gold}
@@ -6555,7 +6556,8 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                   <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                     <Section title="Wild Pokémon" count={`${pokeDone}/${relevantPokemon.length}`} color={C.green}
                       allDone={pokeDone===relevantPokemon.length && relevantPokemon.length>0}
-                      onMarkAll={() => pokeDone===relevantPokemon.length ? clearAllPokemon(verPokemon) : markAllPokemon(verPokemon)}>
+                      onMarkAll={() => pokeDone===relevantPokemon.length ? clearAllPokemon(verPokemon) : markAllPokemon(verPokemon)}
+                      collapsible>
                       {areaPokemon.length === 0 ? <Empty text="No wild Pokémon here" /> :
                         renderPokemonList(areaPokemon, caught, toggleCaught, version, isMobile, choiceGroups, areaId, trades, toggleTrade)
                       }
@@ -6861,14 +6863,19 @@ function TrainerEntry({ t, areaId, done, toggleTrainer }) {
   );
 }
 
-function Section({ title, count, color, children, onMarkAll, allDone }) {
+function Section({ title, count, color, children, onMarkAll, allDone, collapsible }) {
+  const [open, setOpen] = useState(true);
   return (
     <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:10, overflow:"hidden" }}>
-      <div style={{ padding:"9px 14px", background:"rgba(0,0,0,0.15)", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:12, fontWeight:"600" }}>{title}</span>
+      <div onClick={collapsible ? () => setOpen(o => !o) : undefined}
+        style={{ padding:"9px 14px", background:"rgba(0,0,0,0.15)", borderBottom: open ? `1px solid ${C.border}` : "none", display:"flex", justifyContent:"space-between", alignItems:"center", cursor: collapsible ? "pointer" : "default", userSelect: collapsible ? "none" : undefined }}>
+        <span style={{ fontSize:12, fontWeight:"600", display:"flex", alignItems:"center", gap:6 }}>
+          {title}
+          {collapsible && <span style={{ fontSize:10, color:C.muted }}>{open ? "▼" : "▶"}</span>}
+        </span>
         <div style={{ display:"flex", gap:6, alignItems:"center" }}>
           <span style={{ fontSize:11, color, padding:"2px 9px", background:"rgba(0,0,0,0.25)", borderRadius:99, fontWeight:"600" }}>{count}</span>
-          {onMarkAll && (
+          {onMarkAll && open && (
             <button onClick={e => { e.stopPropagation(); onMarkAll(); }}
               title={allDone ? "Clear all" : "Mark all done"}
               style={{ fontSize:9, fontWeight:"700", padding:"2px 7px", border:`1px solid ${allDone ? C.muted : color}`, borderRadius:99, cursor:"pointer", background:"transparent", color: allDone ? C.muted : color, letterSpacing:0.5, transition:"all 0.12s" }}>
@@ -6877,7 +6884,7 @@ function Section({ title, count, color, children, onMarkAll, allDone }) {
           )}
         </div>
       </div>
-      <div>{children}</div>
+      {open && <div>{children}</div>}
     </div>
   );
 }
