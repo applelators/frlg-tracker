@@ -6204,6 +6204,55 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
     try { const obj = {}; n.forEach(k => { obj[k] = true; }); localStorage.setItem("frlg-collapsed-floors", JSON.stringify(obj)); } catch {}
     return n;
   });
+  const [collapsedParts, setCollapsedParts] = useState(() => {
+    try { const r = localStorage.getItem("frlg-collapsed-parts"); return r ? new Set(JSON.parse(r)) : new Set(); } catch { return new Set(); }
+  });
+  const togglePart = (part) => setCollapsedParts(prev => {
+    const n = new Set(prev); n.has(part) ? n.delete(part) : n.add(part);
+    try { localStorage.setItem("frlg-collapsed-parts", JSON.stringify([...n])); } catch {}
+    return n;
+  });
+  const partFullDone = useMemo(() => {
+    const result = {};
+    Object.entries(groups).forEach(([part, list]) => {
+      result[part] = list.length > 0 && list.every(area => {
+        const allPoks = flattenPokemon(area).filter(p =>
+          !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPassedPokemon(p));
+        const pokDone = allPoks.every(p => caught[p.name]);
+        let itemsDone = true;
+        if (area.floors) {
+          for (const f of area.floors) {
+            for (let i = 0; i < (f.items||[]).length; i++) {
+              if (isPassedItem(f.items[i])) continue;
+              if (!items[floorItemKey(area.id, f.label, i)]) { itemsDone = false; break; }
+            }
+            if (!itemsDone) break;
+          }
+        } else {
+          const its = area.items || [];
+          for (let i = 0; i < its.length; i++) {
+            if (isPassedItem(its[i])) continue;
+            if (!items[flatItemKey(area.id, i)]) { itemsDone = false; break; }
+          }
+        }
+        const trainersDone = flattenTrainers(area).every(t => trainers[`${area.id}|${t.class}|${t.name}`]);
+        return pokDone && itemsDone && trainersDone;
+      });
+    });
+    return result;
+  }, [groups, caught, items, trainers, version, choiceGroups]);
+  useEffect(() => {
+    setCollapsedParts(prev => {
+      let changed = false;
+      const n = new Set(prev);
+      Object.entries(partFullDone).forEach(([part, done]) => {
+        if (done && !n.has(part)) { n.add(part); changed = true; }
+      });
+      if (!changed) return prev;
+      try { localStorage.setItem("frlg-collapsed-parts", JSON.stringify([...n])); } catch {}
+      return n;
+    });
+  }, [partFullDone]);
 
   const areaPokemon  = area ? flattenPokemon(area)  : [];
   const areaItems    = area ? flattenItems(area)    : [];
@@ -6252,12 +6301,19 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
         </div>
         {filtered
           ? filtered.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} choiceGroups={choiceGroups} />)
-          : Object.entries(groups).map(([part, list]) => (
-              <div key={part}>
-                <div style={{ padding:"6px 12px", fontSize:10, letterSpacing:2, color:C.muted, textTransform:"uppercase", background:"rgba(0,0,0,0.2)", borderBottom:`1px solid ${C.border}` }}>{part}</div>
-                {list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} choiceGroups={choiceGroups} />)}
-              </div>
-            ))
+          : Object.entries(groups).map(([part, list]) => {
+              const isCollapsed = collapsedParts.has(part);
+              const isDone = partFullDone[part];
+              return (
+                <div key={part}>
+                  <div onClick={() => togglePart(part)} style={{ padding:"6px 12px 6px 10px", fontSize:10, letterSpacing:2, color: isDone ? C.green : C.muted, textTransform:"uppercase", background:"rgba(0,0,0,0.2)", borderBottom:`1px solid ${C.border}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", userSelect:"none" }}>
+                    <span>{isDone ? "✓ " : ""}{part}</span>
+                    <span style={{ fontSize:11, opacity:0.6, marginLeft:6 }}>{isCollapsed ? "▶" : "▼"}</span>
+                  </div>
+                  {!isCollapsed && list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} choiceGroups={choiceGroups} />)}
+                </div>
+              );
+            })
         }
         {filtered?.length === 0 && <div style={{ padding:20, fontSize:12, color:C.muted, textAlign:"center" }}>No matches</div>}
       </div>
