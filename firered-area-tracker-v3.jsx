@@ -4925,7 +4925,7 @@ function DreamTeamTab({ isMobile, version }) {
     });
   }, [version]);
 
-  const eligible = React.useMemo(() => DEX.filter(p => !DT_LEGENDARY.has(p.name)), []);
+  const eligible = React.useMemo(() => DEX.filter(p => p.id <= 151 && !DT_LEGENDARY.has(p.name)), []);
   const team = React.useMemo(() => buildDreamTeamV2(favorite, pins, version), [favorite, pins, version]);
   const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favorite);
   const tmWinners     = React.useMemo(() => team ? assignOneTimeTMs(team) : {}, [team]);
