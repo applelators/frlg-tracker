@@ -808,12 +808,12 @@ const AREAS = [
   { part:"Part 9", id:"celadon-game-corner", name:"Celadon Game Corner",
     note:"Exchange coins at the Prize Corner. TM24 Thunderbolt and TM35 Flamethrower are 4,000 coins each — top-tier competitive TMs. Defeat the Team Rocket Grunt to access the poster switch that opens the Rocket Hideout stairs.",
     pokemon:[
-      {name:"Scyther", method:"Game Corner",levels:"25", note:"5,500 coins — FR only",frOnly:true},
-      {name:"Pinsir",  method:"Game Corner",levels:"18", note:"2,500 coins — LG only",lgOnly:true},
-      {name:"Dratini", method:"Game Corner",levels:"18", note:"2,800 coins FR / 4,600 coins LG"},
-      {name:"Porygon", method:"Game Corner",levels:"26", note:"9,999 coins FR / 6,500 coins LG"},
-      {name:"Abra",    method:"Game Corner",levels:"9",  note:"180 coins FR / 120 coins LG"},
-      {name:"Clefairy",method:"Game Corner",levels:"8",  note:"500 coins FR / 750 coins LG"},
+      {name:"Scyther", method:"Game Corner",levels:"25", optional:true, note:"5,500 coins — FR only",frOnly:true},
+      {name:"Pinsir",  method:"Game Corner",levels:"18", optional:true, note:"2,500 coins — LG only",lgOnly:true},
+      {name:"Dratini", method:"Game Corner",levels:"18", optional:true, note:"2,800 coins FR / 4,600 coins LG"},
+      {name:"Porygon", method:"Game Corner",levels:"26", optional:true, note:"9,999 coins FR / 6,500 coins LG"},
+      {name:"Abra",    method:"Game Corner",levels:"9",  optional:true, note:"180 coins FR / 120 coins LG"},
+      {name:"Clefairy",method:"Game Corner",levels:"8",  optional:true, note:"500 coins FR / 750 coins LG"},
     ],
     items:[
       {name:"10 Coins",  hidden:false,note:"From the Fisherman"},
@@ -6286,7 +6286,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
       result[part] = list.length > 0 && list.every(area => {
         const allPoks = flattenPokemon(area).filter(p =>
           !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) &&
-          !isPassedPokemon(p) && p.method !== "Trade");
+          !isPassedPokemon(p) && p.method !== "Trade" && !p.optional);
         const pokDone = allPoks.every(p => caught[p.name]);
         let reqItemsDone = true;
         if (area.floors) {
@@ -6319,7 +6319,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const verPokemon      = areaPokemon.filter(p => !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
   const relevantPokemon = verPokemon.filter(p => !isPassedPokemon(p));
   const pokeDone        = relevantPokemon.filter(p => p.method === "Trade" ? !!trades[`${areaId}|trade|${p.name}`] : !!caught[p.name]).length;
-  const nonTradePokemon  = relevantPokemon.filter(p => p.method !== "Trade");
+  const nonTradePokemon  = relevantPokemon.filter(p => p.method !== "Trade" && !p.optional);
   const pendingTrades    = relevantPokemon.filter(p => p.method === "Trade" && !trades[`${areaId}|trade|${p.name}`]);
   const nonTradePokeDone = nonTradePokemon.filter(p => caught[p.name]).length;
   const relevantItems   = areaItems.filter(it => !isPassedItem(it));
@@ -6564,7 +6564,7 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, trades, ver
   const allPoksWithTrades = flattenPokemon(area).filter(p =>
     !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPok(p));
   const tradePoks = allPoksWithTrades.filter(p => p.method === "Trade");
-  const allPoks   = allPoksWithTrades.filter(p => p.method !== "Trade");
+  const allPoks   = allPoksWithTrades.filter(p => p.method !== "Trade" && !p.optional);
   const hasPendingTrades = tradePoks.some(p => !trades?.[`${area.id}|trade|${p.name}`]);
   const hasPendingSurfItems = area.floors
     ? area.floors.some(f => (f.items||[]).some((it, i) => it.surf && !items[floorItemKey(area.id, f.label, i)]))
