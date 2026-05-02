@@ -5011,6 +5011,42 @@ function DreamTeamTab({ isMobile, version }) {
         </div>
       </div>
 
+      {/* HM gap suggestions */}
+      {hmsMissing.length > 0 && (() => {
+        const usedFinal = new Set(team.map(n => DT_FINAL_FORM[n] || n));
+        const suggestions = DT_CANDIDATES
+          .filter(cand => {
+            if (usedFinal.has(cand.name)) return false;
+            if (version === "FR" && cand.lgOnly) return false;
+            if (version === "LG" && cand.frOnly) return false;
+            return cand.hms.some(h => hmsMissing.includes(h));
+          })
+          .map(cand => ({ cand, covers: cand.hms.filter(h => hmsMissing.includes(h)), score: scoreCandidateInContext(cand, team, version) }))
+          .sort((a, b) => b.covers.length - a.covers.length || b.score - a.score)
+          .slice(0, 5);
+        if (!suggestions.length) return null;
+        return (
+          <div style={{ background:"rgba(232,160,32,0.06)", border:"1px solid rgba(232,160,32,0.25)", borderRadius:8, padding:"10px 14px", marginBottom:16 }}>
+            <div style={{ fontSize:9, fontWeight:"700", letterSpacing:1.5, color:"#e8a020", textTransform:"uppercase", marginBottom:8 }}>HM Gap — Suggested Fixes</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {suggestions.map(({ cand, covers }) => {
+                const dexEntry = DEX.find(p => p.name === cand.name);
+                return (
+                  <div key={cand.name} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    {dexEntry && <img src={pokeSpriteUrl(dexEntry.id)} alt={cand.name} width={26} height={26} style={{ imageRendering:"pixelated", flexShrink:0 }} />}
+                    <span style={{ fontSize:12, fontWeight:"600", color:C.text, flex:1 }}>{cand.name}</span>
+                    <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+                      {covers.map(hm => <span key={hm} style={{ fontSize:9, fontWeight:"700", color:"#4a8fc4", background:"rgba(74,143,196,0.12)", border:"1px solid rgba(74,143,196,0.3)", padding:"1px 6px", borderRadius:99 }}>{hm}</span>)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ fontSize:10, color:C.muted, marginTop:8 }}>Expand a slot's Alternatives to swap one in.</div>
+          </div>
+        );
+      })()}
+
       {/* Team grid */}
       <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:14 }}>
         {team.map((name, idx) => {
