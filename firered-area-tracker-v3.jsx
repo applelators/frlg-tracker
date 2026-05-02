@@ -4449,6 +4449,7 @@ function FireRedTracker() {
   const [checklist, setChecklist] = useState({});   // {itemId: true}
   const [choiceGroups, setChoiceGroups] = useState({});  // {groupId: choiceId}
   const [tmState, setTmState]     = useState({});   // {TM01: true, HM03: true, ...}
+  const [trades, setTrades]       = useState({});   // {`${areaId}|trade|${name}`: true}
 
 
   useEffect(() => {
@@ -4460,6 +4461,7 @@ function FireRedTracker() {
       try { const r = localStorage.getItem("frlg-badges");     if (r) setBadges(JSON.parse(r));       } catch {}
       try { const r = localStorage.getItem("frlg-checklist"); if (r) setChecklist(JSON.parse(r));    } catch {}
       try { const r = localStorage.getItem("frlg-choices");   if (r) setChoiceGroups(JSON.parse(r)); } catch {}
+      try { const r = localStorage.getItem("frlg-trades");    if (r) setTrades(JSON.parse(r));       } catch {}
       try {
         const savedItems = JSON.parse(localStorage.getItem("fr-items5") || "{}");
         const savedTms   = JSON.parse(localStorage.getItem("frlg-tms")  || "{}");
@@ -4504,13 +4506,14 @@ function FireRedTracker() {
             caught,
             items,
             trainers,
+            trades,
             collapsedFloors: collapsedRaw ? JSON.parse(collapsedRaw) : {},
           }),
         }).catch(() => {});
       } catch {}
     }, 500);
     return () => clearTimeout(timer);
-  }, [booted, areaId, version, caught, items, trainers]);
+  }, [booted, areaId, version, caught, items, trainers, trades]);
 
   const handleSetVersion = (v) => {
     setVersion(v);
@@ -4648,6 +4651,15 @@ function FireRedTracker() {
     });
   }, []);
 
+  const toggleTrade = useCallback((key) => {
+    setTrades(prev => {
+      const next = { ...prev };
+      if (next[key]) delete next[key]; else next[key] = true;
+      try { localStorage.setItem("frlg-trades", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
   const caughtCount = Object.keys(caught).length;
   const area = areaId ? AREAS.find(a => a.id === areaId) : null;
 
@@ -4757,7 +4769,7 @@ function FireRedTracker() {
       {tab === "dex" && <DexTab caught={caught} toggleCaught={toggleCaught} dexFilter={dexFilter} setDexFilter={setDexFilter} dexSelected={dexSelected} setDexSelected={setDexSelected} version={version} isMobile={isMobile} />}
 
       {/* ── Tab: Areas ── */}
-      {tab === "areas" && <AreasTab caught={caught} toggleCaught={toggleCaught} items={items} toggleItem={toggleItem} trainers={trainers} toggleTrainer={toggleTrainer} areaId={areaId} setAreaId={setAreaId} area={area} search={search} setSearch={setSearch} version={version} isMobile={isMobile} choiceGroups={choiceGroups} />}
+      {tab === "areas" && <AreasTab caught={caught} toggleCaught={toggleCaught} items={items} toggleItem={toggleItem} trainers={trainers} toggleTrainer={toggleTrainer} trades={trades} toggleTrade={toggleTrade} areaId={areaId} setAreaId={setAreaId} area={area} search={search} setSearch={setSearch} version={version} isMobile={isMobile} choiceGroups={choiceGroups} />}
 
       {/* ── Tab: Dream Team ── */}
       {tab === "team" && <DreamTeamTab isMobile={isMobile} version={version} />}
@@ -6190,7 +6202,7 @@ function countItemsDone(area, areaId, itemsState) {
 }
 
 // ─── AREAS TAB ────────────────────────────────────────────────────────────────
-function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTrainer, areaId, setAreaId, area, search, setSearch, version, isMobile, choiceGroups }) {
+function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTrainer, trades, toggleTrade, areaId, setAreaId, area, search, setSearch, version, isMobile, choiceGroups }) {
   const isPassedPokemon = p  => !!(p.choiceGroup  && choiceGroups?.[p.choiceGroup]  && choiceGroups[p.choiceGroup]  !== p.choiceId);
   const isPassedItem    = it => !!(it.choiceGroup && choiceGroups?.[it.choiceGroup] && choiceGroups[it.choiceGroup] !== it.choiceId);
   const visibleAreas = useMemo(() => AREAS.filter(a => AUDITED_PARTS.has(a.part)), []);
@@ -6219,7 +6231,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
       result[part] = list.length > 0 && list.every(area => {
         const allPoks = flattenPokemon(area).filter(p =>
           !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPassedPokemon(p));
-        const pokDone = allPoks.every(p => caught[p.name]);
+        const pokDone = allPoks.every(p => p.method === "Trade" ? !!trades[`${area.id}|trade|${p.name}`] : !!caught[p.name]);
         let itemsDone = true;
         if (area.floors) {
           for (const f of area.floors) {
@@ -6241,7 +6253,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
       });
     });
     return result;
-  }, [groups, caught, items, trainers, version, choiceGroups]);
+  }, [groups, caught, items, trainers, trades, version, choiceGroups]);
   useEffect(() => {
     setCollapsedParts(prev => {
       let changed = false;
@@ -6293,9 +6305,9 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const areaTrainers = area ? flattenTrainers(area) : [];
   const verPokemon      = areaPokemon.filter(p => !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
   const relevantPokemon = verPokemon.filter(p => !isPassedPokemon(p));
-  const pokeDone        = relevantPokemon.filter(p => caught[p.name]).length;
+  const pokeDone        = relevantPokemon.filter(p => p.method === "Trade" ? !!trades[`${areaId}|trade|${p.name}`] : !!caught[p.name]).length;
   const nonTradePokemon  = relevantPokemon.filter(p => p.method !== "Trade");
-  const pendingTrades    = relevantPokemon.filter(p => p.method === "Trade" && !caught[p.name]);
+  const pendingTrades    = relevantPokemon.filter(p => p.method === "Trade" && !trades[`${areaId}|trade|${p.name}`]);
   const nonTradePokeDone = nonTradePokemon.filter(p => caught[p.name]).length;
   const relevantItems   = areaItems.filter(it => !isPassedItem(it));
   const itemDone        = area && !area.floors
@@ -6334,7 +6346,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
             style={{ width:"100%", background:"rgba(0,0,0,0.25)", border:`1px solid ${C.border}`, color:C.text, padding:"8px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:14, borderRadius:6, boxSizing:"border-box", outline:"none" }} />
         </div>
         {filtered
-          ? filtered.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} choiceGroups={choiceGroups} />)
+          ? filtered.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} trades={trades} version={version} choiceGroups={choiceGroups} />)
           : Object.entries(groups).map(([part, list]) => {
               const isCollapsed = collapsedParts.has(part);
               const isDone = partFullDone[part];
@@ -6346,7 +6358,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                     <span>{isDone ? "✓ " : isSoft ? "~ " : ""}{part}</span>
                     <span style={{ fontSize:11, opacity:0.6, marginLeft:6 }}>{isCollapsed ? "▶" : "▼"}</span>
                   </div>
-                  {!isCollapsed && list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} choiceGroups={choiceGroups} />)}
+                  {!isCollapsed && list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} trades={trades} version={version} choiceGroups={choiceGroups} />)}
                 </div>
               );
             })
@@ -6437,7 +6449,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                   if (!hasPoks && !hasItms && !hasTrns) return null;
                   const floorVerPoks    = (floor.pokemon || []).filter(p => !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
                   const relevFloorPoks  = floorVerPoks.filter(p => !isPassedPokemon(p));
-                  const pokDone         = relevFloorPoks.filter(p => caught[p.name]).length;
+                  const pokDone         = relevFloorPoks.filter(p => p.method === "Trade" ? !!trades[`${areaId}|trade|${p.name}`] : !!caught[p.name]).length;
                   const relevFloorItems = (floor.items || []).filter(it => !isPassedItem(it));
                   const itmDone         = (floor.items || []).reduce((n, it, i) => n + (!isPassedItem(it) && items[floorItemKey(areaId, floor.label, i)] ? 1 : 0), 0);
                   const trnDone         = (floor.trainers || []).filter(t => trainers[`${areaId}|${t.class}|${t.name}`]).length;
@@ -6461,7 +6473,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                             <Section title="Wild Pokémon" count={`${pokDone}/${relevFloorPoks.length}`} color={C.green}
                               allDone={pokDone===relevFloorPoks.length && relevFloorPoks.length>0}
                               onMarkAll={() => pokDone===relevFloorPoks.length ? clearAllPokemon(floorVerPoks) : markAllPokemon(floorVerPoks)}>
-                              {!hasPoks ? <Empty text="No wild Pokémon here" /> : renderPokemonList(floor.pokemon, caught, toggleCaught, version, isMobile, choiceGroups)}
+                              {!hasPoks ? <Empty text="No wild Pokémon here" /> : renderPokemonList(floor.pokemon, caught, toggleCaught, version, isMobile, choiceGroups, areaId, trades, toggleTrade)}
                             </Section>
                             <Section title="Items" count={`${itmDone}/${relevFloorItems.length}`} color={C.gold}
                               allDone={itmDone===relevFloorItems.length && relevFloorItems.length>0}
@@ -6494,7 +6506,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                       allDone={pokeDone===relevantPokemon.length && relevantPokemon.length>0}
                       onMarkAll={() => pokeDone===relevantPokemon.length ? clearAllPokemon(verPokemon) : markAllPokemon(verPokemon)}>
                       {areaPokemon.length === 0 ? <Empty text="No wild Pokémon here" /> :
-                        renderPokemonList(areaPokemon, caught, toggleCaught, version, isMobile, choiceGroups)
+                        renderPokemonList(areaPokemon, caught, toggleCaught, version, isMobile, choiceGroups, areaId, trades, toggleTrade)
                       }
                     </Section>
                     <Section title="Items" count={`${itemDone}/${relevantItems.length}`} color={C.gold}
@@ -6530,7 +6542,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
 }
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
-function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, choiceGroups }) {
+function AreaRow({ area, areaId, setAreaId, caught, items, trainers, trades, version, choiceGroups }) {
   const isSel  = areaId === area.id;
   const isPok  = p  => !!(p.choiceGroup  && choiceGroups?.[p.choiceGroup]  && choiceGroups[p.choiceGroup]  !== p.choiceId);
   const isItm  = it => !!(it.choiceGroup && choiceGroups?.[it.choiceGroup] && choiceGroups[it.choiceGroup] !== it.choiceId);
@@ -6538,7 +6550,7 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, version, ch
     !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPok(p));
   const tradePoks = allPoksWithTrades.filter(p => p.method === "Trade");
   const allPoks   = allPoksWithTrades.filter(p => p.method !== "Trade");
-  const hasPendingTrades = tradePoks.some(p => !caught[p.name]);
+  const hasPendingTrades = tradePoks.some(p => !trades?.[`${area.id}|trade|${p.name}`]);
   const hasPendingSurfItems = area.floors
     ? area.floors.some(f => (f.items||[]).some((it, i) => it.surf && !items[floorItemKey(area.id, f.label, i)]))
     : (area.items||[]).some((it, i) => it.surf && !items[flatItemKey(area.id, i)]);
@@ -6610,7 +6622,7 @@ function MethodDivider({ label }) {
   );
 }
 
-function renderPokemonList(pokemon, caught, toggleCaught, version, isMobile, choiceGroups) {
+function renderPokemonList(pokemon, caught, toggleCaught, version, isMobile, choiceGroups, areaId, trades, toggleTrade) {
   // Sort within each consecutive method block by effective rate descending.
   // Method block order is preserved; only intra-group ordering changes.
   const getPct = p => {
@@ -6639,12 +6651,14 @@ function renderPokemonList(pokemon, caught, toggleCaught, version, isMobile, cho
   return items.map(item =>
     item.type === "divider"
       ? <MethodDivider key={item.key} label={item.label} />
-      : <PokemonEntry key={item.key} p={item.p} caught={caught} toggleCaught={toggleCaught} version={version} isMobile={isMobile} choiceGroups={choiceGroups} />
+      : <PokemonEntry key={item.key} p={item.p} caught={caught} toggleCaught={toggleCaught} version={version} isMobile={isMobile} choiceGroups={choiceGroups} areaId={areaId} trades={trades} toggleTrade={toggleTrade} />
   );
 }
 
-function PokemonEntry({ p, caught, toggleCaught, version, isMobile, choiceGroups }) {
-  const isCaught = !!caught[p.name];
+function PokemonEntry({ p, caught, toggleCaught, version, isMobile, choiceGroups, areaId, trades, toggleTrade }) {
+  const isTrade  = p.method === "Trade";
+  const tradeKey = isTrade ? `${areaId}|trade|${p.name}` : null;
+  const isCaught = isTrade ? !!(trades?.[tradeKey]) : !!caught[p.name];
   if ((version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly)) return null;
 
   const isPassed = !!(p.choiceGroup && choiceGroups?.[p.choiceGroup] && choiceGroups[p.choiceGroup] !== p.choiceId);
@@ -6657,8 +6671,12 @@ function PokemonEntry({ p, caught, toggleCaught, version, isMobile, choiceGroups
   const best = BEST_AREA_MAP[version][p.name];
   const hasBetter = !isCaught && currentPct && best && best.pct > currentPct;
 
+  const handleClick = isPassed ? undefined
+    : isTrade ? () => toggleTrade(tradeKey)
+    : () => toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined);
+
   return (
-    <Row done={isCaught} passed={isPassed} onClick={isPassed ? undefined : () => toggleCaught(p.name, p.choiceGroup ? {choiceGroup:p.choiceGroup, choiceId:p.choiceId} : undefined)}>
+    <Row done={isCaught} passed={isPassed} onClick={handleClick}>
       {allDexId(p.name) && <img src={pokeSpriteUrl(allDexId(p.name))} alt={p.name} style={{ width:36, height:36, imageRendering:"pixelated", flexShrink:0, opacity:isCaught?1:0.65, filter:isCaught?"none":"brightness(0)" }} />}
       <div style={{ flex:1 }}>
         <span style={{ color:isCaught?C.green:p.lgOnly?C.lgGreen:p.frOnly?"#c85252":C.text, fontWeight:"600", fontSize:12 }}>
