@@ -4537,7 +4537,8 @@ function TMsTab({ tmState }) {
 // ─── ROOT COMPONENT ───────────────────────────────────────────────────────────
 function FireRedTracker() {
   const isMobile = useIsMobile();
-  const [tab, setTab]           = useState("areas");
+  const [tab, setTab]           = useState(() => { try { return localStorage.getItem("frlg-active-tab") || "areas"; } catch { return "areas"; } });
+  const setTabAndSave = t => { setTab(t); try { localStorage.setItem("frlg-active-tab", t); } catch {} };
   const [caught, setCaught]     = useState({});
   const [items, setItems]       = useState({});
   const [trainers, setTrainers] = useState({});
@@ -4825,7 +4826,7 @@ function FireRedTracker() {
             <div style={{ display:"flex", gap:18, fontSize:11, alignItems:"center" }}>
               <span><span style={{ color:C.green, fontWeight:"700", fontSize:13 }}>{caughtCount}</span><span style={{ color:C.muted }}> / 151 caught</span></span>
               <span><span style={{ color:C.gold, fontWeight:"700", fontSize:13 }}>{Object.keys(items).length}</span><span style={{ color:C.muted }}> items</span></span>
-              <span onClick={() => setTab("completion")}
+              <span onClick={() => setTabAndSave("completion")}
                 title="View 100% checklist"
                 style={{ cursor:"pointer" }}>
                 <span style={{ color:"var(--frlg-accent)", fontWeight:"700", fontSize:13 }}>{completionDone}/{completionTotal}</span>
@@ -4855,7 +4856,7 @@ function FireRedTracker() {
         {/* Tabs */}
         <div style={{ display:"flex", gap:2, marginTop:10, overflowX:"auto", WebkitOverflowScrolling:"touch", flexWrap:"nowrap" }}>
           {[["areas","Areas"],["dex","Pokédex"],["team","Team"],["types","Types"],["calc","Catch"],["hunt","Hunt"],["tms","TMs"],["completion","100%"]].map(([t,label]) => (
-            <button key={t} onClick={() => setTab(t)} style={{
+            <button key={t} onClick={() => setTabAndSave(t)} style={{
               padding: isMobile ? "7px 12px" : "8px 20px", border:"none", borderRadius:"6px 6px 0 0", cursor:"pointer", flexShrink:0,
               fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"600",
               background: tab===t ? C.bg : "transparent",
