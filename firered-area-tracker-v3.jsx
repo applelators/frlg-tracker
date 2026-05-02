@@ -3406,6 +3406,7 @@ function buildDreamTeam(favoriteName, version) {
   if (!inTeam.has("Jolteon"))  { team.push("Jolteon");  inTeam.add("Jolteon"); }
   if (!inTeam.has("Snorlax"))  { team.push("Snorlax");  inTeam.add("Snorlax"); }
   if (!inTeam.has("Nidoking")) { team.push("Nidoking"); inTeam.add("Nidoking"); }
+  if (!inTeam.has("Lapras"))   { team.push("Lapras");   inTeam.add("Lapras"); }
   const requiredHMs = ["Fly","Surf","Waterfall","Strength","Cut","Rock Smash"];
   const getCoverage = () => {
     const s = new Set();
