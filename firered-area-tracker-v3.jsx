@@ -3428,54 +3428,116 @@ const DT_FINAL_FORM = {
   "Dratini":"Dragonite","Dragonair":"Dragonite",
 };
 
-function buildDreamTeam(favoriteName, version) {
-  const finalFav = DT_FINAL_FORM[favoriteName] || favoriteName;
-  const team = [favoriteName];
-  const inTeam = new Set([finalFav]);
-  const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favoriteName);
-  if (!isDragoniteLine) { team.push("Dragonite"); inTeam.add("Dragonite"); }
-  // TODO: remove pinned Pokémon when no longer needed
-  if (!inTeam.has("Jolteon"))  { team.push("Jolteon");  inTeam.add("Jolteon"); }
-  if (!inTeam.has("Snorlax"))  { team.push("Snorlax");  inTeam.add("Snorlax"); }
-  if (!inTeam.has("Nidoking")) { team.push("Nidoking"); inTeam.add("Nidoking"); }
-  if (!inTeam.has("Lapras"))   { team.push("Lapras");   inTeam.add("Lapras"); }
-  const requiredHMs = ["Fly","Surf","Waterfall","Strength","Cut","Rock Smash"];
-  const getCoverage = () => {
-    const s = new Set();
-    for (const n of team) {
-      const form = DT_FINAL_FORM[n] || n;
-      for (const [hm, learners] of Object.entries(DT_HM_COMPAT)) {
-        if (learners.has(form)) s.add(hm);
-      }
-    }
-    return s;
-  };
-  while (team.length < 6) {
-    const covered = getCoverage();
-    const missing = requiredHMs.filter(h => !covered.has(h));
-    let best = null, bestScore = -Infinity;
-    for (let ci = 0; ci < DT_CANDIDATES.length; ci++) {
-      const cand = DT_CANDIDATES[ci];
-      if (inTeam.has(cand.name)) continue;
-      // Hard-exclude Pokémon exclusive to the other version from auto-selection
-      if (version === "FR" && cand.lgOnly) continue;
-      if (version === "LG" && cand.frOnly) continue;
-      const hmScore  = cand.hms.filter(h => missing.includes(h)).length * 10;
-      const poolScore = (DT_CANDIDATES.length - ci) * 0.1;
-      const teamTypes = new Set(team.flatMap(n => {
-        const f = DT_FINAL_FORM[n] || n;
-        const c = DT_CANDIDATES.find(x => x.name === f);
-        return c ? c.types : [];
-      }));
-      const typeScore = cand.types.some(t => !teamTypes.has(t)) ? 5 : 0;
-      const score = hmScore + typeScore + poolScore;
-      if (score > bestScore) { best = cand; bestScore = score; }
-    }
-    if (!best) break;
-    team.push(best.name);
-    inTeam.add(best.name);
+// ── Offensive type coverage helpers ──────────────────────────────────────────
+// TYPE_CHART[atk][def] = multiplier; entries missing = 1×.
+// getTypeOffCoverage(T) → defending types that T hits 2× (pure single-type).
+function getTypeOffCoverage(atkType) {
+  const row = TYPE_CHART[atkType] || {};
+  return TYPES_17.filter(def => (row[def] || 1) === 2);
+}
+function getCandCoverage(cand) {
+  const s = new Set();
+  for (const t of cand.types) for (const d of getTypeOffCoverage(t)) s.add(d);
+  return s;
+}
+function getTeamCoverage(names) {
+  const s = new Set();
+  for (const n of names) {
+    const form = DT_FINAL_FORM[n] || n;
+    const c = DT_CANDIDATES.find(x => x.name === form);
+    if (c) for (const t of c.types) for (const d of getTypeOffCoverage(t)) s.add(d);
   }
-  return team;
+  return s;
+}
+function getCandWeaknesses(cand) {
+  const chart = getDefensiveChart(cand.types);
+  return new Set(TYPES_17.filter(t => chart[t] >= 2));
+}
+
+// Score a candidate given the already-fixed team members.
+// Weights: HM gap coverage (10 each) > new offensive type coverage (3 each) >
+//          new team types (2 each) > shared weakness penalty (−2 each) > pool rank (tiebreak).
+function scoreCandidateInContext(cand, fixedNames, version) {
+  if (version === "FR" && cand.lgOnly) return -Infinity;
+  if (version === "LG" && cand.frOnly) return -Infinity;
+
+  const teamCov = getTeamCoverage(fixedNames);
+  const newCov  = [...getCandCoverage(cand)].filter(t => !teamCov.has(t)).length;
+
+  const coveredHMs = new Set(fixedNames.flatMap(n => {
+    const form = DT_FINAL_FORM[n] || n;
+    return Object.entries(DT_HM_COMPAT).filter(([,s]) => s.has(form)).map(([hm]) => hm);
+  }));
+  const newHMs = cand.hms.filter(h => !coveredHMs.has(h)).length;
+
+  const teamWeak = new Set(fixedNames.flatMap(n => {
+    const form = DT_FINAL_FORM[n] || n;
+    const c = DT_CANDIDATES.find(x => x.name === form);
+    return c ? [...getCandWeaknesses(c)] : [];
+  }));
+  const sharedWeak = [...getCandWeaknesses(cand)].filter(w => teamWeak.has(w)).length;
+
+  const fixedTypes = new Set(fixedNames.flatMap(n => {
+    const form = DT_FINAL_FORM[n] || n;
+    const c = DT_CANDIDATES.find(x => x.name === form);
+    return c ? c.types : [];
+  }));
+  const newTypes = cand.types.filter(t => !fixedTypes.has(t)).length;
+
+  const poolRank = DT_CANDIDATES.indexOf(cand);
+  const poolScore = poolRank >= 0 ? (DT_CANDIDATES.length - poolRank) * 0.1 : 0;
+
+  return newHMs * 10 + newCov * 3 + newTypes * 2 - sharedWeak * 2 + poolScore;
+}
+
+// Build a team of 6: slot 0 = favorite, slot 1 = Dragonite (unless Dragonite-line),
+// slots 2–5 filled by pins first then by greedy scoring.
+function buildDreamTeamV2(favorite, pins, version) {
+  if (!favorite) return null;
+  const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favorite);
+  const team = new Array(6).fill(null);
+  team[0] = favorite;
+  if (!isDragoniteLine) team[1] = "Dragonite";
+  for (let i = 2; i <= 5; i++) { if (pins[i]) team[i] = pins[i]; }
+
+  const startSlot = isDragoniteLine ? 1 : 2;
+  for (let i = startSlot; i <= 5; i++) {
+    if (team[i] !== null) continue;
+    const fixed = team.filter(Boolean);
+    const usedFinal = new Set(fixed.map(n => DT_FINAL_FORM[n] || n));
+    let best = null, bestScore = -Infinity;
+    for (const cand of DT_CANDIDATES) {
+      if (usedFinal.has(cand.name)) continue;
+      const s = scoreCandidateInContext(cand, fixed, version);
+      if (s > bestScore) { best = cand; bestScore = s; }
+    }
+    if (best) team[i] = best.name;
+  }
+  return team.filter(Boolean);
+}
+
+// Return up to `count` ranked alternatives for a given team slot.
+// Result includes the current occupant so the user can see where it ranks.
+// delta is score relative to the top scorer (0 = best, negative = worse).
+function getAlternatives(slotIdx, team, version, count = 5) {
+  if (!team || slotIdx >= team.length) return [];
+  const fixed = team.filter((_, i) => i !== slotIdx);
+  const fixedFinal = new Set(fixed.map(n => DT_FINAL_FORM[n] || n));
+  const scored = DT_CANDIDATES
+    .filter(cand => !fixedFinal.has(cand.name))
+    .map(cand => ({ name: cand.name, score: scoreCandidateInContext(cand, fixed, version) }))
+    .filter(x => Number.isFinite(x.score))
+    .sort((a, b) => b.score - a.score);
+  if (!scored.length) return [];
+  const best = scored[0].score;
+  // Ensure the current occupant is always visible even if outside top-N
+  const curr = team[slotIdx];
+  const topN = scored.slice(0, count);
+  if (curr && !topN.find(x => x.name === curr)) {
+    const currEntry = scored.find(x => x.name === curr);
+    if (currEntry) topN.push(currEntry);
+  }
+  return topN.map(x => ({ name: x.name, delta: Math.round(x.score - best) }));
 }
 
 function getDreamMoves(name, suppressedMoves, hms) {
@@ -4833,152 +4895,204 @@ function FireRedTracker() {
 
 // ─── DREAM TEAM TAB ───────────────────────────────────────────────────────────
 function DreamTeamTab({ isMobile, version }) {
-  const [favorite, setFavorite] = React.useState("");
-  const [team, setTeam]         = React.useState(null);
+  const [favorite,        setFavorite]        = React.useState("");
+  const [pins,            setPins]            = React.useState({});   // {slotIdx: name}
+  const [expandedAltSlot, setExpandedAltSlot] = React.useState(null);
 
   React.useEffect(() => {
     try {
-      const r = localStorage.getItem("frlg-dream-team-v3");
-      if (r) {
-        const d = JSON.parse(r);
-        setFavorite(d.favorite || "");
-        const savedTeam = d.team || null;
-        // Validate: discard if version mismatches OR if auto-selected members contain
-        // a Pokémon exclusive to the other version (catches teams built by old code).
-        const lgOnly = new Set(DT_CANDIDATES.filter(c => c.lgOnly).map(c => c.name));
-        const frOnly = new Set(DT_CANDIDATES.filter(c => c.frOnly).map(c => c.name));
-        const hasConflict = savedTeam && savedTeam.some(n => {
-          if (n === d.favorite) return false; // user explicitly chose this
-          const form = DT_FINAL_FORM[n] || n;
-          return (version === "FR" && lgOnly.has(form)) ||
-                 (version === "LG" && frOnly.has(form));
-        });
-        setTeam(d.version === version && !hasConflict ? savedTeam : null);
-      }
+      const r = localStorage.getItem("frlg-dream-team-v4");
+      if (r) { const d = JSON.parse(r); if (d.favorite) setFavorite(d.favorite); if (d.pins) setPins(d.pins); }
     } catch {}
   }, []);
 
-  // Clear stale team when the user switches version
   React.useEffect(() => {
-    try {
-      const r = localStorage.getItem("frlg-dream-team-v3");
-      if (r) { const d = JSON.parse(r); if (d.version && d.version !== version) setTeam(null); }
-    } catch {}
+    if (!favorite) return;
+    try { localStorage.setItem("frlg-dream-team-v4", JSON.stringify({ favorite, pins, version })); } catch {}
+  }, [favorite, pins, version]);
+
+  // Drop version-conflicting pins when version changes
+  React.useEffect(() => {
+    setPins(prev => {
+      const next = {};
+      for (const [k, name] of Object.entries(prev)) {
+        const form = DT_FINAL_FORM[name] || name;
+        const cand = DT_CANDIDATES.find(c => c.name === form);
+        if (cand && ((version === "FR" && cand.lgOnly) || (version === "LG" && cand.frOnly))) continue;
+        next[k] = name;
+      }
+      return next;
+    });
   }, [version]);
 
   const eligible = React.useMemo(() => DEX.filter(p => !DT_LEGENDARY.has(p.name)), []);
+  const team = React.useMemo(() => buildDreamTeamV2(favorite, pins, version), [favorite, pins, version]);
+  const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favorite);
+  const tmWinners     = React.useMemo(() => team ? assignOneTimeTMs(team) : {}, [team]);
+  const hmAssignments = React.useMemo(() => team ? assignHMs(team) : {}, [team]);
 
-  const handleBuild = () => {
-    if (!favorite) return;
-    const t = buildDreamTeam(favorite, version);
-    setTeam(t);
-    try { localStorage.setItem("frlg-dream-team-v3", JSON.stringify({ favorite, team: t, version })); } catch {}
-  };
+  const isHardLocked = idx => idx === 0 || (idx === 1 && !isDragoniteLine);
 
-  const versionLabel = (cand) => {
-    if (cand.frOnly) return "FR";
-    if (cand.lgOnly) return "LG";
-    return null;
+  const togglePin = (idx) => {
+    setPins(prev => {
+      const next = { ...prev };
+      if (next[idx]) delete next[idx]; else if (team && team[idx]) next[idx] = team[idx];
+      return next;
+    });
+    setExpandedAltSlot(null);
   };
-  const needsTrade = (cand) => {
-    if (!cand) return false;
-    return (version === "FR" && cand.lgOnly) || (version === "LG" && cand.frOnly);
-  };
+  const swapAlternative = (slotIdx, name) => { setPins(prev => ({ ...prev, [slotIdx]: name })); setExpandedAltSlot(null); };
+  const resetPins = () => { setPins({}); setExpandedAltSlot(null); };
 
-  // Assign each contested one-time TM to a single best recipient
-  const tmWinners   = team ? assignOneTimeTMs(team) : {};
-  // Assign each HM to exactly one team member
-  const hmAssignments = team ? assignHMs(team) : {};
+  const versionLabel = cand => cand.frOnly ? "FR" : cand.lgOnly ? "LG" : null;
+  const needsTrade   = cand => cand && ((version === "FR" && cand.lgOnly) || (version === "LG" && cand.frOnly));
+
+  const FavSelect = () => (
+    <select value={favorite} onChange={e => { setFavorite(e.target.value); setPins({}); setExpandedAltSlot(null); }}
+      style={{ flex:1, minWidth:160, background:"rgba(0,0,0,0.3)", border:`1px solid ${C.border}`, color:favorite ? C.text : C.muted, padding:"8px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, borderRadius:6, outline:"none" }}>
+      <option value="">Choose your favourite Pokémon…</option>
+      {eligible.map(p => {
+        const cand = DT_CANDIDATES.find(c => c.name === (DT_FINAL_FORM[p.name] || p.name));
+        const vl = cand ? versionLabel(cand) : null;
+        const trade = cand ? needsTrade(cand) : false;
+        const suffix = trade ? ` (${vl} — needs trade)` : vl ? ` (${vl})` : "";
+        return <option key={p.id} value={p.name}>#{String(p.id).padStart(3,"0")} {p.name}{suffix}</option>;
+      })}
+    </select>
+  );
+
+  // ── No favourite yet ─────────────────────────────────────────────────────────
+  if (!team) {
+    return (
+      <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
+        <div style={{ marginBottom:12 }}>
+          <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:4, textTransform:"uppercase" }}>Dream Team Builder</div>
+          <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>Pick your favourite — the builder scores and fills the remaining 5 slots around it. Dragonite (pseudo-legendary) is always included. You can pin any suggested slot and browse ranked alternatives.</div>
+        </div>
+        <FavSelect />
+      </div>
+    );
+  }
+
+  // ── Coverage summary row ──────────────────────────────────────────────────────
+  const teamCoverage = getTeamCoverage(team);
+  const missingTypes = TYPES_17.filter(t => !teamCoverage.has(t));
+  const hmsCovered   = new Set(team.flatMap(n => { const f = DT_FINAL_FORM[n]||n; return Object.entries(DT_HM_COMPAT).filter(([,s])=>s.has(f)).map(([h])=>h); }));
+  const hmsMissing   = ["Fly","Surf","Waterfall","Strength","Cut","Rock Smash"].filter(h => !hmsCovered.has(h));
+
+  const TypePill = ({type, bg}) => (
+    <span style={{ fontSize:8, color:"#fff", background: bg||TYPE_COLORS[type]||"#888", padding:"1px 5px", borderRadius:3, fontWeight:"700", letterSpacing:0.3 }}>{type}</span>
+  );
 
   return (
     <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
-      <div style={{ marginBottom:16 }}>
-        <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:4, textTransform:"uppercase" }}>Dream Team Builder</div>
-        <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>Builds the best 6-Pokémon FireRed team around your favourite. Always includes Dragonite (the region pseudo-legendary), full HM coverage, no trade evolutions, Kanto only.</div>
+      {/* Header controls */}
+      <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", marginBottom:12 }}>
+        <FavSelect />
+        {Object.keys(pins).length > 0 && (
+          <button onClick={resetPins} style={{ padding:"8px 12px", background:"rgba(0,0,0,0.2)", border:`1px solid ${C.border}`, borderRadius:6, cursor:"pointer", fontSize:11, color:C.muted, fontFamily:"'DM Sans',system-ui,sans-serif", whiteSpace:"nowrap" }}>
+            Reset pins
+          </button>
+        )}
       </div>
-      <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap", alignItems:"center" }}>
-        <select value={favorite} onChange={e => { setFavorite(e.target.value); setTeam(null); }}
-          style={{ flex:1, minWidth:180, background:"rgba(0,0,0,0.3)", border:`1px solid ${C.border}`, color:favorite ? C.text : C.muted, padding:"9px 12px", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, borderRadius:6, outline:"none" }}>
-          <option value="">Choose your favourite Pokémon…</option>
-          {eligible.map(p => {
-            const cand = DT_CANDIDATES.find(c => c.name === (DT_FINAL_FORM[p.name] || p.name));
-            const vl = cand ? versionLabel(cand) : null;
-            const trade = cand ? needsTrade(cand) : false;
-            const suffix = trade ? ` (${vl} — needs trade)` : vl ? ` (${vl})` : "";
-            return <option key={p.id} value={p.name}>#{String(p.id).padStart(3,"0")} {p.name}{suffix}</option>;
-          })}
-        </select>
-        <button onClick={handleBuild} disabled={!favorite}
-          style={{ padding:"9px 22px", background:favorite ? "var(--frlg-accent)" : "rgba(0,0,0,0.2)", color:favorite ? "#fff" : C.muted, border:"none", borderRadius:6, cursor:favorite ? "pointer" : "default", fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:13, fontWeight:"700", whiteSpace:"nowrap" }}>
-          Build Team
-        </button>
+
+      {/* Coverage summary */}
+      <div style={{ display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" }}>
+        <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:7, padding:"6px 12px", fontSize:11, display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ color:C.muted }}>Type coverage</span>
+          <span style={{ fontWeight:"700", color: missingTypes.length === 0 ? C.green : C.gold }}>{teamCoverage.size}/17</span>
+          {missingTypes.length > 0 && <span style={{ color:C.muted, fontSize:10 }}>missing: {missingTypes.join(", ")}</span>}
+        </div>
+        <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:7, padding:"6px 12px", fontSize:11, display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ color:C.muted }}>HMs</span>
+          <span style={{ fontWeight:"700", color: hmsMissing.length === 0 ? C.green : "#e07b3a" }}>
+            {hmsMissing.length === 0 ? "All covered ✓" : `Missing: ${hmsMissing.join(", ")}`}
+          </span>
+        </div>
       </div>
-      {team ? (
-        <div style={{ display:"grid", gridTemplateColumns:isMobile ? "1fr" : "repeat(3,1fr)", gap:12 }}>
-          {team.map((name, idx) => {
-            const isFav     = name === favorite;
-            const isPseudo  = ["Dratini","Dragonair","Dragonite"].includes(name);
-            const finalForm = DT_FINAL_FORM[name] || name;
-            const dexEntry  = DEX.find(p => p.name === name);
-            const candInfo  = DT_CANDIDATES.find(c => c.name === finalForm);
-            const assignedHMs = Object.entries(hmAssignments)
-              .filter(([,winner]) => winner === name).map(([hm]) => hm);
-            const suppressedMoves = new Set(
-              Object.entries(tmWinners).filter(([,winner]) => winner !== name).map(([move]) => move)
-            );
-            const moves     = getDreamMoves(name, suppressedMoves, assignedHMs);
-            const acq       = getDreamAcquisition(name);
-            const evoNote   = EVO_DELAY[name];
-            const isPreEvo  = !!DT_FINAL_FORM[name];
-            const vl        = candInfo ? versionLabel(candInfo) : null;
-            const trade     = candInfo ? needsTrade(candInfo) : false;
-            return (
-              <div key={idx} style={{ background:C.card, border:`1px solid ${isFav ? "var(--frlg-accent)" : trade ? "#e07b3a" : isPseudo ? "#a87acc" : C.border}`, borderRadius:10, padding:"14px", display:"flex", flexDirection:"column", gap:9 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  {dexEntry && <img src={pokeSpriteUrl(dexEntry.id)} alt={name} style={{ width:48, height:48, imageRendering:"pixelated", flexShrink:0 }} />}
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap", marginBottom:2 }}>
-                      <span style={{ fontSize:13, fontWeight:"700" }}>{name}</span>
-                      {isFav   && <span style={{ fontSize:8, color:"var(--frlg-accent)", background:"rgba(var(--frlg-accent-rgb,212,98,26),0.12)", border:"1px solid rgba(var(--frlg-accent-rgb,212,98,26),0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>★ FAV</span>}
-                      {isPseudo && !isFav && <span style={{ fontSize:8, color:"#a87acc", background:"rgba(168,122,204,0.12)", border:"1px solid #a87acc55", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>PSEUDO</span>}
-                      {vl && !trade && <span style={{ fontSize:8, color: vl === "FR" ? "#d4621a" : "#3fa84a", background: vl === "FR" ? "rgba(212,98,26,0.12)" : "rgba(63,168,74,0.12)", border:`1px solid ${vl === "FR" ? "rgba(212,98,26,0.4)" : "rgba(63,168,74,0.4)"}`, padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>{vl}</span>}
-                      {trade && <span style={{ fontSize:8, color:"#e07b3a", background:"rgba(224,123,58,0.12)", border:"1px solid rgba(224,123,58,0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>⇄ TRADE ({vl})</span>}
-                    </div>
-                    <div style={{ fontSize:9, color:C.muted }}>
-                      {dexEntry ? `#${String(dexEntry.id).padStart(3,"0")}` : ""}
-                      {candInfo ? ` · ${candInfo.types.join("/")}` : (finalForm !== name ? ` · → ${finalForm}` : "")}
-                    </div>
+
+      {/* Team grid */}
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:14 }}>
+        {team.map((name, idx) => {
+          const hardLocked  = isHardLocked(idx);
+          const userPinned  = !hardLocked && !!pins[idx];
+          const isFav       = idx === 0;
+          const isPseudo    = idx === 1 && !isDragoniteLine;
+          const finalForm   = DT_FINAL_FORM[name] || name;
+          const dexEntry    = DEX.find(p => p.name === name);
+          const candInfo    = DT_CANDIDATES.find(c => c.name === finalForm);
+          const assignedHMs = Object.entries(hmAssignments).filter(([,w]) => w === name).map(([hm]) => hm);
+          const suppressed  = new Set(Object.entries(tmWinners).filter(([,w]) => w !== name).map(([mv]) => mv));
+          const moves       = getDreamMoves(name, suppressed, assignedHMs);
+          const acq         = getDreamAcquisition(name);
+          const evoNote     = EVO_DELAY[name];
+          const isPreEvo    = !!DT_FINAL_FORM[name];
+          const vl          = candInfo ? versionLabel(candInfo) : null;
+          const trade       = candInfo ? needsTrade(candInfo) : false;
+          const altExpanded = expandedAltSlot === idx;
+
+          const borderColor = isFav       ? "var(--frlg-accent)"
+                            : trade       ? "#e07b3a"
+                            : isPseudo    ? "#a87acc"
+                            : userPinned  ? "#4a8fc4"
+                            : C.border;
+
+          return (
+            <div key={idx} style={{ background:C.card, border:`1px solid ${borderColor}`, borderRadius:10, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+
+              {/* Card header */}
+              <div style={{ padding:"12px 14px", display:"flex", alignItems:"center", gap:10 }}>
+                {dexEntry && <img src={pokeSpriteUrl(dexEntry.id)} alt={name} style={{ width:48, height:48, imageRendering:"pixelated", flexShrink:0 }} />}
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:5, flexWrap:"wrap", marginBottom:2 }}>
+                    <span style={{ fontSize:14, fontWeight:"700" }}>{name}</span>
+                    {isFav      && <span style={{ fontSize:8, color:"var(--frlg-accent)", background:"rgba(var(--frlg-accent-rgb,212,98,26),0.12)", border:"1px solid rgba(var(--frlg-accent-rgb,212,98,26),0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>★ FAV</span>}
+                    {isPseudo   && <span style={{ fontSize:8, color:"#a87acc", background:"rgba(168,122,204,0.12)", border:"1px solid #a87acc55", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>PSEUDO</span>}
+                    {userPinned && <span style={{ fontSize:8, color:"#4a8fc4", background:"rgba(74,143,196,0.12)", border:"1px solid rgba(74,143,196,0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>PINNED</span>}
+                    {vl && !trade && <span style={{ fontSize:8, color: vl==="FR"?"#d4621a":"#3fa84a", background: vl==="FR"?"rgba(212,98,26,0.12)":"rgba(63,168,74,0.12)", border:`1px solid ${vl==="FR"?"rgba(212,98,26,0.4)":"rgba(63,168,74,0.4)"}`, padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>{vl}</span>}
+                    {trade      && <span style={{ fontSize:8, color:"#e07b3a", background:"rgba(224,123,58,0.12)", border:"1px solid rgba(224,123,58,0.4)", padding:"1px 5px", borderRadius:99, fontWeight:"700" }}>⇄ TRADE ({vl})</span>}
+                  </div>
+                  <div style={{ fontSize:9, color:C.muted }}>
+                    {dexEntry ? `#${String(dexEntry.id).padStart(3,"0")}` : ""}
+                    {candInfo ? ` · ${candInfo.types.join("/")}` : (finalForm !== name ? ` · → ${finalForm}` : "")}
                   </div>
                 </div>
-                {assignedHMs.length > 0 && (
-                  <div style={{ display:"flex", gap:3, flexWrap:"wrap" }}>
-                    {assignedHMs.map(hm => <span key={hm} style={{ fontSize:8, color:"#4a8fc4", background:"rgba(74,143,196,0.10)", border:"1px solid rgba(74,143,196,0.3)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>{hm}</span>)}
-                  </div>
+                {!hardLocked && (
+                  <button onClick={() => togglePin(idx)} title={userPinned ? "Unpin slot" : "Pin this Pokémon"}
+                    style={{ flexShrink:0, padding:"4px 9px", background: userPinned?"rgba(74,143,196,0.12)":"rgba(0,0,0,0.15)", border:`1px solid ${userPinned?"#4a8fc4":C.border}`, borderRadius:5, cursor:"pointer", fontSize:13, color: userPinned?"#4a8fc4":C.muted, lineHeight:1 }}>
+                    {userPinned ? "🔒" : "🔓"}
+                  </button>
                 )}
+              </div>
+
+              {/* HM pills */}
+              {assignedHMs.length > 0 && (
+                <div style={{ display:"flex", gap:3, flexWrap:"wrap", padding:"0 14px 10px" }}>
+                  {assignedHMs.map(hm => <span key={hm} style={{ fontSize:8, color:"#4a8fc4", background:"rgba(74,143,196,0.10)", border:"1px solid rgba(74,143,196,0.3)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>{hm}</span>)}
+                </div>
+              )}
+
+              <div style={{ padding:"0 14px 14px", display:"flex", flexDirection:"column", gap:12, flex:1 }}>
+
+                {/* Moveset */}
                 <div>
                   <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:5 }}>Moveset{isPreEvo ? ` (as ${finalForm})` : ""}</div>
                   {moves.map((m, i) => {
                     const isHM      = m.kind === "hm";
                     const isOneTime = m.kind === "tm" && m.oneTime;
-                    const moveColor = isHM      ? "#4a8fc4"
-                                    : isOneTime ? "#e8a020"
-                                    : m.kind === "tm" ? C.gold
-                                    : (MOVE_TIERS && MOVE_TIERS.good && MOVE_TIERS.good.has(m.move)) ? C.green
-                                    : C.text;
-                    const superEff = getMoveSuper(m.move);
+                    const moveColor = isHM ? "#4a8fc4" : isOneTime ? "#e8a020" : m.kind === "tm" ? C.gold : (MOVE_TIERS?.good?.has(m.move) ? C.green : C.text);
+                    const superEff  = getMoveSuper(m.move);
                     return (
                       <div key={i} style={{ marginBottom:4 }}>
                         <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
-                          <span style={{ fontSize:11, fontWeight:"600", minWidth:0, color:moveColor }}>{m.move}</span>
+                          <span style={{ fontSize:11, fontWeight:"600", color:moveColor }}>{m.move}</span>
                           <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
                           {isOneTime && <span style={{ fontSize:8, color:"#e8a020", background:"rgba(232,160,32,0.12)", border:"1px solid rgba(232,160,32,0.3)", borderRadius:3, padding:"0 4px", flexShrink:0, whiteSpace:"nowrap" }}>1× only</span>}
                         </div>
                         {superEff.length > 0 && (
-                          <div style={{ display:"flex", gap:3, flexWrap:"wrap", marginTop:2, paddingLeft:0 }}>
+                          <div style={{ display:"flex", gap:3, flexWrap:"wrap", marginTop:2 }}>
                             <span style={{ fontSize:8, color:C.muted }}>2× vs</span>
-                            {superEff.map(t => (
-                              <span key={t} style={{ fontSize:8, fontWeight:"700", color:"#fff", background:TYPE_COLORS[t]||"#888", padding:"0 4px", borderRadius:2 }}>{t}</span>
-                            ))}
+                            {superEff.map(t => <span key={t} style={{ fontSize:8, fontWeight:"700", color:"#fff", background:TYPE_COLORS[t]||"#888", padding:"0 4px", borderRadius:2 }}>{t}</span>)}
                           </div>
                         )}
                       </div>
@@ -4986,15 +5100,21 @@ function DreamTeamTab({ isMobile, version }) {
                   })}
                   {moves.length === 0 && <div style={{ fontSize:10, color:C.muted }}>No moveset data available.</div>}
                 </div>
+
+                {/* Where to Get */}
                 <div>
                   <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>Where to Get</div>
                   <div style={{ fontSize:10, color:C.text, lineHeight:1.5 }}>{acq}</div>
                 </div>
+
+                {/* Evo note */}
                 {evoNote && (
                   <div style={{ fontSize:10, color:"#c8960a", lineHeight:1.5, padding:"5px 8px", background:"rgba(200,150,10,0.08)", borderRadius:5, borderLeft:"2px solid #c8960a" }}>
                     ⏳ {evoNote}
                   </div>
                 )}
+
+                {/* Defensive chart */}
                 {candInfo && (() => {
                   const chart = getDefensiveChart(candInfo.types);
                   const imm  = TYPES_17.filter(t => chart[t] === 0);
@@ -5002,55 +5122,66 @@ function DreamTeamTab({ isMobile, version }) {
                   const res  = TYPES_17.filter(t => chart[t] === 0.5);
                   const weak = TYPES_17.filter(t => chart[t] === 2);
                   const weak4= TYPES_17.filter(t => chart[t] === 4);
-                  const TypePill = ({type, bg}) => (
-                    <span style={{ fontSize:8, color:"#fff", background: bg || TYPE_COLORS[type] || "#888", padding:"1px 5px", borderRadius:3, fontWeight:"700", letterSpacing:0.3 }}>{type}</span>
-                  );
                   return (
                     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                       {(weak4.length > 0 || weak.length > 0) && (
                         <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
                           <div style={{ fontSize:9, color:"#e07b3a", letterSpacing:1.5, textTransform:"uppercase", fontWeight:"700" }}>Weak against</div>
-                          {weak4.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                            <span style={{ fontSize:9, color:"#e83030", fontWeight:"700", minWidth:22 }}>4×</span>
-                            {weak4.map(t => <TypePill key={t} type={t} bg="#c02020" />)}
-                          </div>}
-                          {weak.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                            <span style={{ fontSize:9, color:"#e07b3a", fontWeight:"700", minWidth:22 }}>2×</span>
-                            {weak.map(t => <TypePill key={t} type={t} />)}
-                          </div>}
+                          {weak4.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}><span style={{ fontSize:9, color:"#e83030", fontWeight:"700", minWidth:22 }}>4×</span>{weak4.map(t => <TypePill key={t} type={t} bg="#c02020" />)}</div>}
+                          {weak.length  > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}><span style={{ fontSize:9, color:"#e07b3a", fontWeight:"700", minWidth:22 }}>2×</span>{weak.map(t  => <TypePill key={t} type={t} />)}</div>}
                         </div>
                       )}
                       {(res.length > 0 || res2.length > 0 || imm.length > 0) && (
                         <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
                           <div style={{ fontSize:9, color:"#4a8fc4", letterSpacing:1.5, textTransform:"uppercase", fontWeight:"700" }}>Strong against</div>
-                          {res.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                            <span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>½×</span>
-                            {res.map(t => <TypePill key={t} type={t} />)}
-                          </div>}
-                          {res2.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                            <span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>¼×</span>
-                            {res2.map(t => <TypePill key={t} type={t} />)}
-                          </div>}
-                          {imm.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}>
-                            <span style={{ fontSize:9, color:"#7a5ab0", fontWeight:"700", minWidth:22 }}>0×</span>
-                            {imm.map(t => <TypePill key={t} type={t} bg="#5a3a8a" />)}
-                          </div>}
+                          {res.length  > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}><span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>½×</span>{res.map(t  => <TypePill key={t} type={t} />)}</div>}
+                          {res2.length > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}><span style={{ fontSize:9, color:"#4a8fc4", fontWeight:"700", minWidth:22 }}>¼×</span>{res2.map(t => <TypePill key={t} type={t} />)}</div>}
+                          {imm.length  > 0 && <div style={{ display:"flex", gap:3, flexWrap:"wrap", alignItems:"center" }}><span style={{ fontSize:9, color:"#7a5ab0", fontWeight:"700", minWidth:22 }}>0×</span>{imm.map(t  => <TypePill key={t} type={t} bg="#5a3a8a" />)}</div>}
                         </div>
                       )}
                     </div>
                   );
                 })()}
+
+                {/* Alternatives (suggested slots only) */}
+                {!hardLocked && (
+                  <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:10 }}>
+                    <button onClick={() => setExpandedAltSlot(altExpanded ? null : idx)}
+                      style={{ display:"flex", alignItems:"center", gap:5, background:"none", border:"none", cursor:"pointer", color:C.muted, fontFamily:"'DM Sans',system-ui,sans-serif", fontSize:10, fontWeight:"700", letterSpacing:1, padding:0, textTransform:"uppercase" }}>
+                      <span style={{ fontSize:9 }}>{altExpanded ? "▼" : "▶"}</span>
+                      <span>Alternatives</span>
+                    </button>
+                    {altExpanded && (
+                      <div style={{ marginTop:8, display:"flex", flexDirection:"column", gap:5 }}>
+                        {getAlternatives(idx, team, version).map(({ name: altName, delta }) => {
+                          const altDex = DEX.find(p => p.name === altName);
+                          const isCurr = altName === name;
+                          const isBest = delta === 0;
+                          return (
+                            <div key={altName} style={{ display:"flex", alignItems:"center", gap:8, padding:"5px 8px", background: isCurr?"rgba(var(--frlg-accent-rgb,212,98,26),0.07)":"rgba(0,0,0,0.12)", borderRadius:6, border:`1px solid ${isCurr?"rgba(var(--frlg-accent-rgb,212,98,26),0.2)":"transparent"}` }}>
+                              {altDex && <img src={pokeSpriteUrl(altDex.id)} alt={altName} width={26} height={26} style={{ imageRendering:"pixelated", flexShrink:0 }} />}
+                              <span style={{ fontSize:12, fontWeight:"600", flex:1, color: isCurr?"var(--frlg-accent)":C.text }}>{altName}</span>
+                              <span style={{ fontSize:9, fontWeight:"700", flexShrink:0, padding:"1px 6px", borderRadius:4, background: isBest?"rgba(74,175,116,0.12)":"rgba(0,0,0,0.15)", border:`1px solid ${isBest?"rgba(74,175,116,0.3)":"transparent"}`, color: isBest?C.green:C.muted }}>
+                                {isBest ? "BEST" : `${delta}`}
+                              </span>
+                              {!isCurr && (
+                                <button onClick={() => swapAlternative(idx, altName)}
+                                  style={{ padding:"3px 9px", background:"rgba(var(--frlg-accent-rgb,212,98,26),0.12)", border:"1px solid rgba(var(--frlg-accent-rgb,212,98,26),0.4)", borderRadius:4, cursor:"pointer", fontSize:9, color:"var(--frlg-accent)", fontFamily:"'DM Sans',system-ui,sans-serif", fontWeight:"700", flexShrink:0 }}>
+                                  Use
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div style={{ textAlign:"center", color:C.muted, padding:"60px 20px", display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
-          <div style={{ fontSize:40, opacity:0.25 }}>⚔</div>
-          <div style={{ fontSize:14, fontWeight:"600", color:C.text, opacity:0.5 }}>Your dream team awaits</div>
-          <div style={{ fontSize:12, maxWidth:380, lineHeight:1.8 }}>Pick your favourite and hit <strong style={{ color:C.text }}>Build Team</strong> to get a complete, HM-ready team with recommended movesets.</div>
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
