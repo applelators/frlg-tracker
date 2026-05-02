@@ -5,20 +5,20 @@
   Add as a Browser Source in OBS. Enable "Allow transparency" in the source settings.
 
   URLs:
-    Wild Pokémon : http://localhost:8080/overlay.html?section=wild
-    Items        : http://localhost:8080/overlay.html?section=items
-    Trainers     : http://localhost:8080/overlay.html?section=trainers
+    Wild Pokémon        : http://localhost:8080/overlay.html?section=wild
+    Items               : http://localhost:8080/overlay.html?section=items
+    Trainers            : http://localhost:8080/overlay.html?section=trainers
+    Wild Pokémon + Items: http://localhost:8080/overlay.html?section=combined
 
   URL params (all optional):
-    section  wild | items | trainers        Which section to display
-    width    any number (default: 340)      Panel width in pixels
-    opacity  0.0–1.0 (default: 0.92)        Panel background opacity
-    theme    warm | cool (default: warm)    warm = tracker brown-black; cool = navy for sidebar use
-    worker   URL                            Cloudflare /state endpoint for cross-browser sync
+    section  wild | items | trainers | combined   Which section to display
+    width    any number (default: 340)             Panel width in pixels
+    opacity  0.0–1.0 (default: 0.92)              Panel background opacity
+    theme    warm | cool (default: warm)           warm = tracker brown-black; cool = navy
+    worker   URL                                   Cloudflare /state endpoint for cross-browser sync
 
   Examples:
-    ?section=wild&width=300&opacity=0.80
-    ?section=items&width=200&theme=cool&opacity=0.85
+    ?section=combined&width=300&opacity=0.80
     ?section=wild&theme=cool&width=200&opacity=0.85&worker=https://frlg.nabunan.com/state
 
   Suggested OBS source size: set width to match your ?width= value; height 600+
@@ -26,7 +26,7 @@
   The panel updates within ~1.5 seconds when you switch areas in the main tracker.
 
   Cross-browser OBS setup (tracker in Chrome, overlay in OBS):
-    Add worker= param pointing to the /state Pages Function.
+    Add worker= param pointing to the Cloudflare /state endpoint.
     The tracker posts state there on every change; the overlay polls it.
 -->
 <html lang="en">
@@ -61,7 +61,7 @@
       return key ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${key}.png` : null;
     };
 
-    // ─── Method badge colors (matching main tracker) ──────────────────────────────
+    // ─── Method badge colors ─────────────────────────────────────────────────────
     const METHOD_COLOR = {
       "Grass":      { bg:"rgba(74,175,116,0.15)",  color:"#4aaf74" },
       "Cave":       { bg:"rgba(180,150,100,0.15)", color:"#b49664" },
@@ -81,11 +81,10 @@
       wild:     { label: "WILD POKÉMON", accent: "#4aaf74" },
       items:    { label: "ITEMS",        accent: "#c8960a" },
       trainers: { label: "TRAINERS",     accent: "#a87acc" },
+      combined: { label: "WILD POKÉMON + ITEMS", accent: "#4aaf74" },
     };
 
-    // ─── Rate sorting (mirrors renderPokemonList in main tracker) ────────────────
-    // Within each consecutive same-method block, sort by effective rate descending
-    // for the active version. Handles split-rate strings like "1% FR / 4% LG".
+    // ─── Rate helpers ─────────────────────────────────────────────────────────────
     function effectivePct(p, ver) {
       const split = p.rate && p.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
       const raw   = split ? (ver === "fr" ? split[1] : split[2]) : p.rate;
@@ -126,10 +125,59 @@
       }
       return (area.trainers || []).map(trainer => ({ trainer, floorLabel: null }));
     }
-
-    // ─── Item key — must match main tracker exactly ───────────────────────────────
     function itemKey(areaId, floorLabel, idx) {
       return floorLabel ? `${areaId}|${floorLabel}|${idx}` : `${areaId}|${idx}`;
+    }
+
+    // ─── Wild row builder ─────────────────────────────────────────────────────────
+    function getWildSection(m) {
+      if (m === "Surf") return "surf";
+      if (m === "Old Rod" || m === "Good Rod" || m === "Super Rod") return "fishing";
+      return "land";
+    }
+    const SEC_LABEL = { surf:"SURF", fishing:"FISHING" };
+
+    function buildWildRows(area, areaId, version, collapsedFloors) {
+      const floors = area.floors
+        ? area.floors.map(f => ({ label: f.label, pokemon: f.pokemon || [] }))
+        : [{ label: null, pokemon: area.pokemon || [] }];
+      const rows = [];
+      floors.forEach(({ label, pokemon }, fi) => {
+        if (label && collapsedFloors[`${areaId}|${label}`]) return;
+        const visible = sortByRate(
+          pokemon.filter(p => !((p.frOnly && version === "lg") || (p.lgOnly && version === "fr"))),
+          version
+        );
+        if (!visible.length) return;
+        if (label) rows.push({ type:"floor", label });
+        let lastSec = null;
+        visible.forEach(p => {
+          const sec = getWildSection(p.method);
+          if (sec !== lastSec) {
+            const secLabel = sec === "land" ? p.method.toUpperCase() : SEC_LABEL[sec];
+            rows.push({ type:"method", label: secLabel, color: (METHOD_COLOR[p.method] || {}).color });
+            lastSec = sec;
+          }
+          rows.push({ type:"pokemon", p, fi });
+        });
+      });
+      return rows;
+    }
+
+    // ─── Item row builder ─────────────────────────────────────────────────────────
+    function buildItemRows(area, areaId, collapsedFloors) {
+      const entries = flattenItems(area);
+      const rows = [];
+      let lastFloor = undefined;
+      entries.forEach(({ entry, floorLabel, idx }) => {
+        if (floorLabel && collapsedFloors[`${areaId}|${floorLabel}`]) return;
+        if (floorLabel !== lastFloor) {
+          if (floorLabel) rows.push({ type:"floor", label: floorLabel, isFirst: rows.length === 0 });
+          lastFloor = floorLabel;
+        }
+        rows.push({ type:"item", entry, floorLabel, idx });
+      });
+      return rows;
     }
 
     // ─── OverlayApp ───────────────────────────────────────────────────────────────
@@ -138,31 +186,28 @@
       const section = params.get("section") || "wild";
       const meta    = SECTION_META[section] || SECTION_META.wild;
 
-      // ── URL-configurable display params ────────────────────────────────────────
       const panelWidth   = parseInt(params.get("width"),   10) || 340;
       const panelOpacity = Math.min(1, Math.max(0, parseFloat(params.get("opacity")) || 0.92));
       const isCool       = params.get("theme") === "cool";
+      const workerUrl    = params.get("worker") || null;
 
-      // ── Theme palette ──────────────────────────────────────────────────────────
       const T = isCool ? {
-        bg:          `rgba(16,20,28,${panelOpacity})`,
-        border:      "#2a3040",
-        textPrimary: "#dde4f0",
-        textMuted:   "#7a8a9a",
-        divider:     "rgba(42,48,64,0.5)",
-        teamBg:      "rgba(42,48,64,0.5)",
+        bg:           `rgba(16,20,28,${panelOpacity})`,
+        border:       "#2a3040",
+        textPrimary:  "#dde4f0",
+        textMuted:    "#7a8a9a",
+        divider:      "rgba(42,48,64,0.5)",
+        teamBg:       "rgba(42,48,64,0.5)",
         placeholderBg:"rgba(42,48,64,0.4)",
       } : {
-        bg:          `rgba(28,21,16,${panelOpacity})`,
-        border:      "#3a2a1c",
-        textPrimary: "#ede0d4",
-        textMuted:   "#8a7a6a",
-        divider:     "rgba(58,42,28,0.5)",
-        teamBg:      "rgba(58,42,28,0.5)",
+        bg:           `rgba(28,21,16,${panelOpacity})`,
+        border:       "#3a2a1c",
+        textPrimary:  "#ede0d4",
+        textMuted:    "#8a7a6a",
+        divider:      "rgba(58,42,28,0.5)",
+        teamBg:       "rgba(58,42,28,0.5)",
         placeholderBg:"rgba(58,42,28,0.4)",
       };
-
-      const workerUrl = params.get("worker") || null;
 
       const [ready,           setReady]           = React.useState(false);
       const [areaId,          setAreaId]          = React.useState(null);
@@ -170,17 +215,18 @@
       const [caught,          setCaught]          = React.useState({});
       const [items,           setItems]           = React.useState({});
       const [trainers,        setTrainers]        = React.useState({});
+      const [trades,          setTrades]          = React.useState({});
       const [collapsedFloors, setCollapsedFloors] = React.useState({});
 
-      // Poll worker URL (cross-browser) or localStorage (same-browser fallback)
       React.useEffect(() => {
         function applyState(s) {
           if (!s) return;
-          if (s.areaId)          setAreaId(s.areaId);
-          if (s.version)         setVersion(s.version);
-          if (s.caught)          setCaught(s.caught);
-          if (s.items)           setItems(s.items);
-          if (s.trainers)        setTrainers(s.trainers);
+          if (s.areaId)   setAreaId(s.areaId);
+          if (s.version)  setVersion(s.version);
+          if (s.caught)   setCaught(s.caught);
+          if (s.items)    setItems(s.items);
+          if (s.trainers) setTrainers(s.trainers);
+          if (s.trades)   setTrades(s.trades);
           setCollapsedFloors(s.collapsedFloors || {});
         }
         function poll() {
@@ -188,19 +234,14 @@
             fetch(workerUrl).then(r => r.json()).then(applyState).catch(() => {});
           } else {
             try {
-              const aid = localStorage.getItem("frlg-active-area");
-              const ver = localStorage.getItem("frlg-version");
-              const c   = localStorage.getItem("fr-caught5");
-              const it  = localStorage.getItem("fr-items5");
-              const tr  = localStorage.getItem("fr-trainers1");
-              const cf  = localStorage.getItem("frlg-collapsed-floors");
               applyState({
-                areaId:          aid,
-                version:         ver,
-                caught:          c  ? JSON.parse(c)  : null,
-                items:           it ? JSON.parse(it) : null,
-                trainers:        tr ? JSON.parse(tr) : null,
-                collapsedFloors: cf ? JSON.parse(cf) : {},
+                areaId:          localStorage.getItem("frlg-active-area"),
+                version:         localStorage.getItem("frlg-version"),
+                caught:          JSON.parse(localStorage.getItem("fr-caught5")   || "null"),
+                items:           JSON.parse(localStorage.getItem("fr-items5")    || "null"),
+                trainers:        JSON.parse(localStorage.getItem("fr-trainers1") || "null"),
+                trades:          JSON.parse(localStorage.getItem("frlg-trades")  || "null"),
+                collapsedFloors: JSON.parse(localStorage.getItem("frlg-collapsed-floors") || "null"),
               });
             } catch {}
           }
@@ -210,17 +251,13 @@
         return () => clearInterval(id);
       }, []);
 
-      // Wait for window.__FRLG_AREAS to be populated by the eval'd JSX
       React.useEffect(() => {
-        function check() {
-          if (window.__FRLG_AREAS) { setReady(true); }
-        }
+        function check() { if (window.__FRLG_AREAS) setReady(true); }
         check();
         const id = setInterval(check, 200);
         return () => clearInterval(id);
       }, []);
 
-      // ── Base panel style ───────────────────────────────────────────────────────
       const panel = {
         width: panelWidth,
         background: T.bg,
@@ -230,306 +267,207 @@
         fontFamily: "'DM Sans', sans-serif",
         color: T.textPrimary,
       };
-
       const sectionHeader = (accent) => ({
         fontSize: 11, fontWeight: 700, letterSpacing: 2, color: accent,
         borderLeft: `3px solid ${accent}`, paddingLeft: 7, marginBottom: 8,
       });
       const areaLabel = { fontSize: 11, color: T.textMuted, marginBottom: 6 };
-      const rowDivider = (i, total) => i < total - 1 ? `1px solid ${T.divider}` : "none";
+      const floorLabelStyle = (isFirst) => ({
+        fontSize: 11, fontWeight: 700, letterSpacing: 1,
+        color: T.textMuted,
+        borderLeft: `2px solid ${T.border}`,
+        paddingLeft: 5,
+        marginTop: isFirst ? 2 : 8,
+        marginBottom: 3,
+      });
 
-      // ── Loading / placeholder states ───────────────────────────────────────────
-      if (!ready) {
-        return <div style={{ ...panel, color: T.textMuted, fontSize: 11 }}>Loading…</div>;
-      }
-      if (!areaId) {
-        return (
-          <div style={{ ...panel, color: T.textMuted, fontSize: 11 }}>
-            Select an area in the tracker
-          </div>
-        );
-      }
+      if (!ready) return <div style={{ ...panel, color: T.textMuted, fontSize: 11 }}>Loading…</div>;
+      if (!areaId) return <div style={{ ...panel, color: T.textMuted, fontSize: 11 }}>Select an area in the tracker</div>;
 
       const area = (window.__FRLG_AREAS || []).find(a => a.id === areaId);
       if (!area) return null;
 
-      // ── Wild Pokémon ───────────────────────────────────────────────────────────
-      if (section === "wild") {
-        const getSection = m =>
-          m === "Surf" ? "surf" :
-          (m === "Old Rod" || m === "Good Rod" || m === "Super Rod") ? "fishing" : "land";
-
-        // Build flat row list: { type:"floor", label } | { type:"pokemon", p, fi }
-        const floors = area.floors
-          ? area.floors.map(f => ({ label: f.label, pokemon: f.pokemon || [] }))
-          : [{ label: null, pokemon: area.pokemon || [] }];
-
-        const SEC_LABEL = { land:"LAND", surf:"SURF", fishing:"FISHING" };
-        // Use the method name directly for land (Grass / Cave / Special)
-        const secDisplayLabel = (p) => {
-          const s = getSection(p.method);
-          return s === "land" ? p.method.toUpperCase() : SEC_LABEL[s];
-        };
-
-        const rows = [];
-        floors.forEach(({ label, pokemon }, fi) => {
-          if (label && collapsedFloors[`${areaId}|${label}`]) return;
-          const visible = sortByRate(
-            pokemon.filter(p => !((p.frOnly && version === "lg") || (p.lgOnly && version === "fr"))),
-            version
-          );
-          if (!visible.length) return;
-          if (label) rows.push({ type:"floor", label });
-          let lastSec = null;
-          visible.forEach(p => {
-            const sec = getSection(p.method);
-            if (sec !== lastSec) {
-              rows.push({ type:"method", label: secDisplayLabel(p), color: (METHOD_COLOR[p.method] || {}).color || T.textMuted });
-              lastSec = sec;
-            }
-            rows.push({ type:"pokemon", p, fi });
-          });
-        });
-
-        if (!rows.length) return null;
-
-        // Per-floor section-done stats for dimming
-        const floorSecStats = {};
+      // ── Shared row renderers ───────────────────────────────────────────────────
+      const makeWildRenderer = (rows) => {
+        const secStats = {};
         rows.forEach(r => {
           if (r.type !== "pokemon") return;
-          const key = `${r.fi}:${getSection(r.p.method)}`;
-          if (!floorSecStats[key]) floorSecStats[key] = { total:0, done:0 };
-          floorSecStats[key].total++;
-          if (caught[r.p.name]) floorSecStats[key].done++;
+          const k = `${r.fi}:${getWildSection(r.p.method)}`;
+          if (!secStats[k]) secStats[k] = { total:0, done:0 };
+          secStats[k].total++;
+          if (caught[r.p.name]) secStats[k].done++;
         });
-        const secDone = (fi, m) => {
-          const key = `${fi}:${getSection(m)}`;
-          return floorSecStats[key] && floorSecStats[key].done === floorSecStats[key].total;
-        };
+        const secDone = (fi, m) => { const k = `${fi}:${getWildSection(m)}`; return secStats[k] && secStats[k].done === secStats[k].total; };
 
-        const floorLabelStyle = (isFirst) => ({
-          fontSize:11, fontWeight:700, letterSpacing:1,
-          color: T.textMuted,
-          borderLeft: `2px solid ${T.border}`,
-          paddingLeft: 5,
-          marginTop: isFirst ? 2 : 8,
-          marginBottom: 3,
-        });
-
-        return (
-          <div style={panel}>
-            <div style={sectionHeader(meta.accent)}>{meta.label}</div>
-            <div style={areaLabel}>{area.name}</div>
-            {rows.map((row, i) => {
-              if (row.type === "floor") {
-                return <div key={i} style={floorLabelStyle(i === 0)}>{row.label}</div>;
-              }
-              if (row.type === "method") {
-                const prevRow = rows[i - 1];
-                const isFirstInPanel = i === 0 || (prevRow && prevRow.type === "floor" && rows[i - 2] == null);
-                const hasFloorAbove  = prevRow && prevRow.type === "floor";
-                return (
-                  <div key={i} style={{
-                    fontSize:10, fontWeight:700, letterSpacing:1.5,
-                    color: row.color,
-                    marginTop: hasFloorAbove ? 0 : (i === 0 ? 2 : 7),
-                    marginBottom: 2,
-                  }}>
-                    {row.label}
-                  </div>
-                );
-              }
-              const p = row.p;
-              const isCaught  = caught[p.name];
-              const mc        = METHOD_COLOR[p.method] || { bg:"rgba(120,100,80,0.15)", color: T.textMuted };
-              const spriteUrl = pokeSprite(p.name);
-              const vTag      = p.frOnly ? "FR" : p.lgOnly ? "LG" : null;
-              const dimmed    = secDone(row.fi, p.method);
-              const nextRow   = rows[i + 1];
-              const border    = (!nextRow || nextRow.type === "floor" || nextRow.type === "method") ? "none" : `1px solid ${T.divider}`;
-
-              return (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 0",
-                                      opacity: dimmed ? 0.35 : 1,
-                                      borderBottom: border }}>
-                  {spriteUrl
-                    ? <img src={spriteUrl} alt={p.name} width={32} height={32}
-                           style={{ imageRendering:"pixelated", flexShrink:0,
-                                    opacity: isCaught ? 1 : 0.65,
-                                    filter:  isCaught ? "none" : "brightness(0)" }} />
-                    : <div style={{ width:32, height:32, flexShrink:0 }} />
-                  }
-                  <span style={{ fontSize:14, flex:1, minWidth:0,
-                                 color: isCaught ? "#4aaf74" : T.textPrimary,
-                                 whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-                    {p.name}
-                  </span>
-                  {vTag && (
-                    <span style={{ fontSize:11, fontWeight:700,
-                                   color: vTag === "FR" ? "#d4621a" : "#3fa84a",
-                                   background: vTag === "FR" ? "rgba(212,98,26,0.15)" : "rgba(63,168,74,0.15)",
-                                   borderRadius:4, padding:"1px 6px", flexShrink:0 }}>
-                      {vTag}
-                    </span>
-                  )}
-                  <span style={{ fontSize:11, background:mc.bg, color:mc.color,
-                                 borderRadius:4, padding:"1px 6px", flexShrink:0 }}>
-                    {{"Old Rod":"Old","Good Rod":"Good","Super Rod":"Super"}[p.method] ?? p.method}
-                  </span>
-                  <span style={{ fontSize:11, color: T.textMuted, flexShrink:0, whiteSpace:"nowrap" }}>
-                    {versionRate(p, version)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        );
-      }
-
-      // ── Items ──────────────────────────────────────────────────────────────────
-      if (section === "items") {
-        const entries = flattenItems(area);
-        if (!entries.length) return null;
-
-        const floorLabelStyle = (isFirst) => ({
-          fontSize:11, fontWeight:700, letterSpacing:1,
-          color: T.textMuted,
-          borderLeft: `2px solid ${T.border}`,
-          paddingLeft: 5,
-          marginTop: isFirst ? 2 : 8,
-          marginBottom: 3,
-        });
-
-        const rows = [];
-        let lastFloor = undefined;
-        entries.forEach(({ entry, floorLabel, idx }, i) => {
-          if (floorLabel && collapsedFloors[`${areaId}|${floorLabel}`]) return;
-          if (floorLabel !== lastFloor) {
-            if (floorLabel) rows.push({ type:"floor", label:floorLabel, isFirst: rows.length === 0 });
-            lastFloor = floorLabel;
+        return (row, i) => {
+          if (row.type === "floor") return <div key={i} style={floorLabelStyle(i === 0)}>{row.label}</div>;
+          if (row.type === "method") {
+            const prevRow = rows[i - 1];
+            return (
+              <div key={i} style={{ fontSize:10, fontWeight:700, letterSpacing:1.5, color: row.color || T.textMuted,
+                                    marginTop: (prevRow && prevRow.type === "floor") ? 0 : (i === 0 ? 2 : 7), marginBottom: 2 }}>
+                {row.label}
+              </div>
+            );
           }
-          rows.push({ type:"item", entry, floorLabel, idx, entryIdx: i });
-        });
+          const p = row.p;
+          const isCaught  = caught[p.name];
+          const mc        = METHOD_COLOR[p.method] || { bg:"rgba(120,100,80,0.15)", color: T.textMuted };
+          const spriteUrl = pokeSprite(p.name);
+          const vTag      = p.frOnly ? "FR" : p.lgOnly ? "LG" : null;
+          const dimmed    = secDone(row.fi, p.method);
+          const nextRow   = rows[i + 1];
+          const border    = (!nextRow || nextRow.type === "floor" || nextRow.type === "method") ? "none" : `1px solid ${T.divider}`;
+          return (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 0", opacity: dimmed ? 0.35 : 1, borderBottom: border }}>
+              {spriteUrl
+                ? <img src={spriteUrl} alt={p.name} width={32} height={32} style={{ imageRendering:"pixelated", flexShrink:0, opacity: isCaught ? 1 : 0.65, filter: isCaught ? "none" : "brightness(0)" }} />
+                : <div style={{ width:32, height:32, flexShrink:0 }} />}
+              <span style={{ fontSize:14, flex:1, minWidth:0, color: isCaught ? "#4aaf74" : T.textPrimary, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                {p.name}
+              </span>
+              {vTag && (
+                <span style={{ fontSize:11, fontWeight:700, color: vTag === "FR" ? "#d4621a" : "#3fa84a", background: vTag === "FR" ? "rgba(212,98,26,0.15)" : "rgba(63,168,74,0.15)", borderRadius:4, padding:"1px 6px", flexShrink:0 }}>
+                  {vTag}
+                </span>
+              )}
+              <span style={{ fontSize:11, background:mc.bg, color:mc.color, borderRadius:4, padding:"1px 6px", flexShrink:0 }}>
+                {{"Old Rod":"Old","Good Rod":"Good","Super Rod":"Super"}[p.method] ?? p.method}
+              </span>
+              <span style={{ fontSize:11, color: T.textMuted, flexShrink:0, whiteSpace:"nowrap" }}>
+                {versionRate(p, version)}
+              </span>
+            </div>
+          );
+        };
+      };
 
+      const makeItemRenderer = (rows) => (row, i) => {
+        if (row.type === "floor") return <div key={i} style={floorLabelStyle(row.isFirst)}>{row.label}</div>;
+        const { entry: it, floorLabel, idx } = row;
+        const key       = itemKey(areaId, floorLabel, idx);
+        const collected = it.heldBy
+          ? (Array.isArray(it.heldBy) ? it.heldBy : [it.heldBy]).some(n => !!trades[`${areaId}|trade|${n}`])
+          : !!items[key];
+        const spriteUrl = itemSprite(it.name);
+        const nextRow   = rows[i + 1];
+        const border    = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
+        return (
+          <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 0", opacity: collected ? 0.45 : 1, borderBottom: border }}>
+            {spriteUrl
+              ? <img src={spriteUrl} alt={it.name} width={32} height={32} style={{ imageRendering:"pixelated", flexShrink:0 }} />
+              : <div style={{ width:32, height:32, background: T.placeholderBg, borderRadius:4, flexShrink:0 }} />}
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:14, color: collected ? T.textMuted : T.textPrimary, textDecoration: collected ? "line-through" : "none", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                {it.hidden && <span style={{ color:"#c8960a", marginRight:3 }}>★</span>}
+                {it.name}
+              </div>
+              {it.note && (
+                <div style={{ fontSize:11, color: T.textMuted, marginTop:1, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                  {it.note}
+                </div>
+              )}
+            </div>
+            {collected && <span style={{ fontSize:16, color:"#4aaf74", flexShrink:0 }}>✓</span>}
+          </div>
+        );
+      };
+
+      // ── Wild ──────────────────────────────────────────────────────────────────
+      if (section === "wild") {
+        const rows = buildWildRows(area, areaId, version, collapsedFloors);
+        if (!rows.length) return null;
         return (
           <div style={panel}>
             <div style={sectionHeader(meta.accent)}>{meta.label}</div>
             <div style={areaLabel}>{area.name}</div>
-            {rows.map((row, i) => {
-              if (row.type === "floor") {
-                return <div key={i} style={floorLabelStyle(row.isFirst)}>{row.label}</div>;
-              }
-              const { entry: it, floorLabel, idx } = row;
-              const key       = itemKey(areaId, floorLabel, idx);
-              const collected = items[key];
-              const spriteUrl = itemSprite(it.name);
-              const nextRow   = rows[i + 1];
-              const border    = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
-
-              return (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:7, padding:"5px 0",
-                                      opacity: collected ? 0.45 : 1,
-                                      borderBottom: border }}>
-                  {spriteUrl
-                    ? <img src={spriteUrl} alt={it.name} width={32} height={32}
-                           style={{ imageRendering:"pixelated", flexShrink:0 }} />
-                    : <div style={{ width:32, height:32, background: T.placeholderBg,
-                                    borderRadius:4, flexShrink:0 }} />
-                  }
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:14, color: collected ? T.textMuted : T.textPrimary,
-                                  textDecoration: collected ? "line-through" : "none",
-                                  whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-                      {it.hidden && <span style={{ color:"#c8960a", marginRight:3 }}>★</span>}
-                      {it.name}
-                    </div>
-                    {it.note && (
-                      <div style={{ fontSize:11, color: T.textMuted, marginTop:1,
-                                    whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-                        {it.note}
-                      </div>
-                    )}
-                  </div>
-                  {collected && (
-                    <span style={{ fontSize:16, color:"#4aaf74", flexShrink:0 }}>✓</span>
-                  )}
-                </div>
-              );
-            })}
+            {rows.map(makeWildRenderer(rows))}
           </div>
         );
       }
 
-      // ── Trainers ───────────────────────────────────────────────────────────────
+      // ── Items ─────────────────────────────────────────────────────────────────
+      if (section === "items") {
+        const rows = buildItemRows(area, areaId, collapsedFloors);
+        if (!rows.length) return null;
+        return (
+          <div style={panel}>
+            <div style={sectionHeader(meta.accent)}>{meta.label}</div>
+            <div style={areaLabel}>{area.name}</div>
+            {rows.map(makeItemRenderer(rows))}
+          </div>
+        );
+      }
+
+      // ── Combined ──────────────────────────────────────────────────────────────
+      if (section === "combined") {
+        const wRows = buildWildRows(area, areaId, version, collapsedFloors);
+        const iRows = buildItemRows(area, areaId, collapsedFloors);
+        if (!wRows.length && !iRows.length) return null;
+        return (
+          <div style={panel}>
+            <div style={areaLabel}>{area.name}</div>
+            {wRows.length > 0 && (
+              <>
+                <div style={sectionHeader(SECTION_META.wild.accent)}>{SECTION_META.wild.label}</div>
+                {wRows.map(makeWildRenderer(wRows))}
+              </>
+            )}
+            {wRows.length > 0 && iRows.length > 0 && (
+              <div style={{ height:1, background: T.border, margin:"10px 0 8px" }} />
+            )}
+            {iRows.length > 0 && (
+              <>
+                <div style={sectionHeader(SECTION_META.items.accent)}>{SECTION_META.items.label}</div>
+                {iRows.map(makeItemRenderer(iRows))}
+              </>
+            )}
+          </div>
+        );
+      }
+
+      // ── Trainers ──────────────────────────────────────────────────────────────
       if (section === "trainers") {
         const entries = flattenTrainers(area);
         if (!entries.length) return null;
-
-        const floorLabelStyle = (isFirst) => ({
-          fontSize:11, fontWeight:700, letterSpacing:1,
-          color: T.textMuted,
-          borderLeft: `2px solid ${T.border}`,
-          paddingLeft: 5,
-          marginTop: isFirst ? 2 : 8,
-          marginBottom: 3,
-        });
-
         const rows = [];
         let lastFloor = undefined;
-        entries.forEach(({ trainer, floorLabel }, i) => {
+        entries.forEach(({ trainer, floorLabel }) => {
           if (floorLabel && collapsedFloors[`${areaId}|${floorLabel}`]) return;
           if (floorLabel !== lastFloor) {
-            if (floorLabel) rows.push({ type:"floor", label:floorLabel, isFirst: rows.length === 0 });
+            if (floorLabel) rows.push({ type:"floor", label: floorLabel, isFirst: rows.length === 0 });
             lastFloor = floorLabel;
           }
           rows.push({ type:"trainer", trainer });
         });
-
         return (
           <div style={panel}>
             <div style={sectionHeader(meta.accent)}>{meta.label}</div>
             <div style={areaLabel}>{area.name}</div>
             {rows.map((row, i) => {
-              if (row.type === "floor") {
-                return <div key={i} style={floorLabelStyle(row.isFirst)}>{row.label}</div>;
-              }
-              const tr       = row.trainer;
-              const key      = `${areaId}|${tr.class}|${tr.name}`;
+              if (row.type === "floor") return <div key={i} style={floorLabelStyle(row.isFirst)}>{row.label}</div>;
+              const tr      = row.trainer;
+              const key     = `${areaId}|${tr.class}|${tr.name}`;
               const defeated = trainers[key];
-              const nextRow  = rows[i + 1];
-              const border   = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
-
+              const nextRow = rows[i + 1];
+              const border  = (!nextRow || nextRow.type === "floor") ? "none" : `1px solid ${T.divider}`;
               return (
-                <div key={i} style={{ padding:"4px 0", opacity: defeated ? 0.45 : 1,
-                                      borderBottom: border }}>
+                <div key={i} style={{ padding:"4px 0", opacity: defeated ? 0.45 : 1, borderBottom: border }}>
                   <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                     <div style={{ flex:1, minWidth:0 }}>
                       <span style={{ fontSize:11, color:"#a87acc", marginRight:4 }}>{tr.class}</span>
-                      <span style={{ fontSize:11,
-                                     color: defeated ? T.textMuted : T.textPrimary,
-                                     textDecoration: defeated ? "line-through" : "none" }}>
-                        {tr.name}
-                      </span>
+                      <span style={{ fontSize:11, color: defeated ? T.textMuted : T.textPrimary, textDecoration: defeated ? "line-through" : "none" }}>{tr.name}</span>
                     </div>
-                    {defeated && (
-                      <span style={{ fontSize:13, color:"#4aaf74", flexShrink:0 }}>✓</span>
-                    )}
+                    {defeated && <span style={{ fontSize:13, color:"#4aaf74", flexShrink:0 }}>✓</span>}
                   </div>
                   {tr.team && tr.team.length > 0 && (
                     <div style={{ display:"flex", flexWrap:"wrap", gap:4, marginTop:3 }}>
                       {tr.team.map((mon, j) => {
                         const url = pokeSprite(mon.name);
                         return (
-                          <div key={j} style={{ display:"flex", alignItems:"center", gap:2,
-                                                background: T.teamBg,
-                                                borderRadius:5, padding:"1px 5px 1px 2px" }}>
-                            {url && (
-                              <img src={url} alt={mon.name} width={20} height={20}
-                                   style={{ imageRendering:"pixelated" }} />
-                            )}
-                            <span style={{ fontSize:9, color: T.textMuted }}>
-                              {mon.name} <span style={{ color:"#c8960a" }}>{mon.level}</span>
-                            </span>
+                          <div key={j} style={{ display:"flex", alignItems:"center", gap:2, background: T.teamBg, borderRadius:5, padding:"1px 5px 1px 2px" }}>
+                            {url && <img src={url} alt={mon.name} width={20} height={20} style={{ imageRendering:"pixelated" }} />}
+                            <span style={{ fontSize:9, color: T.textMuted }}>{mon.name} <span style={{ color:"#c8960a" }}>{mon.level}</span></span>
                           </div>
                         );
                       })}
@@ -546,7 +484,6 @@
     }
 
     // ─── Bootstrap ────────────────────────────────────────────────────────────────
-    // Fetch and eval the main JSX to populate window.__FRLG_AREAS etc., then mount.
     fetch('firered-area-tracker-v3.jsx?t=' + Date.now())
       .then(r => r.text())
       .then(jsx => {
