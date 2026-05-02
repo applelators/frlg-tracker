@@ -6254,6 +6254,39 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
       return n;
     });
   }, [partFullDone]);
+  const partSoftDone = useMemo(() => {
+    const result = {};
+    Object.entries(groups).forEach(([part, list]) => {
+      if (partFullDone[part]) { result[part] = false; return; }
+      result[part] = list.length > 0 && list.every(area => {
+        const allPoks = flattenPokemon(area).filter(p =>
+          !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) &&
+          !isPassedPokemon(p) && p.method !== "Trade");
+        const pokDone = allPoks.every(p => caught[p.name]);
+        let reqItemsDone = true;
+        if (area.floors) {
+          for (const f of area.floors) {
+            for (let i = 0; i < (f.items||[]).length; i++) {
+              const it = f.items[i];
+              if (isPassedItem(it) || it.optional || it.recurring) continue;
+              if (!items[floorItemKey(area.id, f.label, i)]) { reqItemsDone = false; break; }
+            }
+            if (!reqItemsDone) break;
+          }
+        } else {
+          const its = area.items || [];
+          for (let i = 0; i < its.length; i++) {
+            const it = its[i];
+            if (isPassedItem(it) || it.optional || it.recurring) continue;
+            if (!items[flatItemKey(area.id, i)]) { reqItemsDone = false; break; }
+          }
+        }
+        const trainersDone = flattenTrainers(area).every(t => trainers[`${area.id}|${t.class}|${t.name}`]);
+        return pokDone && reqItemsDone && trainersDone;
+      });
+    });
+    return result;
+  }, [groups, caught, items, trainers, version, choiceGroups, partFullDone]);
 
   const areaPokemon  = area ? flattenPokemon(area)  : [];
   const areaItems    = area ? flattenItems(area)    : [];
@@ -6305,10 +6338,12 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
           : Object.entries(groups).map(([part, list]) => {
               const isCollapsed = collapsedParts.has(part);
               const isDone = partFullDone[part];
+              const isSoft = partSoftDone[part];
+              const partColor = isDone ? C.green : isSoft ? C.gold : C.muted;
               return (
                 <div key={part}>
-                  <div onClick={() => togglePart(part)} style={{ padding:"6px 12px 6px 10px", fontSize:10, letterSpacing:2, color: isDone ? C.green : C.muted, textTransform:"uppercase", background:"rgba(0,0,0,0.2)", borderBottom:`1px solid ${C.border}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", userSelect:"none" }}>
-                    <span>{isDone ? "✓ " : ""}{part}</span>
+                  <div onClick={() => togglePart(part)} style={{ padding:"6px 12px 6px 10px", fontSize:10, letterSpacing:2, color: partColor, textTransform:"uppercase", background:"rgba(0,0,0,0.2)", borderBottom:`1px solid ${C.border}`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", userSelect:"none" }}>
+                    <span>{isDone ? "✓ " : isSoft ? "~ " : ""}{part}</span>
                     <span style={{ fontSize:11, opacity:0.6, marginLeft:6 }}>{isCollapsed ? "▶" : "▼"}</span>
                   </div>
                   {!isCollapsed && list.map(a => <AreaRow key={a.id} area={a} areaId={areaId} setAreaId={setAreaId} caught={caught} items={items} trainers={trainers} version={version} choiceGroups={choiceGroups} />)}
