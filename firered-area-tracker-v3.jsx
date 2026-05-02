@@ -5892,7 +5892,7 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
     if (dexFilter === "lg")      return p.lgOnly;
     if (dexFilter === "event")   return p.event;
     if (dexFilter === "noball")  return !!CATCH_CONSTRAINT_MAP[p.name];
-    return !isOtherVersionDex(p);
+    return true;
   });
 
   const searchTerm = dexSearch.trim().toLowerCase();
@@ -5948,17 +5948,18 @@ function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, se
             {displayed.map(p => {
               const isCaught = !!caught[p.name];
               const isSel = dexSelected === p.name;
+              const isDimmed = isOtherVersionDex(p);
               return (
-                <div key={p.id} onClick={() => { toggleCaught(p.name); setDexSelected(p.name); }}
+                <div key={p.id} onClick={() => { if (!isDimmed) { toggleCaught(p.name); setDexSelected(p.name); } }}
                   style={{
                     background: isCaught ? "rgba(74,175,116,0.10)" : isSel ? "rgba(0,0,0,0.15)" : C.card,
                     border:`1px solid ${isSel ? "var(--frlg-accent)" : isCaught ? C.green : p.event ? "#a87acc" : p.lgOnly ? C.lgGreen : p.frOnly ? "#c85252" : C.border}`,
-                    borderRadius:8, padding:"8px 5px 6px", cursor:"pointer", textAlign:"center",
-                    transition:"all 0.12s", position:"relative",
+                    borderRadius:8, padding:"8px 5px 6px", cursor: isDimmed ? "default" : "pointer", textAlign:"center",
+                    transition:"all 0.12s", position:"relative", opacity: isDimmed ? 0.3 : 1,
                     boxShadow: isSel ? "0 0 0 2px rgba(var(--frlg-accent-rgb,212,98,26),0.2)" : "none",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = isCaught ? C.green : "var(--frlg-accent)"; e.currentTarget.style.background = isCaught ? "rgba(74,175,116,0.15)" : "rgba(0,0,0,0.2)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = isSel ? "var(--frlg-accent)" : isCaught ? C.green : p.event ? "#a87acc" : p.lgOnly ? C.lgGreen : p.frOnly ? "#c85252" : C.border; e.currentTarget.style.background = isCaught ? "rgba(74,175,116,0.10)" : isSel ? "rgba(0,0,0,0.15)" : C.card; }}
+                  onMouseEnter={e => { if (isDimmed) return; e.currentTarget.style.borderColor = isCaught ? C.green : "var(--frlg-accent)"; e.currentTarget.style.background = isCaught ? "rgba(74,175,116,0.15)" : "rgba(0,0,0,0.2)"; }}
+                  onMouseLeave={e => { if (isDimmed) return; e.currentTarget.style.borderColor = isSel ? "var(--frlg-accent)" : isCaught ? C.green : p.event ? "#a87acc" : p.lgOnly ? C.lgGreen : p.frOnly ? "#c85252" : C.border; e.currentTarget.style.background = isCaught ? "rgba(74,175,116,0.10)" : isSel ? "rgba(0,0,0,0.15)" : C.card; }}
                 >
                   {isCaught && <div style={{ position:"absolute", top:4, left:5, fontSize:9, color:C.green, fontWeight:"700" }}>✓</div>}
                   {p.frOnly && <div style={{ position:"absolute", top:4, right:4, fontSize:8, color:"#c85252", fontWeight:"600" }}>FR</div>}
