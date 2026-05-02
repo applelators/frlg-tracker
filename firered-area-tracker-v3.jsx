@@ -3402,8 +3402,10 @@ function buildDreamTeam(favoriteName, version) {
   const inTeam = new Set([finalFav]);
   const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favoriteName);
   if (!isDragoniteLine) { team.push("Dragonite"); inTeam.add("Dragonite"); }
-  // TODO: remove Jolteon pin when no longer needed
-  if (!inTeam.has("Jolteon")) { team.push("Jolteon"); inTeam.add("Jolteon"); }
+  // TODO: remove pinned Pokémon when no longer needed
+  if (!inTeam.has("Jolteon"))  { team.push("Jolteon");  inTeam.add("Jolteon"); }
+  if (!inTeam.has("Snorlax"))  { team.push("Snorlax");  inTeam.add("Snorlax"); }
+  if (!inTeam.has("Nidoking")) { team.push("Nidoking"); inTeam.add("Nidoking"); }
   const requiredHMs = ["Fly","Surf","Waterfall","Strength","Cut","Rock Smash"];
   const getCoverage = () => {
     const s = new Set();
