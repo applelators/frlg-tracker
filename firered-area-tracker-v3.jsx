@@ -4097,7 +4097,7 @@ const MOVE_TYPES = {
   // Ghost
   "Shadow Ball":"Ghost","Confuse Ray":"Ghost",Lick:"Ghost",
   // Dragon
-  Outrage:"Dragon","Dragon Rage":"Dragon",Twister:"Dragon","Dragon Dance":"Dragon",
+  Outrage:"Dragon","Dragon Rage":"Dragon",Twister:"Dragon","Dragon Dance":"Dragon","Dragon Claw":"Dragon",
   // Dark
   Crunch:"Dark",Pursuit:"Dark",Bite:"Dark",
   // Steel
@@ -4119,6 +4119,135 @@ const MOVE_TYPES = {
   "Rain Dance":"Water","Sunny Day":"Fire",Sandstorm:"Rock",
   "Scary Face":"Normal","Focus Energy":"Normal",Softboiled:"Normal",
   "Mean Look":"Normal","Stockpile":"Normal",Swallow:"Normal",Leer:"Normal",Growl:"Normal",
+};
+// bp: base power (null = status/variable/OHKO), acc: accuracy (null = never misses), pp: max PP
+const MOVE_STATS = {
+  // HMs
+  Cut:              { bp:50,  acc:95,  pp:30 },
+  Fly:              { bp:70,  acc:95,  pp:15 },
+  Surf:             { bp:95,  acc:100, pp:15 },
+  Strength:         { bp:80,  acc:100, pp:15 },
+  "Rock Smash":     { bp:20,  acc:100, pp:15 },
+  Waterfall:        { bp:80,  acc:100, pp:15 },
+  Flash:            { bp:null,acc:70,  pp:20 },
+  // Electric
+  Thunderbolt:      { bp:95,  acc:100, pp:15 },
+  Thunder:          { bp:120, acc:70,  pp:10 },
+  ThunderPunch:     { bp:75,  acc:100, pp:15 },
+  "Thunder Wave":   { bp:null,acc:100, pp:20 },
+  // Fire
+  Flamethrower:     { bp:95,  acc:100, pp:15 },
+  "Fire Blast":     { bp:120, acc:85,  pp:5  },
+  "Fire Punch":     { bp:75,  acc:100, pp:15 },
+  "Will-O-Wisp":    { bp:null,acc:75,  pp:15 },
+  // Ice
+  "Ice Beam":       { bp:95,  acc:100, pp:10 },
+  Blizzard:         { bp:120, acc:70,  pp:5  },
+  "Ice Punch":      { bp:75,  acc:100, pp:15 },
+  "Sheer Cold":     { bp:null,acc:30,  pp:5  },
+  // Ground
+  Earthquake:       { bp:100, acc:100, pp:10 },
+  Fissure:          { bp:null,acc:30,  pp:5  },
+  // Grass
+  SolarBeam:        { bp:120, acc:100, pp:10 },
+  "Razor Leaf":     { bp:55,  acc:95,  pp:25 },
+  "Vine Whip":      { bp:35,  acc:100, pp:10 },
+  "Petal Dance":    { bp:70,  acc:100, pp:20 },
+  "Giga Drain":     { bp:60,  acc:100, pp:5  },
+  "Sleep Powder":   { bp:null,acc:75,  pp:15 },
+  Spore:            { bp:null,acc:100, pp:15 },
+  "Leech Seed":     { bp:null,acc:90,  pp:10 },
+  // Poison
+  "Sludge Bomb":    { bp:90,  acc:100, pp:10 },
+  Toxic:            { bp:null,acc:85,  pp:10 },
+  "Poison Fang":    { bp:50,  acc:100, pp:15 },
+  // Psychic
+  Psychic:          { bp:90,  acc:100, pp:10 },
+  Psybeam:          { bp:65,  acc:100, pp:20 },
+  "Future Sight":   { bp:80,  acc:90,  pp:15 },
+  Amnesia:          { bp:null,acc:null, pp:20 },
+  Agility:          { bp:null,acc:null, pp:30 },
+  Hypnosis:         { bp:null,acc:60,  pp:20 },
+  // Bug
+  Megahorn:         { bp:120, acc:85,  pp:10 },
+  "Silver Wind":    { bp:60,  acc:100, pp:5  },
+  Twineedle:        { bp:25,  acc:100, pp:20 },
+  "Pin Missile":    { bp:14,  acc:85,  pp:20 },
+  "Leech Life":     { bp:20,  acc:100, pp:15 },
+  // Rock
+  "Rock Slide":     { bp:75,  acc:90,  pp:10 },
+  AncientPower:     { bp:60,  acc:100, pp:5  },
+  // Ghost
+  "Shadow Ball":    { bp:80,  acc:100, pp:15 },
+  "Confuse Ray":    { bp:null,acc:100, pp:10 },
+  Lick:             { bp:20,  acc:100, pp:30 },
+  // Dragon
+  "Dragon Claw":    { bp:80,  acc:100, pp:15 },
+  Outrage:          { bp:90,  acc:100, pp:15 },
+  "Dragon Rage":    { bp:null,acc:100, pp:10 },
+  Twister:          { bp:40,  acc:100, pp:20 },
+  "Dragon Dance":   { bp:null,acc:null, pp:20 },
+  // Dark
+  Crunch:           { bp:80,  acc:100, pp:15 },
+  Pursuit:          { bp:40,  acc:100, pp:20 },
+  Bite:             { bp:60,  acc:100, pp:25 },
+  // Steel
+  "Iron Tail":      { bp:100, acc:75,  pp:15 },
+  "Metal Claw":     { bp:50,  acc:95,  pp:35 },
+  "Meteor Mash":    { bp:100, acc:85,  pp:10 },
+  // Fighting
+  "Brick Break":    { bp:75,  acc:100, pp:15 },
+  "High Jump Kick": { bp:85,  acc:90,  pp:20 },
+  "Hi Jump Kick":   { bp:85,  acc:90,  pp:20 },
+  "Sky Uppercut":   { bp:85,  acc:90,  pp:15 },
+  Submission:       { bp:80,  acc:80,  pp:25 },
+  Superpower:       { bp:120, acc:100, pp:5  },
+  "Karate Chop":    { bp:50,  acc:100, pp:25 },
+  "Low Kick":       { bp:null,acc:100, pp:20 },
+  // Normal
+  "Hyper Beam":     { bp:150, acc:90,  pp:5  },
+  "Body Slam":      { bp:85,  acc:100, pp:15 },
+  Thrash:           { bp:90,  acc:100, pp:20 },
+  "Hyper Voice":    { bp:90,  acc:100, pp:10 },
+  "Skull Bash":     { bp:100, acc:100, pp:15 },
+  ExtremeSpeed:     { bp:80,  acc:100, pp:5  },
+  "Hyper Fang":     { bp:80,  acc:90,  pp:15 },
+  "Super Fang":     { bp:null,acc:90,  pp:10 },
+  Slash:            { bp:70,  acc:100, pp:20 },
+  "Tri Attack":     { bp:80,  acc:100, pp:10 },
+  "Rapid Spin":     { bp:20,  acc:100, pp:40 },
+  Swift:            { bp:60,  acc:null, pp:20 },
+  Slam:             { bp:80,  acc:75,  pp:20 },
+  Wrap:             { bp:15,  acc:85,  pp:20 },
+  "Horn Drill":     { bp:null,acc:30,  pp:5  },
+  Guillotine:       { bp:null,acc:30,  pp:5  },
+  Endeavor:         { bp:null,acc:100, pp:5  },
+  "Spit Up":        { bp:null,acc:100, pp:10 },
+  // Flying
+  "Wing Attack":    { bp:60,  acc:100, pp:35 },
+  "Drill Peck":     { bp:80,  acc:100, pp:20 },
+  "Air Cutter":     { bp:55,  acc:95,  pp:25 },
+  "Aerial Ace":     { bp:60,  acc:null, pp:20 },
+  // Water
+  "Water Gun":      { bp:40,  acc:100, pp:25 },
+  "Hydro Pump":     { bp:120, acc:80,  pp:5  },
+  // Status
+  "Swords Dance":   { bp:null,acc:null, pp:30 },
+  "Belly Drum":     { bp:null,acc:null, pp:10 },
+  Safeguard:        { bp:null,acc:null, pp:25 },
+  Protect:          { bp:null,acc:null, pp:10 },
+  "Rain Dance":     { bp:null,acc:null, pp:5  },
+  "Sunny Day":      { bp:null,acc:null, pp:5  },
+  Sandstorm:        { bp:null,acc:null, pp:10 },
+  "Scary Face":     { bp:null,acc:100, pp:10 },
+  "Focus Energy":   { bp:null,acc:null, pp:30 },
+  Softboiled:       { bp:null,acc:null, pp:10 },
+  "Mean Look":      { bp:null,acc:null, pp:5  },
+  Stockpile:        { bp:null,acc:null, pp:20 },
+  Swallow:          { bp:null,acc:null, pp:10 },
+  Leer:             { bp:null,acc:100, pp:30 },
+  Growl:            { bp:null,acc:100, pp:40 },
+  "Mirror Move":    { bp:null,acc:null, pp:20 },
 };
 const STATUS_MOVES = new Set([
   "Swords Dance","Amnesia","Agility","Dragon Dance","Belly Drum",
@@ -5216,6 +5345,12 @@ function DreamTeamTab({ isMobile, version }) {
                           <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
                           {isOneTime && <span style={{ fontSize:8, color:"#e8a020", background:"rgba(232,160,32,0.12)", border:"1px solid rgba(232,160,32,0.3)", borderRadius:3, padding:"0 4px", flexShrink:0, whiteSpace:"nowrap" }}>1× only</span>}
                         </div>
+                        {MOVE_STATS[m.move] && (() => {
+                          const s = MOVE_STATS[m.move];
+                          const bp  = s.bp  != null ? `${s.bp} bp`  : "— bp";
+                          const acc = s.acc != null ? `${s.acc}%`   : "—%";
+                          return <div style={{ fontSize:9, color:C.muted, opacity:0.75, marginTop:1, paddingLeft:1 }}>{bp} · {acc} · {s.pp} PP</div>;
+                        })()}
                         {superEff.length > 0 && (
                           <div style={{ display:"flex", gap:3, flexWrap:"wrap", marginTop:2 }}>
                             <span style={{ fontSize:8, color:C.muted }}>2× vs</span>
