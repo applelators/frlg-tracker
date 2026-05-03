@@ -5212,6 +5212,7 @@ function DreamTeamTab({ isMobile, version }) {
                       <div key={i} style={{ marginBottom:4 }}>
                         <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
                           <span style={{ fontSize:11, fontWeight:"600", color:moveColor }}>{m.move}</span>
+                          {MOVE_TYPES[m.move] && <span style={{ fontSize:8, color:"#fff", background:TYPE_COLORS[MOVE_TYPES[m.move]]||"#888", padding:"1px 5px", borderRadius:3, fontWeight:"700", letterSpacing:0.3, flexShrink:0 }}>{MOVE_TYPES[m.move]}</span>}
                           <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
                           {isOneTime && <span style={{ fontSize:8, color:"#e8a020", background:"rgba(232,160,32,0.12)", border:"1px solid rgba(232,160,32,0.3)", borderRadius:3, padding:"0 4px", flexShrink:0, whiteSpace:"nowrap" }}>1× only</span>}
                         </div>
