@@ -9669,21 +9669,27 @@ function TradeTab({ version, isMobile }) {
     });
   };
 
-  const frEntries = useMemo(() => buildEntries(new Set([...SEREBII_FR, ...NAT_SEREBII_FR]), "frOnly"), []);
-  const lgEntries = useMemo(() => buildEntries(new Set([...SEREBII_LG, ...NAT_SEREBII_LG]), "lgOnly"), []);
+  const frRegEntries = useMemo(() => buildEntries(SEREBII_FR,     "frOnly"), []);
+  const frNatEntries = useMemo(() => buildEntries(NAT_SEREBII_FR, "frOnly"), []);
+  const lgRegEntries = useMemo(() => buildEntries(SEREBII_LG,     "lgOnly"), []);
+  const lgNatEntries = useMemo(() => buildEntries(NAT_SEREBII_LG, "lgOnly"), []);
 
-  const myEntries    = version === "fr" ? frEntries : lgEntries;
-  const theirEntries = version === "fr" ? lgEntries : frEntries;
+  const myRegEntries    = version === "fr" ? frRegEntries : lgRegEntries;
+  const myNatEntries    = version === "fr" ? frNatEntries : lgNatEntries;
+  const theirRegEntries = version === "fr" ? lgRegEntries : frRegEntries;
+  const theirNatEntries = version === "fr" ? lgNatEntries : frNatEntries;
   const myLabel    = version === "fr" ? "FireRed" : "LeafGreen";
   const theirLabel = version === "fr" ? "LeafGreen" : "FireRed";
   const myColor    = version === "fr" ? C.frRed : C.lgGreen;
   const theirColor = version === "fr" ? C.lgGreen : C.frRed;
 
-  const spareCount    = myEntries.filter(e => spares[e.name]).length;
-  const receivedCount = theirEntries.filter(e => received[e.name]).length;
+  const spareRegCount    = myRegEntries.filter(e => spares[e.name]).length;
+  const spareNatCount    = myNatEntries.filter(e => spares[e.name]).length;
+  const receivedRegCount = theirRegEntries.filter(e => received[e.name]).length;
+  const receivedNatCount = theirNatEntries.filter(e => received[e.name]).length;
 
-  const kantoTradeEvos = FRLG_TRADE_EVOS.filter(e => DEX_ID[e.from] && DEX_ID[e.to]);
-  const natTradeEvos   = FRLG_TRADE_EVOS.filter(e => !(DEX_ID[e.from] && DEX_ID[e.to]));
+  const kantoTradeEvos  = FRLG_TRADE_EVOS.filter(e =>  DEX_ID[e.from] && DEX_ID[e.to]);
+  const natTradeEvos    = FRLG_TRADE_EVOS.filter(e => !(DEX_ID[e.from] && DEX_ID[e.to]));
   const evoDoneCount    = kantoTradeEvos.filter(e => evoDone[`${e.from}-${e.to}`]).length;
   const natEvoDoneCount = natTradeEvos.filter(e => evoDone[`${e.from}-${e.to}`]).length;
 
@@ -9766,49 +9772,89 @@ function TradeTab({ version, isMobile }) {
 
   return (
     <div style={{ flex:1, overflowY:"auto" }}>
-      <div style={{ maxWidth:700, margin:"0 auto", padding:"20px 16px 40px", display:"flex", flexDirection:"column", gap:24 }}>
+      <div style={{ maxWidth:700, margin:"0 auto", padding:"20px 16px 40px", display:"flex", flexDirection:"column", gap:32 }}>
 
-        {/* Collect spares to trade away */}
+        {/* ══ Regional Dex (Kanto, #001–151) ══════════════════════════ */}
         <div>
-          {secHead(`${myLabel} exclusives — collect spares`, spareCount, myEntries.length, myColor)}
-          <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
-            Only catchable in {myLabel}. Catch extras to send to your {theirLabel} partner.
+          <div style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.12em", textTransform:"uppercase",
+            color:C.accent, marginBottom:16, display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ flex:1, height:1, background:`${C.accent}40` }} />
+            Regional Dex · Kanto #001–151
+            <div style={{ flex:1, height:1, background:`${C.accent}40` }} />
           </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
-            {myEntries.map(entry => exRow(entry, !!spares[entry.name], () => toggleSpare(entry.name)))}
+
+          <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+            <div>
+              {secHead(`${myLabel} exclusives — collect spares`, spareRegCount, myRegEntries.length, myColor)}
+              <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
+                Only catchable in {myLabel}. Catch extras to send to your {theirLabel} partner.
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                {myRegEntries.map(entry => exRow(entry, !!spares[entry.name], () => toggleSpare(entry.name)))}
+              </div>
+            </div>
+
+            <div>
+              {secHead(`${theirLabel} exclusives — mark when received`, receivedRegCount, theirRegEntries.length, theirColor)}
+              <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
+                Only catchable in {theirLabel}. Check off each one as your partner trades it to you.
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                {theirRegEntries.map(entry => exRow(entry, !!received[entry.name], () => toggleReceived(entry.name)))}
+              </div>
+            </div>
+
+            <div>
+              {secHead("Trade evolutions", evoDoneCount, kantoTradeEvos.length, C.accent)}
+              <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
+                Pokémon that only evolve by trading. Check off once you have the evolved form.
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                {kantoTradeEvos.map(evoRow)}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Mark when received from partner */}
+        {/* ══ National Dex ═════════════════════════════════════════════ */}
         <div>
-          {secHead(`${theirLabel} exclusives — mark when received`, receivedCount, theirEntries.length, theirColor)}
-          <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
-            Only catchable in {theirLabel}. Check off each one as your partner trades it to you.
+          <div style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.12em", textTransform:"uppercase",
+            color:C.muted, marginBottom:16, display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ flex:1, height:1, background:`${C.muted}40` }} />
+            National Dex
+            <div style={{ flex:1, height:1, background:`${C.muted}40` }} />
           </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
-            {theirEntries.map(entry => exRow(entry, !!received[entry.name], () => toggleReceived(entry.name)))}
-          </div>
-        </div>
 
-        {/* Trade evolutions — Kanto Dex */}
-        <div>
-          {secHead("Trade evolutions", evoDoneCount, kantoTradeEvos.length, C.accent)}
-          <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
-            Pokémon that only evolve by trading. Check off once you have the evolved form.
-          </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
-            {kantoTradeEvos.map(evoRow)}
-          </div>
-        </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+            <div>
+              {secHead(`${myLabel} exclusives — collect spares`, spareNatCount, myNatEntries.length, myColor)}
+              <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
+                National Dex exclusives only catchable in {myLabel}. Not required for Kanto 100% — needed for Living Dex.
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                {myNatEntries.map(entry => exRow(entry, !!spares[entry.name], () => toggleSpare(entry.name)))}
+              </div>
+            </div>
 
-        {/* Trade evolutions — National Dex only */}
-        <div>
-          {secHead("National Dex trade evolutions", natEvoDoneCount, natTradeEvos.length, C.muted)}
-          <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
-            Not required for Kanto 100% completion — needed for Living Dex only.
-          </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
-            {natTradeEvos.map(evoRow)}
+            <div>
+              {secHead(`${theirLabel} exclusives — mark when received`, receivedNatCount, theirNatEntries.length, theirColor)}
+              <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
+                National Dex exclusives only catchable in {theirLabel}. Check off as your partner sends them over.
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                {theirNatEntries.map(entry => exRow(entry, !!received[entry.name], () => toggleReceived(entry.name)))}
+              </div>
+            </div>
+
+            <div>
+              {secHead("Trade evolutions", natEvoDoneCount, natTradeEvos.length, C.muted)}
+              <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
+                Not required for Kanto 100% completion — needed for Living Dex only.
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                {natTradeEvos.map(evoRow)}
+              </div>
+            </div>
           </div>
         </div>
 
