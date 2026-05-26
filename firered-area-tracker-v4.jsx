@@ -3147,6 +3147,7 @@ for (const [name, locs] of Object.entries(LOCATION_MAP)) {
     for (const loc of locs) {
       if (ver === "fr" && loc.lgOnly) continue;
       if (ver === "lg" && loc.frOnly) continue;
+      if (loc.areaId === "safari-zone") continue;
       const pct = _locPct(loc, ver);
       if (pct && (!best || pct > best.pct)) best = { pct, areaName: loc.areaName };
     }
@@ -3516,6 +3517,54 @@ const EVO_DELAY = {
   "Jigglypuff": "Consider delaying Moon Stone until Lv. 34 (Body Slam) or Lv. 44 (Hyper Voice).",
   "Clefairy":   "Consider delaying Moon Stone until Lv. 29 (Metronome) or Lv. 33 (Cosmic Power).",
   "Exeggcute":  "Optional: delay Leaf Stone until Lv. 43 (SolarBeam) to avoid using TM22.",
+};
+
+// ─── DREAM TEAM LEVEL CAPS ───────────────────────────────────────────────────
+// "bench at Lv X" — stop grinding once you hit this level; your core moveset is complete.
+// `higher` breakpoints list optional later milestones worth knowing about.
+const DT_LEVEL_CAP = {
+  // Starters
+  "Charizard":  { cap:36, reason:"Learns Flamethrower + Wing Attack at Lv 36 (same level as evolution from Charmeleon); TM02 Dragon Claw + TM26 Earthquake finish the set" },
+  "Blastoise":  { cap:36, reason:"Wartortle → Blastoise at Lv 36; bench here — TM13 Ice Beam + Surf cover the Water role" },
+  "Venusaur":   { cap:32, reason:"Ivysaur → Venusaur at Lv 32 (Razor Leaf already learned at Lv 22 on Ivysaur); TM22 SolarBeam + TM36 Sludge Bomb complete the set" },
+  // Stone evos — delay the stone to this level, then bench the evolved form immediately
+  "Raichu":     { cap:26, reason:"Evolve Pikachu after Thunderbolt at Lv 26 — Raichu starts with Thunderbolt and gains no further level-up moves; bench immediately" },
+  "Arcanine":   { cap:49, reason:"Evolve Growlithe after Flamethrower at Lv 49 — Arcanine gains ExtremeSpeed at Lv 49 post-evolve; bench right after" },
+  "Ninetales":  { cap:29, reason:"Evolve Vulpix after Flamethrower at Lv 29 — Ninetales learns nothing useful via level-up until Lv 45 Fire Spin; bench immediately" },
+  "Wigglytuff": { cap:34, reason:"Evolve Jigglypuff after Body Slam at Lv 34 — Wigglytuff gains no useful level-up moves; bench immediately", higher:[{cap:44, reason:"Wait until Lv 44 for Hyper Voice on Jigglypuff first"}] },
+  "Clefable":   { cap:29, reason:"Evolve Clefairy after Metronome at Lv 29 — Clefable gains no useful level-up moves; bench immediately", higher:[{cap:33, reason:"Wait until Lv 33 for Cosmic Power on Clefairy first"}] },
+  "Vileplume":  { cap:44, reason:"Delay Leaf Stone on Gloom until Lv 44 (Petal Dance), then evolve — Vileplume learns nothing new via level-up; bench immediately" },
+  "Exeggutor":  { cap:43, reason:"Delay Leaf Stone on Exeggcute until Lv 43 (SolarBeam), then evolve — Exeggutor only learns Stomp (Lv 19) + Egg Bomb (Lv 31) via level-up; bench immediately" },
+  // Trade evos — reach this milestone, then trade and bench
+  "Kadabra":    { cap:36, reason:"Learn Psychic at Lv 36, then trade → Alakazam (shares same learnset); bench after trade" },
+  "Haunter":    { cap:39, reason:"Learn Dream Eater at Lv 39, then trade → Gengar (shares same learnset); bench after trade" },
+  "Machoke":    { cap:46, reason:"Learn Cross Chop at Lv 46, then trade → Machamp (shares same learnset); bench after trade" },
+  "Graveler":   { cap:45, reason:"Learn Earthquake at Lv 45, then trade → Golem (shares same learnset); bench after trade" },
+  // Gift / rare
+  "Lapras":     { cap:31, reason:"Learn Ice Beam at Lv 31; bench here — Surf + Ice Beam + TM24 Thunderbolt is the complete kit" },
+  "Snorlax":    { cap:33, reason:"Learn Body Slam at Lv 33; bench here — Rest (Lv 28) + Body Slam + TM26 Earthquake complete the set" },
+  "Gyarados":   { cap:20, reason:"Bench at evolution from Magikarp — Dragon Rage (Lv 20) + TM13 Ice Beam + TM24 Thunderbolt cover the role", higher:[{cap:50, reason:"Dragon Dance at Lv 50 if you want a late-game setup sweeper"}] },
+  "Chansey":    { cap:13, reason:"Learn Softboiled at Lv 13; bench immediately — Chansey's role is defensive wall + Strength HM user, not a sweeper" },
+  // Pseudo-legendary
+  "Dragonite":  { cap:55, reason:"Dragonair → Dragonite at Lv 55; bench here — TM02 Dragon Claw + TM24 Thunderbolt + TM26 Earthquake cover everything" },
+  // Perfect catcher
+  "Parasect":   { cap:27, reason:"Paras → Parasect at Lv 24, then learn Spore at Lv 27; add TM54 False Swipe — sleep + 1 HP is the ideal catch combo" },
+  // Fighters
+  "Hitmonlee":  { cap:26, reason:"Learn Hi Jump Kick at Lv 26; bench here — TM31 Brick Break fills the 2nd slot" },
+  "Hitmonchan": { cap:32, reason:"Learn Sky Uppercut at Lv 32 (gets Ice/Thunder/Fire Punch at Lv 26); bench after Sky Uppercut" },
+  // Fossils
+  "Aerodactyl": { cap:29, reason:"Learn AncientPower at Lv 29; bench here — Wing Attack (Lv 1) + Fly HM + AncientPower is the complete set" },
+  "Kabutops":   { cap:40, reason:"Kabuto → Kabutops at Lv 40; gains Slash + Fury Cutter on evolution — bench immediately; Surf + Waterfall cover the Water role" },
+  "Omastar":    { cap:40, reason:"Omanyte → Omastar at Lv 40; bench here — Surf + TM13 Ice Beam cover the role (Hydro Pump not until Lv 65)" },
+  // Flying HM users
+  "Pidgeot":    { cap:27, reason:"Learn Wing Attack at Lv 27; bench here — Pidgeot's role is Fly HM + Quick Attack utility" },
+  "Fearow":     { cap:40, reason:"Learn Drill Peck at Lv 40; bench here — Drill Peck + Fly HM is Fearow's full contribution" },
+  // Version exclusives and other
+  "Electabuzz": { cap:47, reason:"Learn Thunderbolt at Lv 47 via level-up — no need to spend TM24; ThunderPunch (Lv 9) bridges until then" },
+  "Starmie":    { cap:33, reason:"Learn Confuse Ray at Lv 33; bench here — TM29 Psychic + TM24 Thunderbolt + TM13 Ice Beam is the full set" },
+  "Slowbro":    { cap:37, reason:"Slowpoke → Slowbro at Lv 37; bench here — TM29 Psychic + Surf + Ice Beam cover the role (Psychic not in level-up until Lv 54)" },
+  "Dugtrio":    { cap:26, reason:"Diglett → Dugtrio at Lv 26; bench immediately — TM26 Earthquake is the core move and needs no further leveling" },
+  "Marowak":    { cap:32, reason:"Cubone → Marowak at Lv 28; bench at Lv 32 after Rage — TM26 Earthquake is the core move" },
 };
 
 // ─── DREAM TEAM BUILDER DATA ──────────────────────────────────────────────────
@@ -6030,6 +6079,13 @@ function DreamTeamTab({ isMobile, version }) {
                     {dexEntry ? `#${String(dexEntry.id).padStart(3,"0")}` : ""}
                     {candInfo ? ` · ${candInfo.types.join("/")}` : (finalForm !== name ? ` · → ${finalForm}` : "")}
                   </div>
+                  {DT_LEVEL_CAP[finalForm] && (
+                    <div style={{ marginTop:3 }}>
+                      <span style={{ fontSize:8, color:"#5ba87a", background:"rgba(91,168,122,0.12)", border:"1px solid rgba(91,168,122,0.35)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>
+                        bench at Lv {DT_LEVEL_CAP[finalForm].cap}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 {!hardLocked && (
                   <button onClick={() => togglePin(idx)} title={userPinned ? "Unpin slot" : "Pin this Pokémon"}
@@ -6047,6 +6103,26 @@ function DreamTeamTab({ isMobile, version }) {
               )}
 
               <div style={{ padding:"0 14px 14px", display:"flex", flexDirection:"column", gap:12, flex:1 }}>
+
+                {/* Level Guidance */}
+                {DT_LEVEL_CAP[finalForm] && (() => {
+                  const ci = DT_LEVEL_CAP[finalForm];
+                  return (
+                    <div>
+                      <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:4 }}>Level Guidance</div>
+                      <div style={{ fontSize:9, lineHeight:1.6 }}>
+                        <span style={{ color:"#5ba87a", fontWeight:"700" }}>Lv {ci.cap}: </span>
+                        <span style={{ color:C.muted }}>{ci.reason}</span>
+                      </div>
+                      {ci.higher?.map(h => (
+                        <div key={h.cap} style={{ fontSize:9, lineHeight:1.6, color:C.muted }}>
+                          <span style={{ color:"rgba(91,168,122,0.6)", fontWeight:"700" }}>Lv {h.cap}: </span>
+                          {h.reason}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
 
                 {/* Moveset */}
                 <div>
