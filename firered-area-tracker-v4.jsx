@@ -2135,11 +2135,9 @@ const AREAS = [
     trainers:[]},
 
   { part:"Part 15", id:"route21", name:"Route 21",
-    note:"Connects Cinnabar Island to Pallet Town. Tangela is the only grass encounter. UltraViolet: Tangela 90% + Bulbasaur 10%.",
+    note:"Connects Cinnabar Island to Pallet Town. Tangela is the only grass encounter.",
     pokemon:[
-      {name:"Tangela",    method:"Grass",    levels:"17–28", rate:"100%", vanillaOnly:true},
-      {name:"Tangela",    method:"Grass",    levels:"17–28", rate:"90%",  uvOnly:true},
-      {name:"Bulbasaur",  method:"Grass",    levels:"17–28", rate:"10%",  uvOnly:true},
+      {name:"Tangela",    method:"Grass",    levels:"17–28", rate:"100%"},
       {name:"Tentacool",  method:"Surf",      levels:"5–40",  rate:"100%"},
       {name:"Magikarp",   method:"Old Rod",   levels:"5",     rate:"100%"},
       {name:"Horsea",   method:"Good Rod",  levels:"5–15",  rate:"60% FR / 20% LG"},
@@ -2658,19 +2656,9 @@ const AREAS = [
     ] },
 
   { part:"Part 18", id:"altering-cave", name:"Altering Cave",
-    note:"Mysterious cave on Outcast Island. In vanilla FRLG, only Zubat appears (planned Mystery Gift distributions were never released). UltraViolet replaces the roster with a Gen II variety.",
+    note:"Mysterious cave on Outcast Island. The planned Mystery Gift event distributions (Mareep, Smeargle, and others) were never officially released, so only Zubat appears in any unmodified game.",
     pokemon:[
-      {name:"Zubat",    method:"Cave", levels:"6–16",  rate:"100%", vanillaOnly:true},
-      {name:"Mareep",   method:"Cave", levels:"15–25",  rate:"20%",  uvOnly:true},
-      {name:"Houndour", method:"Cave", levels:"15–25",  rate:"20%",  uvOnly:true},
-      {name:"Pineco",   method:"Cave", levels:"15–25",  rate:"10%",  uvOnly:true},
-      {name:"Teddiursa",method:"Cave", levels:"15–25",  rate:"10%",  uvOnly:true},
-      {name:"Aipom",    method:"Cave", levels:"15–25",  rate:"10%",  uvOnly:true},
-      {name:"Stantler", method:"Cave", levels:"15–25",  rate:"10%",  uvOnly:true},
-      {name:"Smeargle", method:"Cave", levels:"15–25",  rate:"5%",   uvOnly:true},
-      {name:"Snubbull", method:"Cave", levels:"15–25",  rate:"5%",   uvOnly:true},
-      {name:"Hoothoot", method:"Cave", levels:"15–25",  rate:"5%",   uvOnly:true},
-      {name:"Miltank",  method:"Cave", levels:"15–25",  rate:"5%",   uvOnly:true},
+      {name:"Zubat", method:"Cave", levels:"6–16", rate:"100%"},
     ],
     items:[],
     trainers:[] },
@@ -3128,7 +3116,7 @@ const LOCATION_MAP = {};
 for (const area of AREAS) {
   for (const p of _allPokemon(area)) {
     if (!LOCATION_MAP[p.name]) LOCATION_MAP[p.name] = [];
-    LOCATION_MAP[p.name].push({ areaId: area.id, areaName: area.name, part: area.part, method: p.method, levels: p.levels, rate: p.rate, frOnly: !!p.frOnly, lgOnly: !!p.lgOnly, uvOnly: !!p.uvOnly, vanillaOnly: !!p.vanillaOnly });
+    LOCATION_MAP[p.name].push({ areaId: area.id, areaName: area.name, part: area.part, method: p.method, levels: p.levels, rate: p.rate, frOnly: !!p.frOnly, lgOnly: !!p.lgOnly });
   }
 }
 
@@ -3149,17 +3137,16 @@ const TRADE_EVO_SET = new Set(["Alakazam","Machamp","Golem","Gengar"]);
 function _locPct(loc, ver) {
   if (!loc.rate) return null;
   const m = loc.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
-  if (m) return parseRatePct(ver === "lg" ? m[2] : m[1]);
+  if (m) return parseRatePct(ver === "fr" ? m[1] : m[2]);
   return parseRatePct(loc.rate);
 }
-const BEST_AREA_MAP = { fr:{}, lg:{}, uv:{} };
+const BEST_AREA_MAP = { fr:{}, lg:{} };
 for (const [name, locs] of Object.entries(LOCATION_MAP)) {
-  for (const ver of ["fr","lg","uv"]) {
+  for (const ver of ["fr","lg"]) {
     let best = null;
     for (const loc of locs) {
-      if (ver === "fr" && (loc.lgOnly || loc.uvOnly)) continue;
-      if (ver === "lg" && (loc.frOnly || loc.uvOnly)) continue;
-      if (ver === "uv" && loc.vanillaOnly) continue;
+      if (ver === "fr" && loc.lgOnly) continue;
+      if (ver === "lg" && loc.frOnly) continue;
       const pct = _locPct(loc, ver);
       if (pct && (!best || pct > best.pct)) best = { pct, areaName: loc.areaName };
     }
@@ -4032,7 +4019,7 @@ const CONSTRAINT_STYLE = {
 // keyed via the --frlg-accent CSS var.
 const C = {
   bg:"#0a0d14", card:"#141822", border:"#252c3a",
-  frRed:"#e07c3a", lgGreen:"#5fc99a", uvPurple:"#8b5cf6",
+  frRed:"#e07c3a", lgGreen:"#5fc99a",
   accent:"#e07c3a",  // static fallback; live version uses CSS var(--frlg-accent)
   gold:"#e0b450", green:"#5fc99a", lgGreen2:"#5fc99a",
   text:"#e6e8f0", muted:"#7c8395", panel:"#1a1f2b",
@@ -5134,7 +5121,7 @@ function FireRedTracker() {
   const [dexSelected, setDexSelected] = useState(null);
   const [search, setSearch]     = useState("");
   const [booted, setBooted]     = useState(false);
-  const [version, setVersion]   = useState("fr");   // "fr" | "lg" | "uv"
+  const [version, setVersion]   = useState("fr");   // "fr" | "lg"
   const [badges, setBadges]     = useState({});      // {badgeId: true}
   const [checklist, setChecklist] = useState({});   // {itemId: true}
   const [choiceGroups, setChoiceGroups] = useState({});  // {groupId: choiceId}
@@ -5609,7 +5596,8 @@ function FireRedTracker() {
     const allTrns = a => a.floors ? a.floors.flatMap(f => f.trainers || []) : (a.trainers || []);
     const pokSet = new Set();
     auditedAreas.forEach(a => allPoks(a).forEach(p => {
-      if (version === "uv" ? p.vanillaOnly : (p.uvOnly || (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly))) return;
+      if (version === "fr" && p.lgOnly) return;
+      if (version === "lg" && p.frOnly) return;
       pokSet.add(p.name);
     }));
     const totalPok = pokSet.size;
@@ -5627,18 +5615,16 @@ function FireRedTracker() {
     return { caughtPok, totalPok, doneItems, totalItems, doneTrainers, totalTrainers };
   }, [caught, items, trainers, version]);
 
-  const accent = version === "lg" ? C.lgGreen : version === "uv" ? C.uvPurple : C.frRed;
+  const accent = version === "lg" ? C.lgGreen : C.frRed;
 
   if (!booted) return <div style={{ background:C.bg, minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", color:C.text, fontFamily:"'DM Sans',system-ui,sans-serif" }}>Loading…</div>;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", height:"100vh", background:C.bg, fontFamily:"'DM Sans',system-ui,sans-serif", color:C.text, overflow:"hidden", "--frlg-accent":accent, "--frlg-accent-rgb": version === "lg" ? "95,201,154" : version === "uv" ? "139,92,246" : "224,124,58" }}>
+    <div style={{ display:"flex", flexDirection:"column", height:"100vh", background:C.bg, fontFamily:"'DM Sans',system-ui,sans-serif", color:C.text, overflow:"hidden", "--frlg-accent":accent }}>
       {/* ── Top bar ── */}
       <div style={{
         background: version === "lg"
           ? "linear-gradient(135deg,#0a1014 0%,#0c1a1a 45%,#0a1014 100%)"
-          : version === "uv"
-          ? "linear-gradient(135deg,#0c0a14 0%,#150c22 45%,#0c0a14 100%)"
           : "linear-gradient(135deg,#0c1018 0%,#1a141a 45%,#0c1018 100%)",
         borderBottom:`1px solid ${C.border}`, padding:"12px 20px 0", flexShrink:0,
         boxShadow:"0 2px 12px rgba(0,0,0,0.5)", transition:"background 0.4s"
@@ -5650,8 +5636,6 @@ function FireRedTracker() {
               <span style={{ color:C.frRed, fontWeight:"700", opacity: version==="fr" ? 1 : 0.4, transition:"opacity 0.2s" }}>FireRed</span>
               <span style={{ color:C.muted }}>·</span>
               <span style={{ color:C.lgGreen, fontWeight:"700", opacity: version==="lg" ? 1 : 0.4, transition:"opacity 0.2s" }}>LeafGreen</span>
-              <span style={{ color:C.muted }}>·</span>
-              <span style={{ color:C.uvPurple, fontWeight:"700", opacity: version==="uv" ? 1 : 0.4, transition:"opacity 0.2s" }}>UltraViolet</span>
             </div>
             <div style={{ fontSize:20, fontWeight:"700", letterSpacing:-0.5, color:C.text, fontFamily:"'Space Grotesk',system-ui,sans-serif", display:"flex", alignItems:"center", gap:8 }}>
               FRLG Tracker
@@ -5664,7 +5648,7 @@ function FireRedTracker() {
           <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:7 }}>
             {/* FR / LG version toggle — v4: tiny segmented control */}
             <div style={{ display:"flex", gap:0, background:"rgba(0,0,0,0.45)", borderRadius:6, padding:1, border:`1px solid ${C.border}` }}>
-              {[["fr","FR",C.frRed],["lg","LG",C.lgGreen],["uv","UV",C.uvPurple]].map(([v,label,col]) => (
+              {[["fr","FR",C.frRed],["lg","LG",C.lgGreen]].map(([v,label,col]) => (
                 <button key={v} onClick={() => handleSetVersion(v)} style={{
                   padding:"3px 10px", border:"none", borderRadius:4, cursor:"pointer",
                   fontFamily:"'DM Sans',sans-serif", fontSize:10, fontWeight:"700", letterSpacing:0.5,
@@ -6686,7 +6670,8 @@ function HuntTab({ version, isMobile }) {
     if (!selected) return [];
     return (LOCATION_MAP[selected] || [])
       .filter(loc => {
-        if (version === "uv" ? loc.vanillaOnly : (loc.uvOnly || (version === "fr" && loc.lgOnly) || (version === "lg" && loc.frOnly))) return false;
+        if (version === "fr" && loc.lgOnly) return false;
+        if (version === "lg" && loc.frOnly) return false;
         return true;
       })
       .map(loc => {
@@ -6986,7 +6971,7 @@ function CompletionTab({ caught, checklist, toggleChecklist, isMobile }) {
 function NationalDexPanel({ caught, setDexSelected, version }) {
   const [collapsed, setCollapsed] = React.useState(false);
   const caughtCount = NATIONAL_DEX.filter(p => caught[p.name]).length;
-  const isOtherVer = p => version === "uv" ? !!p.vanillaOnly : (!!p.uvOnly || (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly));
+  const isOtherVer = p => (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly);
 
   return (
     <div style={{ marginTop:20, border:`1px solid ${C.border}`, borderRadius:8, overflow:"hidden" }}>
@@ -7038,7 +7023,7 @@ function NationalDexPanel({ caught, setDexSelected, version }) {
 function DexTab({ caught, toggleCaught, dexFilter, setDexFilter, dexSelected, setDexSelected, version, isMobile }) {
   const caughtCount = Object.keys(caught).length;
   const filters = [["all","All"],["caught","Caught"],["missing","Missing"],["fr","FR Only"],["lg","LG Only"],["event","Event"],["noball","No Poké Ball"]];
-  const isOtherVersionDex = (p) => version === "uv" ? !!p.vanillaOnly : (!!p.uvOnly || (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly));
+  const isOtherVersionDex = (p) => (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly);
   const [dexSearch, setDexSearch] = React.useState("");
 
   const filtered = DEX.filter(p => {
@@ -7488,7 +7473,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
     Object.entries(groups).forEach(([part, list]) => {
       result[part] = list.length > 0 && list.every(area => {
         const allPoks = flattenPokemon(area).filter(p =>
-          (version === "uv" ? !p.vanillaOnly : (!p.uvOnly && !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly))) && !isPassedPokemon(p));
+          !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPassedPokemon(p));
         const pokDone = allPoks.every(p => p.method === "Trade" ? !!trades[`${area.id}|trade|${p.name}`] : !!caught[p.name]);
         let itemsDone = true;
         if (area.floors) {
@@ -7534,7 +7519,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
       if (partFullDone[part]) { result[part] = false; return; }
       result[part] = list.length > 0 && list.every(area => {
         const allPoks = flattenPokemon(area).filter(p =>
-          (version === "uv" ? !p.vanillaOnly : (!p.uvOnly && !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly))) &&
+          !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) &&
           !isPassedPokemon(p) && p.method !== "Trade" && !p.optional);
         const pokDone = allPoks.every(p => caught[p.name]);
         let reqItemsDone = true;
@@ -7565,7 +7550,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
   const areaPokemon  = area ? flattenPokemon(area)  : [];
   const areaItems    = area ? flattenItems(area)    : [];
   const areaTrainers = area ? flattenTrainers(area) : [];
-  const verPokemon      = areaPokemon.filter(p => version === "uv" ? !p.vanillaOnly : (!p.uvOnly && !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly)));
+  const verPokemon      = areaPokemon.filter(p => !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
   const relevantPokemon = verPokemon.filter(p => !isPassedPokemon(p));
   const pokeDone        = relevantPokemon.filter(p => p.method === "Trade" ? !!trades[`${areaId}|trade|${p.name}`] : !!caught[p.name]).length;
   const nonTradePokemon  = relevantPokemon.filter(p => p.method !== "Trade" && !p.optional);
@@ -7718,9 +7703,8 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
               )}
 
               <div style={{ fontSize:11, color:C.muted, marginBottom:12, display:"flex", gap:16, flexWrap:"wrap" }}>
-                {version !== "uv" && <span><span style={{ color:"#c85252", fontWeight:"600" }}>FR</span> = FireRed exclusive</span>}
-                {version !== "uv" && <span><span style={{ color:C.lgGreen, fontWeight:"600" }}>LG</span> = LeafGreen exclusive</span>}
-                {version === "uv" && <span><span style={{ color:C.uvPurple, fontWeight:"600" }}>UV</span> = UltraViolet only</span>}
+                <span><span style={{ color:"#c85252", fontWeight:"600" }}>FR</span> = FireRed exclusive</span>
+                <span><span style={{ color:C.lgGreen, fontWeight:"600" }}>LG</span> = LeafGreen exclusive</span>
                 <span><span style={{ color:C.gold }}>★</span> = Hidden (Itemfinder)</span>
               </div>
 
@@ -7731,7 +7715,7 @@ function AreasTab({ caught, toggleCaught, items, toggleItem, trainers, toggleTra
                   const hasItms = (floor.items    || []).length > 0;
                   const hasTrns = (floor.trainers || []).length > 0;
                   if (!hasPoks && !hasItms && !hasTrns) return null;
-                  const floorVerPoks    = (floor.pokemon || []).filter(p => version === "uv" ? !p.vanillaOnly : (!p.uvOnly && !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly)));
+                  const floorVerPoks    = (floor.pokemon || []).filter(p => !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly));
                   const relevFloorPoks  = floorVerPoks.filter(p => !isPassedPokemon(p));
                   const pokDone         = relevFloorPoks.filter(p => p.method === "Trade" ? !!trades[`${areaId}|trade|${p.name}`] : !!caught[p.name]).length;
                   const relevFloorItems        = (floor.items || []).filter(it => !isPassedItem(it));
@@ -7889,7 +7873,7 @@ function AreaRow({ area, areaId, setAreaId, caught, items, trainers, trades, ver
   const isPok  = p  => !!(p.choiceGroup  && choiceGroups?.[p.choiceGroup]  && choiceGroups[p.choiceGroup]  !== p.choiceId);
   const isItm  = it => !!(it.choiceGroup && choiceGroups?.[it.choiceGroup] && choiceGroups[it.choiceGroup] !== it.choiceId);
   const allPoksWithTrades = flattenPokemon(area).filter(p =>
-    (version === "uv" ? !p.vanillaOnly : (!p.uvOnly && !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly))) && !isPok(p));
+    !(version === "fr" && p.lgOnly) && !(version === "lg" && p.frOnly) && !isPok(p));
   const tradePoks = allPoksWithTrades.filter(p => p.method === "Trade");
   const allPoks   = allPoksWithTrades.filter(p => p.method !== "Trade" && !p.optional);
   const hasPendingTrades = tradePoks.some(p => !trades?.[`${area.id}|trade|${p.name}`]);
@@ -8009,16 +7993,16 @@ function PokemonEntry({ p, caught, toggleCaught, version, isMobile, choiceGroups
     if (!prevCaughtRef.current && isCaught) setWobbleNonce(n => n + 1);
     prevCaughtRef.current = isCaught;
   }, [isCaught]);
-  if (version === "uv" ? p.vanillaOnly : (p.uvOnly || (version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly))) return null;
+  if ((version === "fr" && p.lgOnly) || (version === "lg" && p.frOnly)) return null;
 
   const isPassed = !!(p.choiceGroup && choiceGroups?.[p.choiceGroup] && choiceGroups[p.choiceGroup] !== p.choiceId);
 
   // Determine if a better-rate area exists for this Pokémon
   const splitMatch = p.rate && p.rate.match(/^(\S+)\s+FR\s*\/\s*(\S+)\s+LG$/i);
   const currentPct = splitMatch
-    ? parseRatePct(version === "lg" ? splitMatch[2] : splitMatch[1])
+    ? parseRatePct(version === "fr" ? splitMatch[1] : splitMatch[2])
     : parseRatePct(p.rate);
-  const best = (BEST_AREA_MAP[version] || BEST_AREA_MAP.fr)[p.name];
+  const best = BEST_AREA_MAP[version][p.name];
   const hasBetter = !isCaught && currentPct && best && best.pct > currentPct;
 
   const handleClick = isPassed ? undefined
@@ -8029,8 +8013,8 @@ function PokemonEntry({ p, caught, toggleCaught, version, isMobile, choiceGroups
     <Row done={isCaught} passed={isPassed} onClick={handleClick}>
       {allDexId(p.name) && <img key={wobbleNonce} src={pokeSpriteUrl(allDexId(p.name))} alt={p.name} className={wobbleNonce && isCaught ? "frlg-wobble" : ""} style={{ width:36, height:36, imageRendering:"pixelated", flexShrink:0, opacity:isCaught?1:0.65, filter:isCaught?"none":"brightness(0)", transition:"opacity 0.25s, filter 0.25s" }} />}
       <div style={{ flex:1 }}>
-        <span style={{ color:isCaught?C.green:version!=="uv"&&p.lgOnly?C.lgGreen:version!=="uv"&&p.frOnly?"#c85252":p.uvOnly?C.uvPurple:C.text, fontWeight:"600", fontSize:12 }}>
-          {p.name}{version!=="uv"&&p.frOnly&&<Tag color="#c85252">FR</Tag>}{version!=="uv"&&p.lgOnly&&<Tag color={C.lgGreen}>LG</Tag>}{p.uvOnly&&<Tag color={C.uvPurple}>UV</Tag>}
+        <span style={{ color:isCaught?C.green:p.lgOnly?C.lgGreen:p.frOnly?"#c85252":C.text, fontWeight:"600", fontSize:12 }}>
+          {p.name}{p.frOnly&&<Tag color="#c85252">FR</Tag>}{p.lgOnly&&<Tag color={C.lgGreen}>LG</Tag>}
         </span>
         {METHOD_SPRITE_URL[p.method]
           ? <span style={{ display:"inline-flex", alignItems:"center", gap:3, marginLeft:6 }}>
@@ -9690,14 +9674,14 @@ function TradeTab({ version, isMobile }) {
   const lgRegEntries = useMemo(() => buildEntries(SEREBII_LG,     "lgOnly"), []);
   const lgNatEntries = useMemo(() => buildEntries(NAT_SEREBII_LG, "lgOnly"), []);
 
-  const myRegEntries    = version === "fr" ? frRegEntries : version === "uv" ? [] : lgRegEntries;
-  const myNatEntries    = version === "fr" ? frNatEntries : version === "uv" ? [] : lgNatEntries;
-  const theirRegEntries = version === "fr" ? lgRegEntries : version === "uv" ? [] : frRegEntries;
-  const theirNatEntries = version === "fr" ? lgNatEntries : version === "uv" ? [] : frNatEntries;
-  const myLabel    = version === "fr" ? "FireRed" : version === "uv" ? "UltraViolet" : "LeafGreen";
-  const theirLabel = version === "fr" ? "LeafGreen" : version === "uv" ? "UltraViolet" : "FireRed";
-  const myColor    = version === "fr" ? C.frRed : version === "uv" ? C.uvPurple : C.lgGreen;
-  const theirColor = version === "fr" ? C.lgGreen : version === "uv" ? C.uvPurple : C.frRed;
+  const myRegEntries    = version === "fr" ? frRegEntries : lgRegEntries;
+  const myNatEntries    = version === "fr" ? frNatEntries : lgNatEntries;
+  const theirRegEntries = version === "fr" ? lgRegEntries : frRegEntries;
+  const theirNatEntries = version === "fr" ? lgNatEntries : frNatEntries;
+  const myLabel    = version === "fr" ? "FireRed" : "LeafGreen";
+  const theirLabel = version === "fr" ? "LeafGreen" : "FireRed";
+  const myColor    = version === "fr" ? C.frRed : C.lgGreen;
+  const theirColor = version === "fr" ? C.lgGreen : C.frRed;
 
   const spareRegCount    = myRegEntries.filter(e => spares[e.name]).length;
   const spareNatCount    = myNatEntries.filter(e => spares[e.name]).length;
@@ -9790,16 +9774,6 @@ function TradeTab({ version, isMobile }) {
     <div style={{ flex:1, overflowY:"auto" }}>
       <div style={{ maxWidth:700, margin:"0 auto", padding:"20px 16px 40px", display:"flex", flexDirection:"column", gap:32 }}>
 
-        {/* UV notice */}
-        {version === "uv" && (
-          <div style={{ background:"rgba(139,92,246,0.08)", border:"1px solid rgba(139,92,246,0.3)", borderRadius:10, padding:"12px 16px" }}>
-            <div style={{ fontSize:11, fontWeight:"700", color:C.uvPurple, marginBottom:6, letterSpacing:"0.08em", textTransform:"uppercase" }}>UltraViolet — No Trading Needed</div>
-            <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>
-              In UltraViolet, all 386 Pokémon are catchable in the wild — both FireRed and LeafGreen exclusives are available in every area. No version exclusives need to be traded. Trade evolutions still apply.
-            </div>
-          </div>
-        )}
-
         {/* ══ Regional Dex (Kanto, #001–151) ══════════════════════════ */}
         <div>
           <div style={{ fontSize:10, fontWeight:"700", letterSpacing:"0.12em", textTransform:"uppercase",
@@ -9810,7 +9784,7 @@ function TradeTab({ version, isMobile }) {
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-            {version !== "uv" && <div>
+            <div>
               {secHead(`${myLabel} exclusives — collect spares`, spareRegCount, myRegEntries.length, myColor)}
               <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
                 Only catchable in {myLabel}. Catch extras to send to your {theirLabel} partner.
@@ -9818,9 +9792,9 @@ function TradeTab({ version, isMobile }) {
               <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                 {myRegEntries.map(entry => exRow(entry, !!spares[entry.name], () => toggleSpare(entry.name)))}
               </div>
-            </div>}
+            </div>
 
-            {version !== "uv" && <div>
+            <div>
               {secHead(`${theirLabel} exclusives — mark when received`, receivedRegCount, theirRegEntries.length, theirColor)}
               <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
                 Only catchable in {theirLabel}. Check off each one as your partner trades it to you.
@@ -9828,7 +9802,7 @@ function TradeTab({ version, isMobile }) {
               <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                 {theirRegEntries.map(entry => exRow(entry, !!received[entry.name], () => toggleReceived(entry.name)))}
               </div>
-            </div>}
+            </div>
 
             <div>
               {secHead("Trade evolutions", evoDoneCount, kantoTradeEvos.length, C.accent)}
@@ -9852,7 +9826,7 @@ function TradeTab({ version, isMobile }) {
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-            {version !== "uv" && <div>
+            <div>
               {secHead(`${myLabel} exclusives — collect spares`, spareNatCount, myNatEntries.length, myColor)}
               <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
                 National Dex exclusives only catchable in {myLabel}. Not required for Kanto 100% — needed for Living Dex.
@@ -9860,9 +9834,9 @@ function TradeTab({ version, isMobile }) {
               <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                 {myNatEntries.map(entry => exRow(entry, !!spares[entry.name], () => toggleSpare(entry.name)))}
               </div>
-            </div>}
+            </div>
 
-            {version !== "uv" && <div>
+            <div>
               {secHead(`${theirLabel} exclusives — mark when received`, receivedNatCount, theirNatEntries.length, theirColor)}
               <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>
                 National Dex exclusives only catchable in {theirLabel}. Check off as your partner sends them over.
@@ -9870,7 +9844,7 @@ function TradeTab({ version, isMobile }) {
               <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                 {theirNatEntries.map(entry => exRow(entry, !!received[entry.name], () => toggleReceived(entry.name)))}
               </div>
-            </div>}
+            </div>
 
             <div>
               {secHead("Trade evolutions", natEvoDoneCount, natTradeEvos.length, C.muted)}
@@ -10058,30 +10032,21 @@ function ExclusivesTab({ caught, toggleCaught, version, isMobile }) {
     <div style={{ flex:1, overflowY:"auto" }}>
       <div style={{ maxWidth:900, margin:"0 auto", padding:"20px 16px 40px", display:"flex", flexDirection:"column", gap:32 }}>
 
-        {version === "uv" ? (
-          <div style={{ background:"rgba(139,92,246,0.08)", border:"1px solid rgba(139,92,246,0.3)", borderRadius:10, padding:"16px 20px" }}>
-            <div style={{ fontSize:11, fontWeight:"700", color:C.uvPurple, marginBottom:8, letterSpacing:"0.08em", textTransform:"uppercase" }}>UltraViolet — All Pokémon Catchable</div>
-            <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>
-              In UltraViolet, all version exclusives are catchable in the wild from both FireRed and LeafGreen encounter tables. No trades are required for version exclusives. Use the Pokédex tab to track your complete dex.
-            </div>
+        <div>
+          {sectionHead("Kanto Pokédex")}
+          <div style={{ display:"flex", gap: isMobile ? 20 : 32, flexDirection: flexDir }}>
+            {col("FireRed exclusives", C.frRed, frData, frCaught)}
+            {col("LeafGreen exclusives", C.lgGreen, lgData, lgCaught)}
           </div>
-        ) : (<>
-          <div>
-            {sectionHead("Kanto Pokédex")}
-            <div style={{ display:"flex", gap: isMobile ? 20 : 32, flexDirection: flexDir }}>
-              {col("FireRed exclusives", C.frRed, frData, frCaught)}
-              {col("LeafGreen exclusives", C.lgGreen, lgData, lgCaught)}
-            </div>
-          </div>
+        </div>
 
-          <div>
-            {sectionHead("National Dex — post-game & Cerulean Cave")}
-            <div style={{ display:"flex", gap: isMobile ? 20 : 32, flexDirection: flexDir }}>
-              {col("FireRed exclusives", C.frRed, natFrData, natFrCaught)}
-              {col("LeafGreen exclusives", C.lgGreen, natLgData, natLgCaught)}
-            </div>
+        <div>
+          {sectionHead("National Dex — post-game & Cerulean Cave")}
+          <div style={{ display:"flex", gap: isMobile ? 20 : 32, flexDirection: flexDir }}>
+            {col("FireRed exclusives", C.frRed, natFrData, natFrCaught)}
+            {col("LeafGreen exclusives", C.lgGreen, natLgData, natLgCaught)}
           </div>
-        </>)}
+        </div>
 
       </div>
     </div>
