@@ -3568,7 +3568,9 @@ const DT_LEVEL_CAP = {
 };
 
 // ─── DREAM TEAM BUILDER DATA ──────────────────────────────────────────────────
-const DT_LEGENDARY = new Set(["Articuno","Zapdos","Moltres","Mewtwo","Mew"]);
+const DT_LEGENDARY  = new Set(["Articuno","Zapdos","Moltres","Mewtwo","Mew"]);
+// Pokémon that require a link trade to obtain their final evolution
+const DT_NEEDS_TRADE = new Set(["Kadabra","Haunter","Machoke","Graveler"]);
 
 const DT_HM_COMPAT = {
   "Cut":        new Set(["Bulbasaur","Ivysaur","Venusaur","Rattata","Raticate","Sandshrew","Sandslash","Nidoran♀","Nidorina","Nidoqueen","Nidoran♂","Nidorino","Nidoking","Oddish","Gloom","Vileplume","Paras","Parasect","Psyduck","Golduck","Farfetch'd","Seel","Krabby","Kingler","Rhyhorn","Rhydon","Kangaskhan","Scyther","Pinsir","Kabuto","Kabutops","Charizard","Bellsprout","Weepinbell","Victreebel","Dratini","Dragonair","Dragonite"]),
@@ -3792,7 +3794,8 @@ function getCandWeaknesses(cand) {
 // Score a candidate given the already-fixed team members.
 // Weights: HM gap coverage (10 each) > new offensive type coverage (3 each) >
 //          new team types (2 each) > shared weakness penalty (−2 each) > pool rank (tiebreak).
-function scoreCandidateInContext(cand, fixedNames, version) {
+function scoreCandidateInContext(cand, fixedNames, version, candidates) {
+  candidates = candidates || DT_CANDIDATES;
   if (version === "FR" && cand.lgOnly) return -Infinity;
   if (version === "LG" && cand.frOnly) return -Infinity;
 
@@ -3819,31 +3822,42 @@ function scoreCandidateInContext(cand, fixedNames, version) {
   }));
   const newTypes = cand.types.filter(t => !fixedTypes.has(t)).length;
 
-  const poolRank = DT_CANDIDATES.indexOf(cand);
-  const poolScore = poolRank >= 0 ? (DT_CANDIDATES.length - poolRank) * 0.1 : 0;
+  const poolRank = candidates.indexOf(cand);
+  const poolScore = poolRank >= 0 ? (candidates.length - poolRank) * 0.1 : 0;
 
   return newHMs * 10 + newCov * 3 + newTypes * 2 - sharedWeak * 2 + poolScore;
 }
 
-// Build a team of 6: slot 0 = favorite, slot 1 = Dragonite (unless Dragonite-line),
-// slots 2–5 filled by pins first then by greedy scoring.
-function buildDreamTeamV2(favorite, pins, version) {
+// Build a team of 6: slot 0 = favorite, slot 1 = Dragonite when includePseudo,
+// slots filled by pins first then by greedy scoring.
+function buildDreamTeamV2(favorite, pins, version, opts) {
+  opts = opts || {};
+  const includePseudo = opts.includePseudo !== false;
+  const includeTrades = opts.includeTrades !== false;
   if (!favorite) return null;
   const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favorite);
   const team = new Array(6).fill(null);
   team[0] = favorite;
-  if (!isDragoniteLine) team[1] = "Dragonite";
-  for (let i = 2; i <= 5; i++) { if (pins[i]) team[i] = pins[i]; }
+  if (!isDragoniteLine && includePseudo) team[1] = "Dragonite";
+  // Pin-fill: slot 1 is open when Dragonite-line fav or pseudo toggled off
+  const pinStart = (!isDragoniteLine && includePseudo) ? 2 : 1;
+  for (let i = pinStart; i <= 5; i++) { if (pins[i]) team[i] = pins[i]; }
 
-  const startSlot = isDragoniteLine ? 1 : 2;
+  const candidates = DT_CANDIDATES.filter(c => {
+    if (!includePseudo && c.name === "Dragonite") return false;
+    if (!includeTrades && DT_NEEDS_TRADE.has(c.name)) return false;
+    return true;
+  });
+
+  const startSlot = (isDragoniteLine || !includePseudo) ? 1 : 2;
   for (let i = startSlot; i <= 5; i++) {
     if (team[i] !== null) continue;
     const fixed = team.filter(Boolean);
     const usedFinal = new Set(fixed.map(n => DT_FINAL_FORM[n] || n));
     let best = null, bestScore = -Infinity;
-    for (const cand of DT_CANDIDATES) {
+    for (const cand of candidates) {
       if (usedFinal.has(cand.name)) continue;
-      const s = scoreCandidateInContext(cand, fixed, version);
+      const s = scoreCandidateInContext(cand, fixed, version, candidates);
       if (s > bestScore) { best = cand; bestScore = s; }
     }
     if (best) team[i] = best.name;
@@ -3854,13 +3868,21 @@ function buildDreamTeamV2(favorite, pins, version) {
 // Return up to `count` ranked alternatives for a given team slot.
 // Result includes the current occupant so the user can see where it ranks.
 // delta is score relative to the top scorer (0 = best, negative = worse).
-function getAlternatives(slotIdx, team, version, count = 5) {
+function getAlternatives(slotIdx, team, version, count = 5, opts) {
+  opts = opts || {};
+  const includePseudo = opts.includePseudo !== false;
+  const includeTrades = opts.includeTrades !== false;
   if (!team || slotIdx >= team.length) return [];
   const fixed = team.filter((_, i) => i !== slotIdx);
   const fixedFinal = new Set(fixed.map(n => DT_FINAL_FORM[n] || n));
-  const scored = DT_CANDIDATES
+  const candidates = DT_CANDIDATES.filter(c => {
+    if (!includePseudo && c.name === "Dragonite") return false;
+    if (!includeTrades && DT_NEEDS_TRADE.has(c.name)) return false;
+    return true;
+  });
+  const scored = candidates
     .filter(cand => !fixedFinal.has(cand.name))
-    .map(cand => ({ name: cand.name, score: scoreCandidateInContext(cand, fixed, version) }))
+    .map(cand => ({ name: cand.name, score: scoreCandidateInContext(cand, fixed, version, candidates) }))
     .filter(x => Number.isFinite(x.score))
     .sort((a, b) => b.score - a.score);
   if (!scored.length) return [];
@@ -5866,6 +5888,8 @@ function DreamTeamTab({ isMobile, version }) {
   const [pins,            setPins]            = React.useState({});   // {slotIdx: name}
   const [expandedAltSlot, setExpandedAltSlot] = React.useState(null);
   const [hmPerPokemon,    setHmPerPokemon]    = React.useState(3);
+  const [includePseudo,   setIncludePseudo]   = React.useState(true);
+  const [includeTrades,   setIncludeTrades]   = React.useState(true);
 
   React.useEffect(() => {
     try {
@@ -5875,14 +5899,16 @@ function DreamTeamTab({ isMobile, version }) {
         if (d.favorite) setFavorite(d.favorite);
         if (d.pins) setPins(d.pins);
         if (d.hmPerPokemon) setHmPerPokemon(d.hmPerPokemon);
+        if (d.includePseudo !== undefined) setIncludePseudo(d.includePseudo);
+        if (d.includeTrades !== undefined) setIncludeTrades(d.includeTrades);
       }
     } catch {}
   }, []);
 
   React.useEffect(() => {
     if (!favorite) return;
-    try { localStorage.setItem("frlg-dream-team-v4", JSON.stringify({ favorite, pins, version, hmPerPokemon })); } catch {}
-  }, [favorite, pins, version, hmPerPokemon]);
+    try { localStorage.setItem("frlg-dream-team-v4", JSON.stringify({ favorite, pins, version, hmPerPokemon, includePseudo, includeTrades })); } catch {}
+  }, [favorite, pins, version, hmPerPokemon, includePseudo, includeTrades]);
 
   // Drop version-conflicting pins when version changes
   React.useEffect(() => {
@@ -5899,12 +5925,12 @@ function DreamTeamTab({ isMobile, version }) {
   }, [version]);
 
   const eligible = React.useMemo(() => DEX.filter(p => p.id <= 151 && !DT_LEGENDARY.has(p.name)), []);
-  const team = React.useMemo(() => buildDreamTeamV2(favorite, pins, version), [favorite, pins, version]);
+  const team = React.useMemo(() => buildDreamTeamV2(favorite, pins, version, { includePseudo, includeTrades }), [favorite, pins, version, includePseudo, includeTrades]);
   const isDragoniteLine = ["Dratini","Dragonair","Dragonite"].includes(favorite);
   const tmWinners     = React.useMemo(() => team ? assignOneTimeTMs(team) : {}, [team]);
   const hmAssignments = React.useMemo(() => team ? assignHMs(team, hmPerPokemon) : {}, [team, hmPerPokemon]);
 
-  const isHardLocked = idx => idx === 0 || (idx === 1 && !isDragoniteLine);
+  const isHardLocked = idx => idx === 0 || (idx === 1 && !isDragoniteLine && includePseudo);
 
   const togglePin = (idx) => {
     setPins(prev => {
@@ -5940,7 +5966,7 @@ function DreamTeamTab({ isMobile, version }) {
       <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
         <div style={{ marginBottom:12 }}>
           <div style={{ fontSize:10, letterSpacing:2, color:C.muted, marginBottom:4, textTransform:"uppercase" }}>Dream Team Builder</div>
-          <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>Pick your favourite — the builder scores and fills the remaining 5 slots around it. Dragonite (pseudo-legendary) is always included. You can pin any suggested slot and browse ranked alternatives.</div>
+          <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>Pick your favourite — the builder scores and fills the remaining 5 slots around it. {includePseudo ? "Dragonite (pseudo-legendary) auto-fills slot 2. " : ""}You can pin any suggested slot and browse ranked alternatives.</div>
         </div>
         <FavSelect />
       </div>
@@ -5967,7 +5993,20 @@ function DreamTeamTab({ isMobile, version }) {
             Reset pins
           </button>
         )}
-        <div style={{ display:"flex", alignItems:"center", gap:6, marginLeft:"auto" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:6, marginLeft:"auto", flexWrap:"wrap" }}>
+          {/* Pool toggles */}
+          <div style={{ display:"flex", border:`1px solid ${C.border}`, borderRadius:6, overflow:"hidden" }}>
+            {[["Pseudo", includePseudo, () => setIncludePseudo(p => !p)], ["Trade evos", includeTrades, () => setIncludeTrades(t => !t)]].map(([label, on, toggle]) => (
+              <button key={label} onClick={toggle} title={label === "Pseudo" ? (on ? "Dragonite auto-fills slot 2 — click to let algorithm decide" : "Dragonite excluded from auto-fill — click to restore") : (on ? "Trade-evo Pokémon included — click to exclude Kadabra/Haunter/Machoke/Graveler" : "Trade evos excluded — click to include")} style={{
+                padding:"5px 10px", fontSize:11, fontFamily:"'DM Sans',system-ui,sans-serif",
+                background: on ? "rgba(91,168,122,0.18)" : "rgba(0,0,0,0.2)",
+                color: on ? "#5ba87a" : C.muted,
+                border:"none", borderLeft: label === "Trade evos" ? `1px solid ${C.border}` : "none",
+                cursor:"pointer", fontWeight: on ? "700" : "400", whiteSpace:"nowrap",
+              }}>{on ? "✓ " : ""}{label}</button>
+            ))}
+          </div>
+          <div style={{ width:1, alignSelf:"stretch", background:C.border, flexShrink:0 }} />
           <span style={{ fontSize:10, color:C.muted, whiteSpace:"nowrap" }}>Max HMs/member:</span>
           <div style={{ display:"flex", border:`1px solid ${C.border}`, borderRadius:6, overflow:"hidden" }}>
             {[1,2,3].map(n => (
@@ -6040,7 +6079,7 @@ function DreamTeamTab({ isMobile, version }) {
           const hardLocked  = isHardLocked(idx);
           const userPinned  = !hardLocked && !!pins[idx];
           const isFav       = idx === 0;
-          const isPseudo    = idx === 1 && !isDragoniteLine;
+          const isPseudo    = idx === 1 && !isDragoniteLine && includePseudo;
           const finalForm   = DT_FINAL_FORM[name] || name;
           const dexEntry    = DEX.find(p => p.name === name);
           const candInfo    = DT_CANDIDATES.find(c => c.name === finalForm);
@@ -6212,7 +6251,7 @@ function DreamTeamTab({ isMobile, version }) {
                     </button>
                     {altExpanded && (
                       <div style={{ marginTop:8, display:"flex", flexDirection:"column", gap:5 }}>
-                        {getAlternatives(idx, team, version, 15).map(({ name: altName, delta }) => {
+                        {getAlternatives(idx, team, version, 15, { includePseudo, includeTrades }).map(({ name: altName, delta }) => {
                           const altDex = DEX.find(p => p.name === altName);
                           const isCurr = altName === name;
                           const isBest = delta === 0;
@@ -6240,6 +6279,43 @@ function DreamTeamTab({ isMobile, version }) {
             </div>
           );
         })}
+      </div>
+
+      {/* Dedicated Catcher */}
+      <div style={{ marginTop:24 }}>
+        <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5, textTransform:"uppercase", marginBottom:8 }}>Dedicated Catcher — not part of your main 6</div>
+        <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:10, padding:"14px 16px", display:"flex", gap:14, alignItems:"flex-start" }}>
+          {(() => {
+            const catcherDex = DEX.find(p => p.name === "Parasect");
+            return catcherDex && <img src={pokeSpriteUrl(catcherDex.id)} alt="Parasect" style={{ width:56, height:56, imageRendering:"pixelated", flexShrink:0, marginTop:2 }} />;
+          })()}
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+              <span style={{ fontSize:14, fontWeight:"700" }}>Parasect</span>
+              <span style={{ fontSize:8, color:"#5ba87a", background:"rgba(91,168,122,0.12)", border:"1px solid rgba(91,168,122,0.35)", padding:"1px 6px", borderRadius:99, fontWeight:"700" }}>bench at Lv 27</span>
+            </div>
+            <div style={{ fontSize:9, color:C.muted, marginBottom:8 }}>#047 · Bug/Grass · Paras → Parasect at Lv 24</div>
+            <div style={{ fontSize:10, color:C.muted, lineHeight:1.6, marginBottom:10 }}>
+              Carry in your party during catch sessions. Spore (learned at Lv 27) puts targets to sleep at 100% accuracy; False Swipe (TM54) always leaves exactly 1 HP. Together they guarantee the safest possible capture conditions.
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+              {[
+                { move:"Spore",       src:"Level 27 — learned as Parasect",                   color:"#5ba87a", note:"100% accuracy sleep — the single best status move for catching" },
+                { move:"False Swipe", src:"TM54 — Celadon Dept. Store 5F (₽2,000)",           color:"#5ba87a", note:"Guaranteed 1 HP remaining — no accidental knockouts" },
+                { move:"Stun Spore",  src:"Level 7 as Paras — retained after evolution",       color:C.muted,   note:"Backup if you're out of Poké Balls mid-session" },
+                { move:"Cut",         src:"HM01 — S.S. Anne",                                  color:"#4a8fc4", note:"HM filler — Bug/Grass typing makes Cut usable" },
+              ].map(m => (
+                <div key={m.move} style={{ padding:"5px 8px", background:"rgba(0,0,0,0.18)", borderRadius:6, borderLeft:`2px solid ${m.color}` }}>
+                  <div style={{ display:"flex", alignItems:"baseline", gap:6 }}>
+                    <span style={{ fontSize:11, fontWeight:"600", color:C.text }}>{m.move}</span>
+                    <span style={{ fontSize:9, color:C.muted, flex:1, lineHeight:1.4 }}>{m.src}</span>
+                  </div>
+                  <div style={{ fontSize:9, color:m.color, opacity:0.8, marginTop:2 }}>{m.note}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
