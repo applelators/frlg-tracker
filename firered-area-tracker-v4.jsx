@@ -5466,6 +5466,21 @@ function FireRedTracker() {
     input.click();
   };
 
+  const handleReset = () => {
+    if (!window.confirm("Delete ALL session data and reset to fresh?\n\nThis cannot be undone. Export a backup first if you want to keep your progress.")) return;
+    const keys = [
+      "fr-caught5","fr-items5","fr-trainers1",
+      "frlg-version","frlg-badges","frlg-checklist","frlg-choices",
+      "frlg-tms","frlg-sweeps","frlg-box-names","frlg-area-notes",
+      "frlg-active-area","frlg-active-tab","frlg-collapsed-floors",
+      "frlg-collapsed-parts","frlg-dream-team-v4","frlg-sidebar-scroll",
+      "frlg-box-caught","frlg-trades","frlg-trade-evo-done",
+      "frlg-trade-received","frlg-trade-spares",
+    ];
+    keys.forEach(k => { try { localStorage.removeItem(k); } catch {} });
+    window.location.reload();
+  };
+
   const toggleBadge = useCallback((id) => {
     setBadges(prev => {
       const next = { ...prev };
@@ -5682,6 +5697,16 @@ function FireRedTracker() {
                   onMouseLeave={e => { e.currentTarget.style.color=C.muted; e.currentTarget.style.borderColor=C.border; }}
                   >{label}</button>
                 ))}
+                <button onClick={handleReset} title="Delete all session data and reset to fresh"
+                  style={{
+                    padding:"2px 8px", fontSize:10, fontWeight:"600", cursor:"pointer",
+                    background:"rgba(0,0,0,0.3)", color:"#a04040",
+                    border:"1px solid rgba(160,64,64,0.4)", borderRadius:4,
+                    fontFamily:"'DM Sans',sans-serif", transition:"all 0.15s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color="#e07070"; e.currentTarget.style.borderColor="rgba(224,112,112,0.7)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color="#a04040"; e.currentTarget.style.borderColor="rgba(160,64,64,0.4)"; }}
+                >✕ Reset</button>
               </div>
             </div>
           </div>
