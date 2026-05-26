@@ -3643,7 +3643,7 @@ const DT_LEVEL_CAP = {
   "Dewgong":    { cap:34, reason:"Seel → Dewgong at Lv 34; bench here — apply TM13 Ice Beam immediately (Dewgong doesn't learn it until lv51 naturally); Rest (lv29) + Ice Beam is the core set",
     higher:[{cap:42, reason:"Take Down (lv42, 90BP Normal STAB with recoil — physical option)"},{cap:51, reason:"Ice Beam (lv51, natural Ice STAB — only if TM13 was given to another Pokémon)"}] },
   "Golduck":    { cap:33, reason:"Psyduck → Golduck at Lv 33; bench here — TM13 Ice Beam + TM29 Psychic + Surf cover the full kit",
-    higher:[{cap:58, reason:"Hydro Pump (lv58, 120BP Water nuke — very late; Surf covers most scenarios; TM12 Water Pulse is an alternative")  }] },
+    higher:[{cap:58, reason:"Hydro Pump (lv58, 120BP Water nuke — very late; Surf covers most scenarios; TM12 Water Pulse is an alternative)"}] },
   "Rapidash":   { cap:40, reason:"Ponyta → Rapidash at Lv 40; bench here — TM35 Flamethrower + Agility (lv38 on Ponyta) is the complete kit",
     higher:[{cap:50, reason:"Bounce (lv50, 85BP Flying with 30% paralysis — coverage against Fighting types)"},{cap:63, reason:"Fire Blast (lv63, 110BP Fire nuke — very late; TM38 from Blaine's Gym gives this earlier)"}] },
   "Muk":        { cap:38, reason:"Grimer → Muk at Lv 38; bench here — TM36 Sludge Bomb (one-time, Rocket Warehouse) gives 90BP Poison STAB right away",
