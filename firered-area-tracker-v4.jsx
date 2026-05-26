@@ -3521,50 +3521,172 @@ const EVO_DELAY = {
 
 // ─── DREAM TEAM LEVEL CAPS ───────────────────────────────────────────────────
 // "bench at Lv X" — stop grinding once you hit this level; your core moveset is complete.
-// `higher` breakpoints list optional later milestones worth knowing about.
+// `higher` breakpoints list optional later milestones worth knowing about (ascending order).
 const DT_LEVEL_CAP = {
-  // Starters
-  "Charizard":  { cap:36, reason:"Learns Flamethrower + Wing Attack at Lv 36 (same level as evolution from Charmeleon); TM02 Dragon Claw + TM26 Earthquake finish the set" },
-  "Blastoise":  { cap:36, reason:"Wartortle → Blastoise at Lv 36; bench here — TM13 Ice Beam + Surf cover the Water role" },
-  "Venusaur":   { cap:32, reason:"Ivysaur → Venusaur at Lv 32 (Razor Leaf already learned at Lv 22 on Ivysaur); TM22 SolarBeam + TM36 Sludge Bomb complete the set" },
-  // Stone evos — delay the stone to this level, then bench the evolved form immediately
+  // ── Starters ─────────────────────────────────────────────────────────────────
+  "Charizard":  { cap:36, reason:"Charmeleon → Charizard at Lv 36; learns Flamethrower + Wing Attack on evolve — bench here; TM02 Dragon Claw + TM26 Earthquake finish the set",
+    higher:[{cap:44, reason:"Slash (lv44, high crit rate — physical complement to Fire STAB)"},{cap:54, reason:"Dragon Rage (lv54, fixed 40 dmg — TM02 Dragon Claw covers Dragon far better by then)"}] },
+  "Blastoise":  { cap:36, reason:"Wartortle → Blastoise at Lv 36; bench here — TM13 Ice Beam + Surf + Strength cover the role",
+    higher:[{cap:42, reason:"Rain Dance (lv42, 5-turn Water boost — enables a powered-up Surf sweep)"},{cap:55, reason:"Skull Bash (lv55, 130BP Normal after charge — powerful but very slow)"}] },
+  "Venusaur":   { cap:32, reason:"Ivysaur → Venusaur at Lv 32 (Razor Leaf already at Lv 22 on Ivysaur); TM22 SolarBeam + TM36 Sludge Bomb complete the set",
+    higher:[{cap:41, reason:"Growth (lv41, +1 Atk/SpA — offensive setup; pair with TM22 SolarBeam for big damage)"}] },
+  // ── Stone evos — delay stone to this level on pre-evo, bench evolved form immediately ──
   "Raichu":     { cap:26, reason:"Evolve Pikachu after Thunderbolt at Lv 26 — Raichu starts with Thunderbolt and gains no further level-up moves; bench immediately" },
   "Arcanine":   { cap:49, reason:"Evolve Growlithe after Flamethrower at Lv 49 — Arcanine gains ExtremeSpeed at Lv 49 post-evolve; bench right after" },
-  "Ninetales":  { cap:29, reason:"Evolve Vulpix after Flamethrower at Lv 29 — Ninetales learns nothing useful via level-up until Lv 45 Fire Spin; bench immediately" },
-  "Wigglytuff": { cap:34, reason:"Evolve Jigglypuff after Body Slam at Lv 34 — Wigglytuff gains no useful level-up moves; bench immediately", higher:[{cap:44, reason:"Wait until Lv 44 for Hyper Voice on Jigglypuff first"}] },
-  "Clefable":   { cap:29, reason:"Evolve Clefairy after Metronome at Lv 29 — Clefable gains no useful level-up moves; bench immediately", higher:[{cap:33, reason:"Wait until Lv 33 for Cosmic Power on Clefairy first"}] },
-  "Vileplume":  { cap:44, reason:"Delay Leaf Stone on Gloom until Lv 44 (Petal Dance), then evolve — Vileplume learns nothing new via level-up; bench immediately" },
-  "Exeggutor":  { cap:43, reason:"Delay Leaf Stone on Exeggcute until Lv 43 (SolarBeam), then evolve — Exeggutor only learns Stomp (Lv 19) + Egg Bomb (Lv 31) via level-up; bench immediately" },
-  // Trade evos — reach this milestone, then trade and bench
-  "Kadabra":    { cap:36, reason:"Learn Psychic at Lv 36, then trade → Alakazam (shares same learnset); bench after trade" },
-  "Haunter":    { cap:39, reason:"Learn Dream Eater at Lv 39, then trade → Gengar (shares same learnset); bench after trade" },
-  "Machoke":    { cap:46, reason:"Learn Cross Chop at Lv 46, then trade → Machamp (shares same learnset); bench after trade" },
-  "Graveler":   { cap:45, reason:"Learn Earthquake at Lv 45, then trade → Golem (shares same learnset); bench after trade" },
-  // Gift / rare
-  "Lapras":     { cap:31, reason:"Learn Ice Beam at Lv 31; bench here — Surf + Ice Beam + TM24 Thunderbolt is the complete kit" },
-  "Snorlax":    { cap:33, reason:"Learn Body Slam at Lv 33; bench here — Rest (Lv 28) + Body Slam + TM26 Earthquake complete the set" },
-  "Gyarados":   { cap:20, reason:"Bench at evolution from Magikarp — Dragon Rage (Lv 20) + TM13 Ice Beam + TM24 Thunderbolt cover the role", higher:[{cap:50, reason:"Dragon Dance at Lv 50 if you want a late-game setup sweeper"}] },
-  "Chansey":    { cap:13, reason:"Learn Softboiled at Lv 13; bench immediately — Chansey's role is defensive wall + Strength HM user, not a sweeper" },
-  // Pseudo-legendary
-  "Dragonite":  { cap:55, reason:"Dragonair → Dragonite at Lv 55; bench here — TM02 Dragon Claw + TM24 Thunderbolt + TM26 Earthquake cover everything" },
-  // Perfect catcher
+  "Ninetales":  { cap:29, reason:"Evolve Vulpix after Flamethrower at Lv 29 — Ninetales' only other level-up move is Fire Spin at Lv 45; bench immediately",
+    higher:[{cap:45, reason:"Fire Spin (lv45, 35BP trapping — the only natural move; TM35 Flamethrower is far better)"}] },
+  "Wigglytuff": { cap:34, reason:"Evolve Jigglypuff after Body Slam at Lv 34 — Wigglytuff gains no useful level-up moves; bench immediately",
+    higher:[{cap:44, reason:"Hyper Voice (lv44 on Jigglypuff, 90BP Normal — wait for this before Moon Stone if not in a hurry)"}] },
+  "Clefable":   { cap:29, reason:"Evolve Clefairy after Metronome at Lv 29 — Clefable gains no useful level-up moves; bench immediately",
+    higher:[{cap:33, reason:"Cosmic Power (lv33 on Clefairy, +1 Def/SpDef — defensive setup before stone if you want bulk)"}] },
+  "Vileplume":  { cap:44, reason:"Delay Leaf Stone on Gloom until Lv 44 (Petal Dance) — Vileplume learns nothing new via level-up; bench immediately",
+    higher:[] },
+  "Victreebel": { cap:42, reason:"Delay Leaf Stone on Weepinbell until Lv 42 (Razor Leaf) — Victreebel starts with Razor Leaf + Sleep Powder + Vine Whip at lv1; bench immediately; TM36 Sludge Bomb + TM22 SolarBeam cover offense",
+    higher:[] },
+  "Exeggutor":  { cap:43, reason:"Delay Leaf Stone on Exeggcute until Lv 43 (SolarBeam); Exeggutor only learns Stomp (lv19) + Egg Bomb (lv31) via level-up — bench immediately",
+    higher:[] },
+  "Cloyster":   { cap:33, reason:"Evolve Shellder with Water Stone; bench at Lv 33 (Spikes, entry-hazard utility) — TM13 Ice Beam covers Ice STAB immediately",
+    higher:[{cap:41, reason:"Spike Cannon (lv41, multi-hit Normal — minor damage upgrade if Spikes role is covered)"}] },
+  "Flareon":    { cap:36, reason:"Fire Spin (lv36, 35BP trapping) is the first notable post-evolve move — TM35 Flamethrower from Celadon Game Corner (4,500 coins) is far better; apply TM and bench",
+    higher:[{cap:52, reason:"Flamethrower (lv52, 90BP Fire STAB) — natural path if skipping the Game Corner route"}] },
+  "Vaporeon":   { cap:36, reason:"Aurora Beam (lv36, 65BP Ice coverage) is the first notable post-evolve move; apply TM13 Ice Beam immediately after evolving instead and bench",
+    higher:[{cap:47, reason:"Acid Armor (lv47, +2 Defense — makes Vaporeon very bulky)"},{cap:52, reason:"Hydro Pump (lv52, 120BP Water — nuke option if Surf's 95BP isn't enough)"}] },
+  "Jolteon":    { cap:36, reason:"Pin Missile (lv36, multi-hit Bug coverage) — apply TM24 Thunderbolt right after evolving and bench; Pin Missile is the only level-up move worth waiting for",
+    higher:[{cap:47, reason:"Agility (lv47, +2 Speed — setup for a fast sweeper lategame)"},{cap:52, reason:"Thunder (lv52, 110BP — TM25 from Power Plant gives this earlier; pair with Rain Dance for 100% accuracy)"}] },
+  // ── Trade evos — reach this milestone on the pre-trade form, then trade and bench ──
+  "Kadabra":    { cap:36, reason:"Learn Psychic at Lv 36, then trade → Alakazam (same learnset); bench after trade",
+    higher:[{cap:43, reason:"Trick (lv43, swaps held items — fun combo; trade for Alakazam before this if possible)"}] },
+  "Haunter":    { cap:39, reason:"Learn Dream Eater at Lv 39, then trade → Gengar (same learnset); bench after trade",
+    higher:[{cap:48, reason:"Destiny Bond (lv48, mutual faint if used right before fainting — trade for Gengar before this)"}] },
+  "Machoke":    { cap:46, reason:"Learn Cross Chop at Lv 46, then trade → Machamp (same learnset); bench after trade",
+    higher:[{cap:59, reason:"DynamicPunch (lv59, 100BP Fighting + 100% confuse — powerful if you keep Machoke/Machamp this long)"}] },
+  "Graveler":   { cap:45, reason:"Learn Earthquake at Lv 45, then trade → Golem (same learnset); bench after trade",
+    higher:[{cap:53, reason:"Explosion (lv53, 250BP self-destruct — nuclear sacrificial option; trade for Golem before if possible)"}] },
+  // ── Gift / rare ──────────────────────────────────────────────────────────────
+  "Lapras":     { cap:31, reason:"Learn Ice Beam at Lv 31; bench here — Surf + Ice Beam + TM24 Thunderbolt is the complete kit",
+    higher:[{cap:37, reason:"Rain Dance (lv37, boosts Water-type moves — enables a powered-up Surf sweep)"},{cap:49, reason:"Hydro Pump (lv49, 120BP Water nuke — meaningful upgrade over Surf for pure damage)"}] },
+  "Snorlax":    { cap:33, reason:"Learn Body Slam at Lv 33; bench here — Rest (lv28) + Body Slam + TM26 Earthquake complete the set",
+    higher:[{cap:37, reason:"Sleep Talk (lv37, random move while sleeping — pairs with Rest for the classic Rest/Sleep Talk combo)"},{cap:51, reason:"Hyper Beam (lv51, 200BP nuke — powerful one-shot but requires a recharge turn)"}] },
+  "Gyarados":   { cap:20, reason:"Bench at evolution from Magikarp — Dragon Rage (lv20) + TM13 Ice Beam + TM24 Thunderbolt cover the role",
+    higher:[{cap:40, reason:"Hydro Pump (lv40, 120BP Water — strong if Surf's 95BP falls short)"},{cap:50, reason:"Dragon Dance (lv50, +1 Atk/Spe — transforms Gyarados into a fearsome lategame setup sweeper)"}] },
+  "Chansey":    { cap:13, reason:"Learn Softboiled at Lv 13; bench immediately — Chansey is a defensive wall + Strength HM user, not a sweeper",
+    higher:[{cap:29, reason:"Sing (lv29, 55% sleep — lower accuracy than Spore but a useful status move on a Chansey that stays active)"}] },
+  // ── Pseudo-legendary ─────────────────────────────────────────────────────────
+  "Dragonite":  { cap:55, reason:"Dragonair → Dragonite at Lv 55; bench here — TM02 Dragon Claw + TM24 Thunderbolt + TM26 Earthquake cover everything",
+    higher:[{cap:61, reason:"Outrage (lv61, 120BP Dragon STAB, 2-3 turns — use if TM02 Dragon Claw was given elsewhere)"},{cap:75, reason:"Hyper Beam (lv75, 200BP — rarely worth the recharge; TM15 from Celadon Dept. Store saves the grind)"}] },
+  // ── Perfect catcher ──────────────────────────────────────────────────────────
   "Parasect":   { cap:27, reason:"Paras → Parasect at Lv 24, then learn Spore at Lv 27; add TM54 False Swipe — sleep + 1 HP is the ideal catch combo" },
-  // Fighters
-  "Hitmonlee":  { cap:26, reason:"Learn Hi Jump Kick at Lv 26; bench here — TM31 Brick Break fills the 2nd slot" },
-  "Hitmonchan": { cap:32, reason:"Learn Sky Uppercut at Lv 32 (gets Ice/Thunder/Fire Punch at Lv 26); bench after Sky Uppercut" },
-  // Fossils
-  "Aerodactyl": { cap:29, reason:"Learn AncientPower at Lv 29; bench here — Wing Attack (Lv 1) + Fly HM + AncientPower is the complete set" },
-  "Kabutops":   { cap:40, reason:"Kabuto → Kabutops at Lv 40; gains Slash + Fury Cutter on evolution — bench immediately; Surf + Waterfall cover the Water role" },
-  "Omastar":    { cap:40, reason:"Omanyte → Omastar at Lv 40; bench here — Surf + TM13 Ice Beam cover the role (Hydro Pump not until Lv 65)" },
-  // Flying HM users
-  "Pidgeot":    { cap:27, reason:"Learn Wing Attack at Lv 27; bench here — Pidgeot's role is Fly HM + Quick Attack utility" },
-  "Fearow":     { cap:40, reason:"Learn Drill Peck at Lv 40; bench here — Drill Peck + Fly HM is Fearow's full contribution" },
-  // Version exclusives and other
-  "Electabuzz": { cap:47, reason:"Learn Thunderbolt at Lv 47 via level-up — no need to spend TM24; ThunderPunch (Lv 9) bridges until then" },
-  "Starmie":    { cap:33, reason:"Learn Confuse Ray at Lv 33; bench here — TM29 Psychic + TM24 Thunderbolt + TM13 Ice Beam is the full set" },
-  "Slowbro":    { cap:37, reason:"Slowpoke → Slowbro at Lv 37; bench here — TM29 Psychic + Surf + Ice Beam cover the role (Psychic not in level-up until Lv 54)" },
-  "Dugtrio":    { cap:26, reason:"Diglett → Dugtrio at Lv 26; bench immediately — TM26 Earthquake is the core move and needs no further leveling" },
-  "Marowak":    { cap:32, reason:"Cubone → Marowak at Lv 28; bench at Lv 32 after Rage — TM26 Earthquake is the core move" },
+  // ── Fighters ─────────────────────────────────────────────────────────────────
+  "Hitmonlee":  { cap:26, reason:"Learn Hi Jump Kick at Lv 26; bench here — TM31 Brick Break fills the 2nd Fighting slot",
+    higher:[{cap:31, reason:"Mind Reader (lv31, guarantees next move hits — combo with Hi Jump Kick for the 90% miss)"},{cap:46, reason:"Mega Kick (lv46, 120BP Normal STAB — very slow but powerful)"}] },
+  "Hitmonchan": { cap:32, reason:"Learn Sky Uppercut at Lv 32 (gets Ice/Thunder/Fire Punch at Lv 26); bench after Sky Uppercut",
+    higher:[{cap:38, reason:"Mega Punch (lv38, 80BP Normal STAB — physical option)"},{cap:50, reason:"Counter (lv50, reflects double physical damage received — devastating surprise move)"}] },
+  // ── Fossils ──────────────────────────────────────────────────────────────────
+  "Aerodactyl": { cap:29, reason:"Learn AncientPower at Lv 29; bench here — Wing Attack (lv1) + Fly HM + AncientPower is the core set",
+    higher:[{cap:36, reason:"Scary Face (lv36, -2 Speed — slows fast threats)"},{cap:50, reason:"Hyper Beam (lv50, 200BP nuke — TM15 from Celadon Dept. Store saves the grind to get this)"}] },
+  "Kabutops":   { cap:40, reason:"Kabuto → Kabutops at Lv 40; gains Slash + Fury Cutter on evolution — bench immediately; Surf + Waterfall cover the Water role",
+    higher:[{cap:46, reason:"Metal Sound (lv46, -2 Sp. Def — softens special walls before a Surf sweep)"}] },
+  "Omastar":    { cap:40, reason:"Omanyte → Omastar at Lv 40; bench here — Surf + TM13 Ice Beam cover the role (Hydro Pump not until lv65)",
+    higher:[{cap:46, reason:"Tickle (lv46, -1 Atk/Def — defensive utility move)"},{cap:55, reason:"AncientPower (lv55, Rock STAB with 10% all-stat boost — Rock coverage payoff for patient players)"}] },
+  // ── Flying HM users ──────────────────────────────────────────────────────────
+  "Pidgeot":    { cap:27, reason:"Learn Wing Attack at Lv 27; bench here — Pidgeot's role is Fly HM + Quick Attack utility",
+    higher:[{cap:34, reason:"FeatherDance (lv34, -2 Atk — excellent for neutering physical attackers)"},{cap:48, reason:"Agility (lv48, +2 Speed — makes Pidgeot a legitimate speed-tier threat)"}] },
+  "Fearow":     { cap:40, reason:"Learn Drill Peck at Lv 40; bench here — Drill Peck + Fly HM is Fearow's full contribution",
+    higher:[{cap:47, reason:"Agility (lv47, +2 Speed — Fearow becomes one of the faster Pokémon; useful before the Elite Four)"}] },
+  "Dodrio":     { cap:47, reason:"Learn Drill Peck at Lv 47 (Doduo evolves at lv31) — bench here; Fly HM + Drill Peck is the core set",
+    higher:[{cap:60, reason:"Agility (lv60, +2 Speed — Dodrio already has high Speed; mainly for late-game sweeping)"}] },
+  "Golbat":     { cap:35, reason:"Learn Air Cutter at Lv 35 (high crit rate Flying) — bench here; mainly a Fly HM carrier + Confuse Ray utility",
+    higher:[{cap:42, reason:"Mean Look (lv42, trap foes — excellent for legendary Pokémon hunting)"},{cap:49, reason:"Poison Fang (lv49, 50BP Poison with 30% badly poison — Golbat's best Poison move by level-up)"}] },
+  // ── Nido lines ───────────────────────────────────────────────────────────────
+  "Nidoking":   { cap:23, reason:"Evolve Nidorino with Moon Stone after Lv 23 (Fury Attack) — Nidoking gets Thrash at Lv 23; TM26 Earthquake + TM13 Ice Beam + TM24 Thunderbolt complete coverage",
+    higher:[{cap:43, reason:"Megahorn (lv43, 120BP Bug STAB — strong physical coverage; worth investing in Nidoking long-term)"}] },
+  "Nidoqueen":  { cap:23, reason:"Evolve Nidorina with Moon Stone after Lv 23 (Bite) — Nidoqueen gets Body Slam at Lv 23; TM26 Earthquake + TM13 Ice Beam complete coverage",
+    higher:[{cap:43, reason:"Superpower (lv43, 120BP Fighting STAB — powerful nuke at the cost of -1 Atk/Def)"}] },
+  // ── FR exclusives ────────────────────────────────────────────────────────────
+  "Arcanine":   { cap:49, reason:"Evolve Growlithe after Flamethrower at Lv 49 — Arcanine gains ExtremeSpeed at Lv 49 post-evolve; bench right after" },
+  "Electabuzz": { cap:47, reason:"Learn Thunderbolt at Lv 47 via level-up — no need to spend TM24; ThunderPunch (lv9) bridges until then",
+    higher:[{cap:58, reason:"Thunder (lv58, 110BP Electric — TM25 from Power Plant gives this much earlier; pair with Rain Dance for 100% accuracy)"}] },
+  "Scyther":    { cap:36, reason:"Learn Swords Dance at Lv 36 (+2 Attack) — bench here; Slash (lv31) + Aerial Ace (TM40) + Swords Dance is the core physical set",
+    higher:[{cap:46, reason:"Fury Cutter (lv46, doubles in power each consecutive turn — strong when uninterrupted)"}] },
+  "Primeape":   { cap:45, reason:"Learn Cross Chop at Lv 45 (100BP Fighting, high crit) — bench here; TM31 Brick Break bridges until then",
+    higher:[{cap:63, reason:"Thrash (lv63, 120BP Normal 2-3 turns then confused — very late; Cross Chop is the better Fighting STAB)"}] },
+  "Arbok":      { cap:28, reason:"Learn Screech at Lv 28 (-2 Def — softens physical defenders) — bench here; TM36 Sludge Bomb covers Poison STAB",
+    higher:[{cap:46, reason:"Stockpile + Swallow (lv46, defensive HP storage/recovery combo — niche but functional)"}] },
+  "Seadra":     { cap:40, reason:"Learn Agility at Lv 40 (+2 Speed — makes Seadra a fast sweeper) — bench here; TM13 Ice Beam + Surf cover offense",
+    higher:[{cap:51, reason:"Hydro Pump (lv51, 120BP Water — very powerful if you invest this far)"},{cap:62, reason:"Dragon Dance (lv62, +1 Atk/Spe — extremely late but a powerful lategame setup)"}] },
+  // ── LG exclusives ────────────────────────────────────────────────────────────
+  "Starmie":    { cap:33, reason:"Learn Confuse Ray at Lv 33; bench here — TM29 Psychic + TM24 Thunderbolt + TM13 Ice Beam is the full set; Confuse Ray is the only post-evolution level-up move",
+    higher:[] },
+  "Ninetales":  { cap:29, reason:"Evolve Vulpix after Flamethrower at Lv 29 — Ninetales' only other level-up move is Fire Spin at Lv 45; bench immediately",
+    higher:[{cap:45, reason:"Fire Spin (lv45, trapping move — the sole natural level-up move; TM35 Flamethrower is far better"}] },
+  "Slowbro":    { cap:37, reason:"Slowpoke → Slowbro at Lv 37; bench here — TM29 Psychic + Surf + Ice Beam cover the role (Psychic not in level-up until Lv 54)",
+    higher:[{cap:46, reason:"Amnesia (lv46, +2 Sp. Def — powerful defensive setup if you're investing in Slowbro)"},{cap:54, reason:"Psychic (lv54, 90BP — use TM29 from Saffron City instead to skip this grind)"}] },
+  "Sandslash":  { cap:24, reason:"Sandshrew → Sandslash at Lv 22, then Slash (lv24, high crit rate) — bench here; TM26 Earthquake covers Ground STAB",
+    higher:[{cap:33, reason:"Swift (lv33, never misses Normal — useful vs evasion stacking)"},{cap:42, reason:"Fury Swipes (lv42, multi-hit Normal — filler physical damage)"}] },
+  "Pinsir":     { cap:31, reason:"Learn Brick Break at Lv 31 (75BP Fighting, removes screens) — bench here; Pinsir's role is physical attacker + Cut HM slave",
+    higher:[{cap:37, reason:"Guillotine (lv37, one-hit KO — works on lower-level opponents)"},{cap:49, reason:"Swords Dance (lv49, +2 Attack — devastating setup move for a late-game sweep)"}] },
+  "Magmar":     { cap:41, reason:"Learn Flamethrower at Lv 41 (90BP Fire STAB) — bench here; Fire Punch (lv19) is a strong early move; TM29 Psychic provides secondary coverage",
+    higher:[{cap:57, reason:"Fire Blast (lv57, 110BP Fire nuke — TM38 from Blaine's Gym gives this much earlier as a one-time pickup)"}] },
+  "Persian":    { cap:38, reason:"Learn Screech at Lv 38 (-2 Def — softens physical defenders) — bench here; Pay Day (lv20) is the signature, Slash (lv53) is the payoff",
+    higher:[{cap:53, reason:"Slash (lv53, high crit rate) — strongest Normal move Persian learns naturally; very late but notable"}] },
+  // ── Other misc ───────────────────────────────────────────────────────────────
+  "Tentacruel": { cap:38, reason:"Learn Barrier at Lv 38 (+2 Defense, defensive utility) — bench here; TM36 Sludge Bomb + Surf cover offense",
+    higher:[{cap:47, reason:"Screech (lv47, -2 Def — softens physical walls before a Surf or Crunch)"},{cap:55, reason:"Hydro Pump (lv55, 120BP Water nuke — notable power upgrade over Surf)"}] },
+  "Poliwrath":  { cap:35, reason:"Submission (lv35, 80BP Fighting with recoil) — confirms Fighting STAB; TM31 Brick Break replaces it with no recoil; bench after evolving + TMs applied",
+    higher:[{cap:51, reason:"Mind Reader (lv51, guarantees next move hits 100% — situational combo utility)"}] },
+  "Hypno":      { cap:33, reason:"Learn Poison Gas at Lv 33 (90% Poison chance — free chip damage); bench here if TM29 Psychic is available from Saffron City",
+    higher:[{cap:40, reason:"Meditate (lv40, +1 Attack — physical option for a mixed set)"},{cap:49, reason:"Psychic (lv49, 90BP — use TM29 from Saffron City to skip this grind)"}] },
+  "Magneton":   { cap:30, reason:"Magnemite → Magneton at Lv 30; bench here — TM24 Thunderbolt + Thunder Wave cover the Electric role",
+    higher:[{cap:35, reason:"Lock-On (lv35, guarantees next move hits — combo with TM25 Thunder for a sure paralysis + 110BP hit)"},{cap:44, reason:"Tri Attack (lv44, 80BP Normal + 20% chance to burn/freeze/paralyze — strong utility move)"}] },
+  "Electrode":  { cap:30, reason:"Voltorb → Electrode at Lv 30; bench here — TM24 Thunderbolt is the main Electric STAB; Electrode has the highest Speed in Gen I",
+    higher:[{cap:34, reason:"Rollout (lv34, doubles power each turn — niche but fun with a momentum start)"},{cap:54, reason:"Explosion (lv54, 250BP self-destruct — nuclear option in a pinch)"}] },
+  "Dewgong":    { cap:34, reason:"Seel → Dewgong at Lv 34; bench here — apply TM13 Ice Beam immediately (Dewgong doesn't learn it until lv51 naturally); Rest (lv29) + Ice Beam is the core set",
+    higher:[{cap:42, reason:"Take Down (lv42, 90BP Normal STAB with recoil — physical option)"},{cap:51, reason:"Ice Beam (lv51, natural Ice STAB — only if TM13 was given to another Pokémon)"}] },
+  "Golduck":    { cap:33, reason:"Psyduck → Golduck at Lv 33; bench here — TM13 Ice Beam + TM29 Psychic + Surf cover the full kit",
+    higher:[{cap:58, reason:"Hydro Pump (lv58, 120BP Water nuke — very late; Surf covers most scenarios; TM12 Water Pulse is an alternative")  }] },
+  "Rapidash":   { cap:40, reason:"Ponyta → Rapidash at Lv 40; bench here — TM35 Flamethrower + Agility (lv38 on Ponyta) is the complete kit",
+    higher:[{cap:50, reason:"Bounce (lv50, 85BP Flying with 30% paralysis — coverage against Fighting types)"},{cap:63, reason:"Fire Blast (lv63, 110BP Fire nuke — very late; TM38 from Blaine's Gym gives this earlier)"}] },
+  "Muk":        { cap:38, reason:"Grimer → Muk at Lv 38; bench here — TM36 Sludge Bomb (one-time, Rocket Warehouse) gives 90BP Poison STAB right away",
+    higher:[{cap:47, reason:"Sludge Bomb (lv47, 90BP Poison STAB — natural path if TM36 was used elsewhere)"}] },
+  "Rhydon":     { cap:42, reason:"Rhyhorn → Rhydon at Lv 42; bench here — TM26 Earthquake (one-time, Viridian Gym) covers Ground STAB immediately",
+    higher:[{cap:58, reason:"Earthquake (lv58, natural Ground STAB — only if TM26 was given to another Pokémon; TM28 Dig from Cerulean City is a weaker fallback)"}] },
+  "Tauros":     { cap:34, reason:"Learn Rest at Lv 34 (recovery) — bench here; TM26 Earthquake + Body Slam (Move Tutor, Four Island) cover offense",
+    higher:[{cap:43, reason:"Thrash (lv43, 120BP Normal STAB, 2-3 turns) — strong physical nuke if you avoid TMs"}] },
+  "Kangaskhan": { cap:25, reason:"Learn Mega Punch at Lv 25 (80BP Normal STAB) — bench here; TM26 Earthquake + TM31 Brick Break cover the main coverage moves",
+    higher:[{cap:37, reason:"Endure (lv37, survive at 1 HP — synergizes with Reversal for high-damage counterplay)"},{cap:49, reason:"Reversal (lv49, escalating power at low HP — devastating after Endure)"}] },
+  "Weezing":    { cap:35, reason:"Koffing → Weezing at Lv 35; bench here — TM36 Sludge Bomb + TM35 Flamethrower cover the role",
+    higher:[{cap:44, reason:"Explosion (lv44, 250BP self-destruct — nuclear option for a decisive play)"},{cap:51, reason:"Destiny Bond (lv51, guarantees foe faints if you do — use as the final move)"}] },
+  "Kingler":    { cap:38, reason:"Learn Guillotine at Lv 38 (one-hit KO) — bench here; TM13 Ice Beam + Surf cover the rest; Kingler has very high Attack",
+    higher:[{cap:57, reason:"Crabhammer (lv57, 90BP+ physical Water STAB — the strongest Water move Kingler learns naturally)"}] },
+  "Raticate":   { cap:40, reason:"Learn Super Fang at Lv 40 (halves opponent's HP — signature move) — bench here; Hyper Fang (lv13) + TM31 Brick Break cover early offense",
+    higher:[{cap:50, reason:"Endeavor (lv50, reduces foe to Raticate's HP — pair with Quick Attack for a surprise finisher)"}] },
+  "Butterfree": { cap:15, reason:"Learn Sleep Powder at Lv 15 (75% accuracy sleep) — bench here; Butterfree's stats don't scale for lategame; Confusion (lv1) bridges until Sleep Powder",
+    higher:[{cap:34, reason:"Psybeam (lv34, 65BP Psychic coverage — if you invest further)"},{cap:47, reason:"Silver Wind (lv47, 60BP Bug STAB with 10% chance to boost all stats — Butterfree's best move, very late)"}] },
+  "Beedrill":   { cap:20, reason:"Learn Twineedle at Lv 20 (2-hit Bug STAB with chance to poison) — bench here; Beedrill stats don't scale for lategame",
+    higher:[{cap:35, reason:"Pin Missile (lv35, multi-hit Bug — higher max damage than Twineedle)"},{cap:40, reason:"Agility (lv40, +2 Speed — makes Beedrill a legitimate speed threat)"}] },
+  "Venomoth":   { cap:42, reason:"Learn Sleep Powder at Lv 42 (75% accuracy sleep — great support utility) — bench here; TM29 Psychic covers the main attack role",
+    higher:[{cap:52, reason:"Psychic (lv52, 90BP — use TM29 from Saffron City to skip this grind)"}] },
+  "Dugtrio":    { cap:26, reason:"Diglett → Dugtrio at Lv 26; bench immediately — TM26 Earthquake is the core move and needs no further leveling",
+    higher:[{cap:38, reason:"Slash (lv38, high crit rate Normal — physical complement if Earthquake is given elsewhere)"},{cap:51, reason:"Earthquake (lv51, natural Ground STAB — only if TM26 used elsewhere)"}] },
+  "Marowak":    { cap:32, reason:"Cubone → Marowak at Lv 28; bench at Lv 32 after Rage — TM26 Earthquake is the core move",
+    higher:[{cap:39, reason:"False Swipe (lv39, 40BP — Marowak can double as a catcher partner)"},{cap:46, reason:"Thrash (lv46, 120BP Normal STAB 2-3 turns — strong physical nuke)"}] },
+  "Farfetch'd": { cap:31, reason:"Learn Swords Dance at Lv 31 (+2 Attack) — bench here; Farfetch'd's role is Cut HM slave + Aerial Ace (TM40) sweeper after setup",
+    higher:[{cap:41, reason:"Slash (lv41, high crit rate) — strongest level-up move; hits hard after Swords Dance"},{cap:46, reason:"False Swipe (lv46, 40BP — Farfetch'd can double as a catcher)"}] },
+  "Onix":       { cap:37, reason:"Learn Slam at Lv 37 (80BP Normal STAB) — bench here after TM26 Earthquake; Onix is mainly a Strength/Rock Smash HM carrier with huge Defense",
+    higher:[{cap:45, reason:"Iron Tail (lv45, 100BP Steel STAB with 30% Def drop — if keeping Onix as a physical attacker)"}] },
+  "Lickitung":  { cap:40, reason:"Learn Slam at Lv 40 (80BP Normal STAB) — bench here; TM26 Earthquake + TM15 Hyper Beam cover the damage role; Lickitung has solid HP",
+    higher:[{cap:45, reason:"Screech (lv45, -2 Def — useful for softening physical walls before a sweeper finishes)"}] },
+  "Tangela":    { cap:44, reason:"Learn Sleep Powder at Lv 44 (75% accuracy sleep) — bench here; TM22 SolarBeam is the main Grass attack",
+    higher:[{cap:46, reason:"Tickle (lv46, -1 Atk/Def — defensive disruption utility)"}] },
+  "Seaking":    { cap:41, reason:"Learn Waterfall at Lv 41 (Water STAB, HM-equivalent) — bench here; Seaking is a Water HM carrier + Surf slave",
+    higher:[{cap:49, reason:"Horn Drill (lv49, one-hit KO — low accuracy but a surprise move against lower-level opponents)"}] },
+  "Mr. Mime":   { cap:21, reason:"Learn Light Screen + Reflect at Lv 21 (dual screens — immediate setup utility) — bench here if TM29 Psychic available from Saffron City",
+    higher:[{cap:45, reason:"Psychic (lv45, 90BP — use TM29 from Saffron City instead if available)"},{cap:49, reason:"Baton Pass (lv49, passes stat boosts to teammates — a powerful support combo after screen setup)"}] },
+  "Jynx":       { cap:25, reason:"Learn Ice Punch at Lv 25 (75BP Ice STAB) — bench here; Lovely Kiss (lv1) + TM29 Psychic + Ice Punch is the core kit",
+    higher:[{cap:35, reason:"Mean Look (lv35, traps foes — excellent for legendary Pokémon hunting with Lovely Kiss setup)"},{cap:57, reason:"Perish Song (lv57, 3-turn KO countdown — combine with Mean Look to force a faint)"}] },
+  "Porygon":    { cap:36, reason:"Learn Tri Attack at Lv 36 (80BP Normal + 20% burn/freeze/paralyze) — bench here; TM24 Thunderbolt + TM13 Ice Beam provide coverage",
+    higher:[{cap:48, reason:"Zap Cannon (lv48, 100BP Electric + 100% paralyze — powerful after Lock-On guarantees the hit)"}] },
+  "Ditto":      { cap:1,  reason:"Transform at lv1 is Ditto's only move — bench at any level; Ditto is mainly used for breeding in the Pokémon Day Care" },
 };
 
 // ─── DREAM TEAM BUILDER DATA ──────────────────────────────────────────────────
@@ -5890,6 +6012,7 @@ function DreamTeamTab({ isMobile, version }) {
   const [hmPerPokemon,    setHmPerPokemon]    = React.useState(3);
   const [includePseudo,   setIncludePseudo]   = React.useState(true);
   const [includeTrades,   setIncludeTrades]   = React.useState(true);
+  const [copiedDT,        setCopiedDT]        = React.useState(false);
 
   React.useEffect(() => {
     try {
@@ -5931,6 +6054,47 @@ function DreamTeamTab({ isMobile, version }) {
   const hmAssignments = React.useMemo(() => team ? assignHMs(team, hmPerPokemon) : {}, [team, hmPerPokemon]);
 
   const isHardLocked = idx => idx === 0 || (idx === 1 && !isDragoniteLine && includePseudo);
+
+  const buildClipboardText = () => {
+    if (!team) return "";
+    const lines = ["=== FireRed/LeafGreen Dream Team ===", `Version: Pokémon ${version === "FR" ? "FireRed" : "LeafGreen"}`, ""];
+    team.forEach((name, idx) => {
+      const finalForm  = DT_FINAL_FORM[name] || name;
+      const candInfo   = DT_CANDIDATES.find(c => c.name === finalForm);
+      const assignedHMs = Object.entries(hmAssignments).filter(([,w]) => w === name).map(([hm]) => hm);
+      const suppressed  = new Set(Object.entries(tmWinners).filter(([,w]) => w !== name).map(([mv]) => mv));
+      const moves   = getDreamMoves(name, suppressed, assignedHMs);
+      const acq     = getDreamAcquisition(name);
+      const evoNote = EVO_DELAY[name];
+      const capInfo = DT_LEVEL_CAP[finalForm];
+      const typeStr = candInfo ? candInfo.types.join("/") : "";
+      const vl      = candInfo ? (candInfo.frOnly ? " [FR only]" : candInfo.lgOnly ? " [LG only]" : "") : "";
+      const isPreEvo = !!DT_FINAL_FORM[name];
+      const label   = idx === 0 ? " ★ FAV" : (idx === 1 && !isDragoniteLine && includePseudo) ? " [PSEUDO]" : "";
+      lines.push(`${idx + 1}. ${name}${isPreEvo ? ` → ${finalForm}` : ""}${label}  #${String(DEX.find(p=>p.name===name)?.id||0).padStart(3,"0")} · ${typeStr}${vl}`);
+      if (capInfo) {
+        lines.push(`   Bench at: Lv ${capInfo.cap} — ${capInfo.reason}`);
+        capInfo.higher?.forEach(h => lines.push(`   Or Lv ${h.cap} — ${h.reason}`));
+      }
+      if (moves.length) {
+        lines.push(`   Moveset${isPreEvo ? ` (as ${finalForm})` : ""}:`);
+        moves.forEach(m => lines.push(`     • ${m.move} — ${m.src}`));
+      }
+      if (assignedHMs.length) lines.push(`   HMs assigned: ${assignedHMs.join(", ")}`);
+      lines.push(`   Where to get: ${acq}`);
+      if (evoNote) lines.push(`   Evo note: ${evoNote}`);
+      lines.push("");
+    });
+    lines.push("── Dedicated Catcher ──");
+    lines.push("Parasect  #047 · Bug/Grass  (Paras → Parasect at Lv 24)");
+    lines.push("   Bench at: Lv 27 — learn Spore; add TM54 False Swipe for perfect catch combo");
+    lines.push("   Moves:");
+    lines.push("     • Spore — Level 27 (100% sleep, best catch status)");
+    lines.push("     • False Swipe — TM54, Celadon Dept. Store 5F ₽2,000 (leaves 1 HP)");
+    lines.push("     • Stun Spore — Level 7 as Paras, kept on evolve (backup status)");
+    lines.push("     • Cut — HM01, S.S. Anne (HM filler)");
+    return lines.join("\n");
+  };
 
   const togglePin = (idx) => {
     setPins(prev => {
@@ -5993,6 +6157,10 @@ function DreamTeamTab({ isMobile, version }) {
             Reset pins
           </button>
         )}
+        <button onClick={() => { navigator.clipboard.writeText(buildClipboardText()).then(() => { setCopiedDT(true); setTimeout(() => setCopiedDT(false), 2000); }).catch(() => {}); }}
+          style={{ padding:"8px 12px", background: copiedDT ? "rgba(91,168,122,0.15)" : "rgba(0,0,0,0.2)", border:`1px solid ${copiedDT ? "rgba(91,168,122,0.5)" : C.border}`, borderRadius:6, cursor:"pointer", fontSize:11, color: copiedDT ? "#5ba87a" : C.muted, fontFamily:"'DM Sans',system-ui,sans-serif", whiteSpace:"nowrap", transition:"color 0.15s,border-color 0.15s,background 0.15s" }}>
+          {copiedDT ? "✓ Copied!" : "Copy team"}
+        </button>
         <div style={{ display:"flex", alignItems:"center", gap:6, marginLeft:"auto", flexWrap:"wrap" }}>
           {/* Pool toggles */}
           <div style={{ display:"flex", border:`1px solid ${C.border}`, borderRadius:6, overflow:"hidden" }}>
